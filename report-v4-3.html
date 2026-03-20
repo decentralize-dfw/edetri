@@ -1,120 +1,147 @@
+
 <!DOCTYPE html>
 <html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EDETRI — Creative Bible</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap');
-:root{--bk:#090807;--ch:#18170f;--dk:#262520;--mg:#484438;--wg:#887860;--sv:#b0a890;--cr:#e8e0d0;--ow:#f4f0e8;--cu:#a86828;--bg:#581020;--gd:#b89850;--sage:#607848}
+:root{--bk:#090807;--ch:#18170f;--dk:#262520;--mg:#484438;--wg:#887860;--sv:#b0a890;--cr:#e8e0d0;--ow:#f4f0e8;--cu:#a86828;--bg:#581020;--gd:#b89850;--sage:#607848;
+  /* document palette — grey, no yellow */
+  --base:#e5e6e1;--s1:#dddede;--s2:#d6d7d2;--s3:#d0d1cc;--card:#dadbda;
+  --tx:#4a4a4a;--tx2:#787878;--tx3:#a4a4a2;--brd:#c4c5c2}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:50px}
-body{background:var(--bk);color:var(--cr);font-family:'Archivo',sans-serif;font-weight:300;line-height:1.85;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-::selection{background:var(--cu);color:var(--cr)}
+body{background:var(--base);color:var(--tx);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;letter-spacing:-0.25px;line-height:1.9;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:#111;color:var(--base)}
 img{max-width:100%;display:block;height:auto}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.97);backdrop-filter:blur(12px);padding:.65rem 1.2rem;display:flex;gap:1.2rem;overflow-x:auto;border-bottom:1px solid rgba(168,104,40,.08);scrollbar-width:none}
+nav{position:sticky;top:0;z-index:100;background:rgba(229,230,225,.96);backdrop-filter:blur(16px);padding:.7rem 1.6rem;display:flex;gap:1.6rem;overflow-x:auto;border-bottom:1px solid rgba(0,0,0,.07);scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
-nav a{font-family:'IBM Plex Mono',monospace;font-size:.38rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sv);text-decoration:none;white-space:nowrap;transition:color .3s;padding:.3rem 0}
-nav a:hover{color:var(--cu)}
+nav a{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-stretch:condensed;font-size:.34rem;letter-spacing:-0.25px;text-transform:uppercase;color:var(--tx2);text-decoration:none;white-space:nowrap;transition:color .2s;padding:.3rem 0}
+nav a:hover{color:#000}
 
 /* LAYOUT */
-.s{padding:clamp(3rem,6vw,5rem) clamp(1.2rem,3vw,2.5rem);max-width:1080px;margin:0 auto}
-.full{max-width:100%;padding:clamp(3rem,6vw,5rem) clamp(1.2rem,3vw,2.5rem)}
-.full .inn{max-width:1080px;margin:0 auto}
-.bg-bk{background:var(--bk)}
-.bg-dk{background:var(--dk)}
-.bg-ch{background:var(--ch)}
-.bg-lt{background:var(--ow);color:var(--ch)}
+.s{padding:clamp(4rem,8vw,7rem) clamp(1.4rem,4vw,3rem);max-width:1100px;margin:0 auto}
+.full{max-width:100%;padding:clamp(4rem,8vw,7rem) clamp(1.4rem,4vw,3rem)}
+.full .inn{max-width:1100px;margin:0 auto}
+.bg-bk{background:var(--base)}
+.bg-dk{background:var(--s1)}
+.bg-ch{background:var(--s2)}
+.bg-lt{background:var(--base);color:var(--tx)}
 
-/* TYPO */
-.sn{font-family:'IBM Plex Mono',monospace;font-weight:300;font-size:.4rem;letter-spacing:.5em;text-transform:uppercase;color:var(--cu);margin-bottom:.3rem}
-.st{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.6rem,3vw,2.6rem);line-height:1.12;margin-bottom:.6rem}
-.ss{font-size:.76rem;color:var(--wg);max-width:520px;margin-bottom:2rem;font-weight:200}
-h3{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.05rem,1.8vw,1.3rem);margin:1.8rem 0 .6rem;color:var(--cr)}
-h3.sm{font-size:1rem}
-p{margin-bottom:.9rem;max-width:64ch;font-size:.78rem;font-weight:300}
-strong{font-weight:500;color:var(--cr)}
-em{color:var(--gd);font-style:normal}
-.lead{font-family:'Playfair Display',serif;font-size:clamp(.95rem,1.5vw,1.1rem);font-weight:400;line-height:1.9;max-width:56ch}
-.qt{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.1rem,2vw,1.4rem);line-height:1.5;border-left:2px solid var(--cu);padding-left:1.2rem;margin:1.8rem 0;max-width:44ch;color:var(--cr)}
+/* ── TYPOGRAPHY HIERARCHY ──────────────────────── */
+
+/* 1. Section index — condensed bold, tiny uppercase */
+.sn{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-stretch:condensed;font-size:.38rem;letter-spacing:-0.25px;text-transform:uppercase;color:#000;margin-bottom:.5rem;opacity:.55}
+
+/* 2. Page title — bold, display size */
+.st{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:clamp(2rem,4.5vw,4rem);letter-spacing:-0.25px;line-height:1.04;margin-bottom:.5rem;color:#111}
+
+/* 3. Deck / intro sentence — light italic, generous */
+.ss{font-size:clamp(.88rem,1.4vw,1rem);color:var(--tx2);max-width:560px;margin-bottom:2.5rem;font-weight:300;font-style:italic;letter-spacing:-0.25px;line-height:1.7}
+
+/* 4. Sub-heading — medium, restrained */
+h3{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:500;font-size:clamp(.95rem,1.5vw,1.1rem);letter-spacing:-0.25px;line-height:1.3;margin:2.2rem 0 .7rem;color:#111;padding-bottom:.35rem;border-bottom:1px solid var(--brd)}
+h3.sm{font-size:.9rem;border-bottom:none;margin-top:1.4rem}
+
+/* 5. Body — light, comfortable measure */
+p{margin-bottom:1rem;max-width:62ch;font-size:.82rem;font-weight:300;letter-spacing:-0.25px;line-height:1.9}
+strong{font-weight:700;color:#111;letter-spacing:-0.25px}
+em{color:var(--tx);font-style:italic;font-weight:300}
+
+/* 6. Lead paragraph — regular, slightly larger */
+.lead{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:clamp(1rem,1.8vw,1.2rem);font-weight:400;letter-spacing:-0.25px;line-height:1.85;max-width:52ch}
+
+/* 7. Pull quote — light italic, editorial scale */
+.qt{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-style:italic;font-weight:300;font-size:clamp(1.2rem,2.2vw,1.7rem);letter-spacing:-0.25px;line-height:1.4;border-left:1px solid #111;padding-left:1.4rem;margin:2.2rem 0;max-width:40ch;color:#111}
 
 /* GRID */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:1.2rem 0}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:1.2rem 0}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:1.2rem 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;margin:1.5rem 0}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:1.5rem 0}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:1.5rem 0}
 @media(max-width:800px){.g2,.g3,.g4{grid-template-columns:1fr}}
 
 /* IMAGE */
-.ig{margin:1.5rem 0}.ig img{width:100%}
-.ig2{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:1.5rem 0}
-.ig3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin:1.5rem 0}
-.ig4{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:1.5rem 0}
+.ig{margin:2rem 0}.ig img{width:100%}
+.ig2{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:2rem 0}
+.ig3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin:2rem 0}
+.ig4{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:2rem 0}
 @media(max-width:800px){.ig2,.ig3,.ig4{grid-template-columns:1fr 1fr}}
-.ic{font-family:'IBM Plex Mono',monospace;font-size:.36rem;letter-spacing:.12em;text-transform:uppercase;color:var(--wg);margin-top:.3rem;padding-left:.15rem}
-.ic-lt{color:var(--mg)}
+/* Caption — light, restrained */
+.ic{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-size:.33rem;letter-spacing:-0.25px;text-transform:uppercase;color:var(--tx3);margin-top:.4rem;padding-left:.15rem}
+.ic-lt{color:var(--tx2)}
 
 /* TAGS */
-.tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.6rem 0}
-.tg{font-family:'IBM Plex Mono',monospace;font-size:.36rem;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--mg);color:var(--wg);display:inline-block}
-.tg-cu{border-color:var(--cu);color:var(--cu)}
-.tg-gd{border-color:var(--gd);color:var(--gd)}
-.tg-sage{border-color:var(--sage);color:var(--sage)}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.7rem 0}
+.tg{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-stretch:condensed;font-size:.34rem;letter-spacing:-0.25px;text-transform:uppercase;padding:.2rem .55rem;border:1px solid var(--brd);color:var(--tx2);display:inline-block}
+.tg-cu{border-color:#111;color:#111}
+.tg-gd{border-color:var(--tx2);color:var(--tx2)}
+.tg-sage{border-color:var(--tx2);color:var(--tx2)}
 
 /* CARD */
-.card{padding:1.4rem;border:1px solid rgba(255,255,255,.04);margin:.7rem 0;position:relative;background:rgba(255,255,255,.01)}
-.card::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--cu)}
-.card h4{font-family:'IBM Plex Mono',monospace;font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cu);margin-bottom:.3rem}
-.card-lt{background:var(--cr);color:var(--ch);border-color:rgba(0,0,0,.04)}
-.card-lt h4{color:var(--cu)}
-.card-lt p{color:var(--dk)}
+.card{padding:1.6rem;border:1px solid var(--brd);margin:.8rem 0;position:relative;background:var(--card)}
+.card::before{content:'';position:absolute;top:0;left:0;width:1px;height:100%;background:#111}
+/* Card label — bold condensed */
+.card h4{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-stretch:condensed;font-size:.38rem;letter-spacing:-0.25px;text-transform:uppercase;color:#111;margin-bottom:.5rem}
+.card-lt{background:var(--s1);color:var(--tx);border-color:var(--brd)}
+.card-lt h4{color:#111}
+.card-lt p{color:var(--tx)}
 
 /* RULE */
-.rule{padding:1.2rem 1.4rem;margin:.6rem 0;border-left:2px solid var(--gd);background:rgba(255,255,255,.015)}
-.rule h4{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:.3rem}
-.rule p{font-size:.72rem;color:var(--sv)}
-.rule-do{border-left-color:var(--sage)}
-.rule-no{border-left-color:var(--bg)}
+.rule{padding:1.4rem 1.6rem;margin:.7rem 0;border-left:1px solid #111;background:var(--s1)}
+/* Rule heading — medium italic */
+.rule h4{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:500;font-style:italic;font-size:1rem;letter-spacing:-0.25px;margin-bottom:.4rem;color:#111}
+.rule p{font-size:.75rem;font-weight:300;letter-spacing:-0.25px;color:var(--tx2)}
+.rule-do{border-left-color:#111}
+.rule-no{border-left-color:#111}
 
 /* VERDICT */
-.vd{background:rgba(168,104,40,.06);border-left:2px solid var(--cu);padding:1rem 1.3rem;margin:1rem 0}
-.vd h4{font-family:'IBM Plex Mono',monospace;font-size:.4rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cu);margin-bottom:.25rem}
+.vd{background:rgba(0,0,0,.03);border-left:1px solid #111;padding:1.1rem 1.4rem;margin:1.2rem 0}
+/* Verdict label — bold condensed */
+.vd h4{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-stretch:condensed;font-size:.38rem;letter-spacing:-0.25px;text-transform:uppercase;color:#111;margin-bottom:.3rem}
 
 /* TENSION */
-.tn{display:flex;align-items:center;gap:.6rem;margin:.8rem 0;padding:.7rem 1rem;background:rgba(255,255,255,.015)}
-.tn em{font-family:'Playfair Display',serif;font-size:.82rem;font-style:italic;flex:1;min-width:0;color:var(--cr)}
+.tn{display:flex;align-items:center;gap:.8rem;margin:.9rem 0;padding:.8rem 1.2rem;background:var(--s1)}
+/* Tension labels — light italic */
+.tn em{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-size:.78rem;font-style:italic;flex:1;min-width:0;letter-spacing:-0.25px;color:var(--tx)}
 .tn em:last-of-type{text-align:right}
-.tb{flex:2.5;height:1px;background:linear-gradient(to right,var(--cu),var(--sv));position:relative}
-.td{width:6px;height:6px;border-radius:50%;background:var(--cu);position:absolute;top:-2.5px}
+.tb{flex:3;height:1px;background:linear-gradient(to right,#111,var(--brd));position:relative}
+.td{width:5px;height:5px;border-radius:50%;background:#111;position:absolute;top:-2px}
 
 /* COLOR STRIP */
-.cs{display:flex;height:56px;margin:1rem 0;gap:1px}
-.cw{flex:1;display:flex;align-items:flex-end;padding:.25rem}
-.cw span{font-family:'IBM Plex Mono',monospace;font-size:.3rem;letter-spacing:.03em;line-height:1.2}
+.cs{display:flex;height:52px;margin:1.2rem 0;gap:2px}
+.cw{flex:1;display:flex;align-items:flex-end;padding:.3rem}
+.cw span{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-size:.28rem;letter-spacing:-0.25px;line-height:1.3}
 
 /* DIVIDER */
-.dv{display:flex;align-items:center;gap:1rem;margin:2.5rem 0}
-.dv-l{flex:1;height:1px;background:var(--mg);opacity:.2}
-.dv-t{font-family:'IBM Plex Mono',monospace;font-size:.36rem;letter-spacing:.35em;text-transform:uppercase;color:var(--wg)}
+.dv{display:flex;align-items:center;gap:1.2rem;margin:3rem 0}
+.dv-l{flex:1;height:1px;background:var(--brd)}
+/* Divider label — light italic */
+.dv-t{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-style:italic;font-size:.34rem;letter-spacing:-0.25px;color:var(--tx3)}
 
 /* SPECIAL: COVER */
 .cover{min-height:100vh;position:relative;display:flex;flex-direction:column}
 .cover-img{flex:1;position:relative;overflow:hidden}
 .cover-img img{width:100%;height:100%;object-fit:cover;min-height:80vh}
-.cover-ov{position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(9,8,7,.96));display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(1.5rem,4vw,3rem)}
-.cover-ov h1{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.5rem);color:var(--cr);line-height:1}
-.cover-ov h1 i{font-style:italic;color:var(--cu)}
-.cover-m{font-family:'IBM Plex Mono',monospace;font-size:.38rem;letter-spacing:.45em;text-transform:uppercase;color:var(--wg);margin-top:.8rem}
+.cover-ov{position:absolute;inset:0;background:linear-gradient(transparent 25%,rgba(229,230,225,.96));display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(2rem,5vw,4rem)}
+/* Cover title — bold */
+.cover-ov h1{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:clamp(2.5rem,6.5vw,5.5rem);letter-spacing:-0.25px;color:#111;line-height:1}
+.cover-ov h1 i{font-style:normal;color:#111}
+/* Cover meta — light */
+.cover-m{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-size:.36rem;letter-spacing:-0.25px;text-transform:uppercase;color:var(--tx2);margin-top:1rem}
 
 /* SPECIAL: PHASE */
-.phase{display:grid;grid-template-columns:clamp(200px,30vw,320px) 1fr;gap:0;margin:1.2rem 0;min-height:280px;overflow:hidden}
-.phase-img{overflow:hidden;min-height:280px}.phase-img img{width:100%;height:100%;object-fit:cover}
-.phase-txt{padding:clamp(1.2rem,2vw,2rem);background:var(--dk);display:flex;flex-direction:column;justify-content:center}
-.phase-txt h4{font-family:'Playfair Display',serif;font-weight:400;font-size:1.2rem;margin-bottom:.5rem}
-.phase-txt p{font-size:.7rem;color:var(--sv);line-height:1.85}
+.phase{display:grid;grid-template-columns:clamp(220px,32vw,340px) 1fr;gap:0;margin:1.5rem 0;min-height:300px;overflow:hidden}
+.phase-img{overflow:hidden;min-height:300px}.phase-img img{width:100%;height:100%;object-fit:cover}
+.phase-txt{padding:clamp(1.5rem,2.5vw,2.5rem);background:var(--s1);display:flex;flex-direction:column;justify-content:center}
+/* Phase heading — medium italic */
+.phase-txt h4{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:500;font-style:italic;font-size:1.15rem;letter-spacing:-0.25px;margin-bottom:.6rem;color:#111}
+.phase-txt p{font-size:.73rem;font-weight:300;letter-spacing:-0.25px;color:var(--tx2);line-height:1.9}
 .phase:nth-child(even){direction:rtl}.phase:nth-child(even)>*{direction:ltr}
-@media(max-width:800px){.phase{grid-template-columns:1fr}.phase:nth-child(even){direction:ltr}.phase-img{min-height:200px}}
+@media(max-width:800px){.phase{grid-template-columns:1fr}.phase:nth-child(even){direction:ltr}.phase-img{min-height:220px}}
 
 /* FOOTER */
-.ft{text-align:center;padding:3.5rem 2rem;font-size:.45rem;letter-spacing:.08em;color:var(--wg);background:var(--bk)}
+.ft{text-align:center;padding:4rem 2rem;font-size:.4rem;font-weight:300;letter-spacing:-0.25px;color:var(--tx3);background:var(--s1)}
 </style></head><body>
 
 <!-- ════════════════════════════════════════════════════════════ -->
@@ -289,7 +316,7 @@ em{color:var(--gd);font-style:normal}
 
 <div class="dv" style="margin-top:2.5rem"><div class="dv-l"></div><div class="dv-t">Çalışmayan Görseller — Analiz</div><div class="dv-l"></div></div>
 
-<p style="font-size:.78rem;color:var(--sv);max-width:64ch;margin-bottom:1.2rem">Sistem neyin çalıştığını olduğu kadar neyin çalışmadığını da netleştirmek zorunda. Aşağıdaki görseller tekrarlanmaması için kayıt altına alındı.</p>
+<p style="font-size:.78rem;color:#707068;max-width:64ch;margin-bottom:1.2rem">Sistem neyin çalıştığını olduğu kadar neyin çalışmadığını da netleştirmek zorunda. Aşağıdaki görseller tekrarlanmaması için kayıt altına alındı.</p>
 
 <div class="rule rule-no">
 <h4>8-1 — Dil Çakışması</h4>
@@ -313,7 +340,7 @@ em{color:var(--gd);font-style:normal}
 
 <div class="dv" style="margin-top:2.5rem"><div class="dv-l"></div><div class="dv-t">Görsel Kalite Eşiği — Yayın Kriterleri</div><div class="dv-l"></div></div>
 
-<p style="font-size:.78rem;color:var(--sv);max-width:64ch;margin-bottom:1.2rem">Bir görselin yayına girmesi için aşağıdaki dört koşulun tamamını karşılaması gerekir. Tek bir koşul eksikse görsel düzeltilir — yayınlanmaz.</p>
+<p style="font-size:.78rem;color:#707068;max-width:64ch;margin-bottom:1.2rem">Bir görselin yayına girmesi için aşağıdaki dört koşulun tamamını karşılaması gerekir. Tek bir koşul eksikse görsel düzeltilir — yayınlanmaz.</p>
 
 <div class="card">
 <h4>Kriter 1 — Obje Okunabilirliği</h4>
@@ -1003,11 +1030,11 @@ em{color:var(--gd);font-style:normal}
 <!-- ════════════════════════════════════════════════════════════ -->
 <section class="s" style="text-align:center;padding:5rem 2rem">
 <div class="ig" style="max-width:560px;margin:0 auto 2rem"><img src="https://xrweb.studio/edetri/image/8-5.png" alt="Final"></div>
-<div style="font-family:'Playfair Display',serif;font-size:clamp(1.1rem,2vw,1.6rem);font-style:italic;margin-bottom:.6rem;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.5">"EDETRI does not refer to anything that exists and has thus no boundary."</div>
-<div style="width:30px;height:1px;background:var(--cu);margin:1.5rem auto"></div>
-<div style="font-family:'IBM Plex Mono',monospace;font-size:.36rem;letter-spacing:.4em;color:var(--wg)">CREATIVE BIBLE — DEFINITIVE EDITION — 2026</div>
-<div style="font-family:'IBM Plex Mono',monospace;font-size:.34rem;letter-spacing:.25em;color:var(--wg);margin-top:.2rem">EDETRI — ISTANBUL — PARIS</div>
-<div style="font-family:'IBM Plex Mono',monospace;font-size:.3rem;letter-spacing:.5em;color:var(--mg);margin-top:1rem">C O N F I D E N T I A L</div>
+<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-style:italic;font-size:clamp(1.1rem,2vw,1.6rem);letter-spacing:-0.25px;margin-bottom:.6rem;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.5;color:#111">"EDETRI does not refer to anything that exists and has thus no boundary."</div>
+<div style="width:30px;height:1px;background:#111;margin:1.8rem auto"></div>
+<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-size:.34rem;letter-spacing:-0.25px;text-transform:uppercase;color:#a4a4a2">CREATIVE BIBLE — DEFINITIVE EDITION — 2026</div>
+<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;font-size:.32rem;letter-spacing:-0.25px;text-transform:uppercase;color:#a4a4a2;margin-top:.3rem">EDETRI — ISTANBUL — PARIS</div>
+<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-stretch:condensed;font-size:.3rem;letter-spacing:-0.25px;text-transform:uppercase;color:#c4c5c2;margin-top:1.2rem">CONFIDENTIAL</div>
 </section>
 
 </body></html>
