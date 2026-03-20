@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EDETRI — Creative Bible v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;400&display=swap');
+:root{--bk:#0a0908;--ch:#1a1916;--dk:#2a2824;--wg:#8a8070;--sv:#b8b0a4;--cr:#eee8e0;--ow:#f6f3ee;--cu:#b07030;--bg:#601828;--gd:#c0a060}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bk);color:var(--cr);font-family:'Archivo',sans-serif;font-weight:300;line-height:1.8;overflow-x:hidden}
+::selection{background:var(--cu);color:var(--cr)}
+img{max-width:100%;display:block}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(10,9,8,.96);backdrop-filter:blur(14px);padding:.8rem 1.2rem;display:flex;gap:1.4rem;overflow-x:auto;border-bottom:1px solid rgba(176,112,48,.1)}
+nav a{font-family:'IBM Plex Mono',monospace;font-size:.42rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sv);text-decoration:none;white-space:nowrap;transition:color .3s}
+nav a:hover{color:var(--cu)}
+
+/* SECTIONS */
+.s{padding:4.5rem 2rem;max-width:1100px;margin:0 auto}
+.s-dk{background:var(--bk);padding:4.5rem 2rem;max-width:100%}
+.s-dk .i{max-width:1100px;margin:0 auto}
+.s-lt{background:var(--ow);color:var(--ch);padding:4.5rem 2rem;max-width:100%}
+.s-lt .i{max-width:1100px;margin:0 auto}
+.s-ac{background:var(--ch);padding:4.5rem 2rem;max-width:100%}
+.s-ac .i{max-width:1100px;margin:0 auto}
+
+.sn{font-family:'IBM Plex Mono',monospace;font-weight:300;font-size:.44rem;letter-spacing:.45em;text-transform:uppercase;color:var(--cu);margin-bottom:.3rem}
+.st{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.7rem,3.2vw,2.8rem);line-height:1.15;margin-bottom:.7rem}
+.ss{font-size:.78rem;color:var(--wg);max-width:540px;margin-bottom:2.2rem;font-weight:300}
+h3{font-family:'Playfair Display',serif;font-weight:400;font-size:1.25rem;margin:1.8rem 0 .7rem}
+p{margin-bottom:1rem;max-width:66ch;font-size:.82rem;font-weight:300}
+strong{font-weight:500;color:var(--cr)}
+.qt{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;line-height:1.5;border-left:2px solid var(--cu);padding-left:1.3rem;margin:2rem 0;max-width:46ch}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2.2rem;margin:1.5rem 0}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:1.5rem 0}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:1.5rem 0}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.7rem 0}
+.t{font-family:'IBM Plex Mono',monospace;font-size:.4rem;letter-spacing:.06em;text-transform:uppercase;padding:.25rem .55rem;border:1px solid var(--wg);color:var(--wg);display:inline-block}
+.tc{border-color:var(--cu);color:var(--cu)}
+
+/* CARDS */
+.card{padding:1.6rem;border:1px solid rgba(255,255,255,.06);margin:.8rem 0;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--cu)}
+.card h4{font-family:'IBM Plex Mono',monospace;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cu);margin-bottom:.35rem}
+.card-lt{background:var(--cr);color:var(--ch);border-color:rgba(0,0,0,.06)}
+
+/* IMAGE CONTAINERS */
+.img-full{width:100%;margin:1.5rem 0}
+.img-full img{width:100%;height:auto}
+.img-hero{width:100%;max-height:85vh;overflow:hidden;margin:0}
+.img-hero img{width:100%;height:100%;object-fit:cover}
+.img-cap{font-family:'IBM Plex Mono',monospace;font-size:.4rem;letter-spacing:.12em;text-transform:uppercase;color:var(--wg);margin-top:.4rem;padding-left:.2rem}
+.img-grid{display:grid;gap:4px;margin:1.5rem 0}
+.img-grid img{width:100%;height:100%;object-fit:cover}
+.img-grid-2{grid-template-columns:1fr 1fr}
+.img-grid-3{grid-template-columns:1fr 1fr 1fr}
+.img-grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:768px){.img-grid-2,.img-grid-3,.img-grid-4{grid-template-columns:1fr 1fr}}
+
+/* CONCEPT CARD */
+.concept{border:1px solid var(--cu);padding:2.5rem;margin:2rem 0;position:relative}
+.concept-num{font-family:'IBM Plex Mono',monospace;font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cu);margin-bottom:.5rem}
+.concept h3{font-family:'Playfair Display',serif;font-size:1.8rem;margin:0 0 .5rem}
+.concept-rec{border-color:var(--gd);background:rgba(192,160,96,.03)}
+.concept-rec::after{content:'RECOMMENDED';position:absolute;top:-8px;right:20px;font-family:'IBM Plex Mono',monospace;font-size:.4rem;letter-spacing:.2em;color:var(--bk);background:var(--gd);padding:.15rem .6rem}
+
+/* DIVIDER */
+.dv{display:flex;align-items:center;gap:1rem;margin:3rem 0}
+.dv-l{flex:1;height:1px;background:var(--wg);opacity:.15}
+.dv-t{font-family:'IBM Plex Mono',monospace;font-size:.4rem;letter-spacing:.3em;text-transform:uppercase;color:var(--wg)}
+
+/* TENSION */
+.tn{display:flex;align-items:center;gap:.7rem;margin:1rem 0;padding:.8rem 1rem;background:rgba(255,255,255,.02)}
+.tn em{font-family:'Playfair Display',serif;font-size:.85rem;font-style:italic;flex:1;min-width:0}
+.tn em:last-of-type{text-align:right}
+.tb{flex:2;height:1px;background:linear-gradient(to right,var(--cu),var(--sv));position:relative}
+.td{width:6px;height:6px;border-radius:50%;background:var(--cu);position:absolute;top:-2.5px}
+
+/* COLOR */
+.cs{display:flex;height:60px;margin:1.2rem 0;gap:2px}
+.cw{flex:1;display:flex;align-items:flex-end;padding:.3rem}
+.cw span{font-family:'IBM Plex Mono',monospace;font-size:.32rem;letter-spacing:.03em;line-height:1.2}
+
+/* FOOTER */
+.ft{text-align:center;padding:4rem 2rem;font-size:.5rem;letter-spacing:.08em;color:var(--wg)}
+
+/* COVER */
+.cover{min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.cover-img{flex:1;position:relative;overflow:hidden}
+.cover-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.85)}
+.cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(10,9,8,.95) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:3rem}
+.cover-overlay h1{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(2.5rem,6vw,5rem);color:var(--cr);line-height:1}
+.cover-overlay h1 em{font-style:italic;color:var(--cu)}
+.cover-meta{font-family:'IBM Plex Mono',monospace;font-size:.45rem;letter-spacing:.4em;text-transform:uppercase;color:var(--wg);margin-top:1rem}
+
+/* VERDICT */
+.verdict{background:rgba(176,112,48,.06);border-left:3px solid var(--cu);padding:1.2rem 1.5rem;margin:1.2rem 0}
+.verdict h4{font-family:'IBM Plex Mono',monospace;font-size:.45rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cu);margin-bottom:.3rem}
+
+/* BIBLE RULE */
+.rule{background:var(--ch);padding:1.5rem;margin:.8rem 0;border-left:3px solid var(--gd)}
+.rule h4{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:.4rem}
+.rule p{font-size:.75rem;color:var(--sv)}
+.rule-do{border-left-color:#6a8a5a}
+.rule-dont{border-left-color:#8a3030}
+</style></head><body>
+
+<!-- COVER -->
+<section class="cover">
+<div class="cover-img"><img src="img_split.png" alt="EDETRI Split"></div>
+<div class="cover-overlay">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:.4rem;letter-spacing:1em;color:var(--wg);text-transform:uppercase;margin-bottom:.8rem">E D E T R I</div>
+<h1>Creative<br><em>Bible</em></h1>
+<div class="cover-meta">Visual Identity & Creative Direction System &nbsp;/&nbsp; V2 &nbsp;/&nbsp; 2026</div>
+</div>
+</section>
+
+<nav>
+<a href="#audit">00 Audit</a>
+<a href="#concepts">01 3 Konsept</a>
+<a href="#direction">02 Seçilen Yön</a>
+<a href="#principles">03 İlkeler</a>
+<a href="#visual">04 Görsel Sistem</a>
+<a href="#product">05 Ürün Dili</a>
+<a href="#photo">06 Fotoğraf</a>
+<a href="#video">07 Video</a>
+<a href="#typo">08 Tipografi</a>
+<a href="#color">09 Renk</a>
+<a href="#web">10 Website</a>
+<a href="#booklet">11 Booklet</a>
+<a href="#event">12 Event</a>
+<a href="#social">13 Sosyal Medya</a>
+<a href="#donts">14 Yapma/Yap</a>
+</nav>
+
+<!-- 00 AUDIT -->
+<section class="s" id="audit">
+<div class="sn">00 — Görsel Deney Analizi</div>
+<h2 class="st">Ne Denendi, Ne Çalıştı</h2>
+<p class="ss">17 görsel deneyin dürüst analizi. Her biri farklı bir olasılığı test ediyor.</p>
+
+<div class="img-grid img-grid-3">
+<div><img src="img_split.png" alt="Split"><div class="img-cap">8-5 / Split — ★★★★★</div></div>
+<div><img src="img_chrome.png" alt="Chrome"><div class="img-cap">8-3 / Full Chrome — ★★★★★</div></div>
+<div><img src="img_drip_real.png" alt="Drip Light"><div class="img-cap">6-4 / Drip Açık Fon — ★★★★★</div></div>
+</div>
+
+<div class="verdict">
+<h4>En Güçlü 3</h4>
+<p>Split kompozisyon (8-5) markanın tüm gerilimini tek karede özetliyor. Full chrome (8-3) metalin zarafeti yutmadığını kanıtlıyor. Drip/açık fon (6-4) baskıya hazır bir litografi kalitesi sunuyor. Bu üçü ayrı ayrı değil, bir arada bir dil oluşturuyor.</p>
+</div>
+
+<div class="img-grid img-grid-4" style="margin-top:1.5rem">
+<div><img src="img_grain_bw.png" alt="BW Grain"><div class="img-cap">1 / Grain S&B — ★★★★</div></div>
+<div><img src="img_cocktail.png" alt="Cocktail"><div class="img-cap">7-1 / Wire+Chrome — ★★★★</div></div>
+<div><img src="img_baroque3.png" alt="Baroque Dark"><div class="img-cap">8-2 / Barok Karanlık — ★★★★</div></div>
+<div><img src="img_caravaggio.png" alt="Caravaggio"><div class="img-cap">Caravaggio Remix — ★★★½</div></div>
+</div>
+
+<div class="g2" style="margin-top:2rem">
+<div>
+<h3>Deneylerin Haritası</h3>
+<p>17 görselde 5 farklı görsel dil test edilmiş:</p>
+<p><strong>A) Chrome Baroque</strong> — Klasik resim + krom metallizasyon (8-3, 8-4-2, 8-5, 8-1, 8-2). En tutarlı ve en güçlü seri.</p>
+<p><strong>B) Wireframe + Drip</strong> — 3D teknik çizim + eriyen/damlayan efekt (5, 5-2, 6-1, 6-2, 6-3, 6-4). Ürün iletişimi için çok güçlü.</p>
+<p><strong>C) Grainy Documentary</strong> — Siyah beyaz film grain, yaşam sahneleri (1, 2, 4). En "gerçek" hisseden dil.</p>
+<p><strong>D) Caravaggio Overlay</strong> — Eski usta bulanık + keskin ürün üst üste (caravaggio-1, caravaggio-2). Kavramsal olarak güçlü.</p>
+<p><strong>E) Chrome Texture</strong> — Sıvı metal doku + wireframe (7-1). Melez ve ilginç.</p>
+</div>
+<div>
+<h3>Kritik Gözlem</h3>
+<p>En güçlü çalışmalar HER ZAMAN iki karşıt dünyayı aynı karede buluşturanlar. Saf wireframe (5) tek başına soğuk. Saf barok (8-1) tek başına nostaljik. Ama split (8-5) ikisini birden yaşatıyor.</p>
+<p>Bu deneylerin ortak paydası: <strong>"zamanlar arası gerilim"</strong>. 18. yüzyıl tablosu + 21. yüzyıl metali. Caravaggio ışığı + dijital wireframe. Analog grain + temiz cam formu.</p>
+<p>Bu gerilim EDETRI'nin yeni dilinin omurgası olmalı.</p>
+</div>
+</div>
+</section>
+
+<!-- 01 THREE CONCEPTS -->
+<section class="s-ac" id="concepts">
+<div class="i">
+<div class="sn">01 — Üç Konsept Paket</div>
+<h2 class="st">Üç Yol</h2>
+<p class="ss">Her biri mevcut deneylerin farklı bir sentezini temsil ediyor.</p>
+
+<!-- CONCEPT A -->
+<div class="concept">
+<div class="concept-num">Konsept A</div>
+<h3>"Chrome Baroque"</h3>
+<p style="color:var(--wg);font-size:.75rem;margin-bottom:1rem">Kaynak görseller: 8-3, 8-5, 8-1, 8-2, 8-4-2</p>
+<div class="img-grid img-grid-2">
+<div><img src="img_chrome.png" alt="Chrome"></div>
+<div><img src="img_split.png" alt="Split"></div>
+</div>
+<p style="margin-top:1rem">Klasik resim estetiği tamamen krom/gümüş metallize ediliyor. Barok zarafet + endüstriyel soğukluk. Her görsel "iki dünya arasında" var. Çok güçlü bir marka imzası yaratır ama üretim maliyeti yüksek ve tekrar edilmesi zor. Tek başına kullanıldığında fazla "kampanya" gibi durabilir, günlük iletişim için esnekliği düşük.</p>
+<div class="tags"><span class="t tc">yüksek etki</span><span class="t">düşük esneklik</span><span class="t">kampanya odaklı</span></div>
+</div>
+
+<!-- CONCEPT B -->
+<div class="concept">
+<div class="concept-num">Konsept B</div>
+<h3>"Etching & Drip"</h3>
+<p style="color:var(--wg);font-size:.75rem;margin-bottom:1rem">Kaynak görseller: 6-3, 6-4, 5-2, 6-1, 6-2, 7-1</p>
+<div class="img-grid img-grid-3">
+<div><img src="img_drip_real.png" alt="Drip Real"></div>
+<div><img src="img_drip_dark.png" alt="Drip Dark"></div>
+<div><img src="img_cocktail.png" alt="Cocktail Wire"></div>
+</div>
+<p style="margin-top:1rem">Wireframe teknik çizim + eriyen/damlayan efekt. Mimari hassasiyet + organik kaos. Açık fonda litografi, karanlık fonda röntgen estetiği. Ürün odaklı, kolayca tekrar edilebilir, booklet ve web için ideal. Ama tek başına duygusal derinlik eksik kalabilir — "cool" ama "romantic" değil.</p>
+<div class="tags"><span class="t tc">yüksek esneklik</span><span class="t tc">ürün odaklı</span><span class="t">orta duygusal etki</span></div>
+</div>
+
+<!-- CONCEPT C — RECOMMENDED -->
+<div class="concept concept-rec">
+<div class="concept-num">Konsept C — Hibrit</div>
+<h3>"Tarnished Grace"</h3>
+<p style="color:var(--wg);font-size:.75rem;margin-bottom:1rem">Kaynak: A + B + C melezi — tüm deneylerin en güçlü yönlerinin sentezi</p>
+<div class="img-grid img-grid-4">
+<div><img src="img_split.png" alt="Split"></div>
+<div><img src="img_drip_real.png" alt="Drip"></div>
+<div><img src="img_grain_bw.png" alt="Grain"></div>
+<div><img src="img_cocktail.png" alt="Cocktail"></div>
+</div>
+<p style="margin-top:1rem"><strong>"Tarnished Grace" — "Kararmış Zarafet".</strong> Gümüşün zamanla kararması gibi, zarafet de yaşandıkça değişir ama kaybolmaz. Bu konsept üç katmandan oluşuyor:</p>
+<p><strong>Katman 1 — Hero/Kampanya:</strong> Chrome Baroque dili (8-5 split yaklaşımı). Büyük lansman görselleri, sergi afişleri, booklet kapakları.</p>
+<p><strong>Katman 2 — Ürün/Teknik:</strong> Wireframe + Drip dili (6-3, 6-4). Ürün tanıtımı, katalog, web product sayfaları, sosyal medya ürün postları.</p>
+<p><strong>Katman 3 — Yaşam/Atmosphere:</strong> Grainy documentary dili (1, 2). Lifestyle, event belgeleme, Instagram stories, behind-the-scenes.</p>
+<p>Bu üç katman tek bir marka evreni içinde birlikte çalışır. Her biri farklı bir ihtiyaca cevap verir ama hepsi aynı DNA'yı paylaşır: <strong>zamanlar arası gerilim + yaşanmış zarafet + kontrollü kirlilik.</strong></p>
+<div class="tags"><span class="t tc">yüksek etki</span><span class="t tc">yüksek esneklik</span><span class="t tc">3 katmanlı sistem</span><span class="t tc">tüm touchpoints</span></div>
+</div>
+</div>
+</section>
+
+<!-- 02 SELECTED DIRECTION -->
+<section class="s" id="direction">
+<div class="sn">02 — Seçilen Yön</div>
+<h2 class="st">Tarnished Grace</h2>
+<p class="ss">Kararmış zarafet. Gümüşün patinası. Yaşanmış ama kaybolmamış güzellik.</p>
+
+<div class="img-full"><img src="img_split.png" alt="Hero Split"></div>
+<div class="img-cap">Manifesto görseli: Sol yarı sıcak barok (geçmiş, romantik, organik), sağ yarı soğuk krom (şimdi, endüstriyel, metalik). EDETRI her ikisinin de arasında.</div>
+
+<div class="qt">"Tarnished Grace, kusursuzluğu reddetmez — onu yaşatır. Gümüş parıldar, sonra kararır, sonra tekrar parlatılır. Her döngü onu daha güzel yapar."</div>
+
+<div class="g2">
+<div>
+<h3>Manifesto</h3>
+<p>EDETRI, güzelliğin sabit olmadığını biliyor. Bir bardak kullanıldıkça güzelleşir. Bir sofra yaşandıkça anlam kazanır. Bir metal yüzey zamanla patina alır — ve o patina, hikâyenin kendisidir.</p>
+<p>Tarnished Grace, EDETRI'nin yeni yaratıcı çerçevesidir. Barok zarafetin krom metallle buluşması. Caravaggio ışığının wireframe tekniğiyle karşılaşması. Analog dokunun dijital hassasiyetle dans etmesi.</p>
+<p>Bu bir "vintage" nostalji değil. Bu, zamansızlığın bilinçli tasarımı.</p>
+</div>
+<div>
+<h3>Üç Katman Sistemi</h3>
+<p><strong>LAYER 1 — HERO</strong><br>Chrome Baroque. Büyük ölçekli kampanya görselleri. Split kompozisyon. Sergi afişleri. Booklet kapakları. Yılda 2-4 kez üretilir. Yüksek prodüksiyon.</p>
+<p><strong>LAYER 2 — PRODUCT</strong><br>Wireframe + Drip. Ürün tanıtımı. Katalog. Web ürün sayfaları. Teknik ama duygusal. Sürekli üretilebilir. Orta prodüksiyon.</p>
+<p><strong>LAYER 3 — LIFE</strong><br>Grainy Documentary. Lifestyle. Event. BTS. Instagram stories. Ham, analog, yaşanmış. Düşük prodüksiyon maliyeti, yüksek otantiklik.</p>
+</div>
+</div>
+</section>
+
+<!-- 03 PRINCIPLES -->
+<section class="s-dk" id="principles">
+<div class="i">
+<div class="sn">03 — Temel İlkeler</div>
+<h2 class="st">5 Kural</h2>
+<p class="ss">Her yaratıcı kararın geçmesi gereken 5 filtre.</p>
+
+<div class="rule">
+<h4>1. Zamanlar Arası Gerilim</h4>
+<p>Her görselde, her tasarımda en az iki farklı "zaman" bir arada olmalı. 18. yüzyıl tablosu + 21. yüzyıl metali. Analog grain + dijital wireframe. El yapımı cam + CNC-kesim çelik. Tek bir zamana ait görünen her şey sorgulanmalı.</p>
+</div>
+<div class="rule">
+<h4>2. Kontrollü Kirlilik</h4>
+<p>Her şey kusursuz olmamalı — ama kaos da olmamalı. Eriyen damla hesaplı bir yere düşer. Grain dokusu kasıtlıdır. Ruj lekesi doğru bardağın doğru kenarında. "Kirlilik" bir tasarım kararıdır, kaza değil.</p>
+</div>
+<div class="rule">
+<h4>3. Metal Fısıltısı</h4>
+<p>Metal her zaman mevcut ama asla bağırmaz. Bir çizgi, bir yansıma, bir aksanı — ama tüm sahneyi ele geçirmez. Chrome Baroque hero görselleri bile dantelin sıcaklığını korur. Metal fısıldar, cam cevap verir.</p>
+</div>
+<div class="rule">
+<h4>4. Yaşanmışlık İzi</h4>
+<p>Her görsel "birileri az önce buradaydı" hissini taşımalı. Boş bir sofra değil, bırakılmış bir sofra. Yeni bir bardak değil, kullanılmış bir bardak. Bu iz, objelere ruh katar.</p>
+</div>
+<div class="rule">
+<h4>5. Umursamaz Zarafet</h4>
+<p>"Cool ama umursamadan gibi." Hiçbir şey fazla çabalamış görünmemeli. Zarafet doğal, eforsuz. Bir kadın Paris'te kaldırım kafesinde EDETRI bardağıyla oturuyorsa, poz vermiyor — yaşıyor. Bu, "çabalamadan güzel olmak" hali, markanın en ayırt edici tonu.</p>
+</div>
+</div>
+</section>
+
+<!-- 04 VISUAL SYSTEM -->
+<section class="s" id="visual">
+<div class="sn">04 — Görsel Sistem</div>
+<h2 class="st">Layer'lar Pratikte</h2>
+<p class="ss">Her katmanın ne zaman, nerede, nasıl kullanılacağı.</p>
+
+<h3>Layer 1 — Hero / Chrome Baroque</h3>
+<div class="img-grid img-grid-3">
+<div><img src="img_split.png" alt="Split"><div class="img-cap">Split kompozisyon — hero format</div></div>
+<div><img src="img_chrome.png" alt="Chrome"><div class="img-cap">Full chrome — maksimum etki</div></div>
+<div><img src="img_baroque.png" alt="Baroque"><div class="img-cap">Sıcak barok — romantik uç</div></div>
+</div>
+<p style="margin-top:1rem"><strong>Kullanım:</strong> Sergi afişi, booklet kapağı, web hero banner, büyük format baskı, lansman kampanyası. Yılda 2-4 hero set üretilir. Her set bir "split" (iki dünya), bir "full chrome" (metal dünya), bir "warm baroque" (romantik dünya) içerir.</p>
+
+<div class="dv"><div class="dv-l"></div><div class="dv-t">Layer 2</div><div class="dv-l"></div></div>
+
+<h3>Layer 2 — Product / Wireframe + Drip</h3>
+<div class="img-grid img-grid-4">
+<div><img src="img_wireframe.png" alt="Wire"><div class="img-cap">Saf wireframe — teknik</div></div>
+<div><img src="img_glass_drip.png" alt="Drip"><div class="img-cap">Wireframe + drip — duygusal</div></div>
+<div><img src="img_drip_light.png" alt="Drip Light"><div class="img-cap">Açık fon — litografi</div></div>
+<div><img src="img_dismoi_wire.png" alt="Dis-Moi Wire"><div class="img-cap">Dis-Moi wireframe</div></div>
+</div>
+<p style="margin-top:1rem"><strong>Kullanım:</strong> Web ürün sayfaları, sosyal medya ürün postları, katalog iç sayfaları, fatura illüstrasyonu, packaging baskı. Her ürün için 3 versiyon: saf wireframe (teknik), wireframe+drip (duygusal), açık fon litografi (baskı). Karanlık fon = dijital/ekran. Açık fon = baskı/kâğıt.</p>
+
+<div class="dv"><div class="dv-l"></div><div class="dv-t">Layer 3</div><div class="dv-l"></div></div>
+
+<h3>Layer 3 — Life / Grainy Documentary</h3>
+<div class="img-grid img-grid-3">
+<div><img src="img_grain_bw.png" alt="BW Grain"><div class="img-cap">Kahvaltı sahnesi — yaşanmış</div></div>
+<div><img src="img_paris.png" alt="Paris"><div class="img-cap">Paris kafe — umursamaz zarafet</div></div>
+<div><img src="img_party.png" alt="Party"><div class="img-cap">Gece — flash + grain</div></div>
+</div>
+<p style="margin-top:1rem"><strong>Kullanım:</strong> Instagram stories, event belgeleme, behind-the-scenes, lifestyle editoryal, mailing görselleri. Çekim: analog film veya dijitale grain eklenerek. Siyah-beyaz dominant, bazen desaturated renk. EDETRI objeleri sahnenin parçası — vitrin değil, yaşamın doğal uzantısı.</p>
+</section>
+
+<!-- 05 PRODUCT LANGUAGE -->
+<section class="s-dk" id="product">
+<div class="i">
+<div class="sn">05 — Ürün Görsel Dili</div>
+<h2 class="st">Obje Nasıl Gösterilir</h2>
+
+<div class="img-grid img-grid-2">
+<div><img src="img_caravaggio.png" alt="Caravaggio + Product"><div class="img-cap">Caravaggio blur + ürün overlay — kontekst içinde</div></div>
+<div><img src="img_drip_real.png" alt="Drip Product"><div class="img-cap">Ürün tek başına — litografi kalitesi</div></div>
+</div>
+
+<div class="g2" style="margin-top:2rem">
+<div>
+<h3>Ürün Fotoğraf Matrisi</h3>
+<p>Her EDETRI ürünü 5 farklı formatta görselleştirilir:</p>
+<p><strong>1. Wireframe Teknik</strong> — Saf çizgi, siyah fon. Mühendislik hassasiyeti. Web hover state, booklet teknik sayfa.</p>
+<p><strong>2. Wireframe + Drip</strong> — Aynı çizgi ama eriyen/damlayan detaylar. Duygusal. Sosyal medya, poster.</p>
+<p><strong>3. Litografi (Açık Fon)</strong> — Krem zemin, vintage baskı hissi. Booklet iç sayfa, fatura illüstrasyonu, packaging.</p>
+<p><strong>4. Caravaggio Overlay</strong> — Eski usta tablosu blur + ürün keskin. Ürünü bir "hikâye içine" yerleştirir. Web editoryal, kampanya.</p>
+<p><strong>5. Yaşam Sahnesi</strong> — Grain, S/B veya desaturated. Ürün gerçek hayatta: sofrada, elde, kafede. Lifestyle, event.</p>
+</div>
+<div>
+<h3>Ürün İsimlendirme Devam</h3>
+<p>Mevcut DNA korunuyor: kültürel referanslar taşıyan isimler (Cahun, Pablo, Scarpa, Dis-Moi, Lovers, Koga, Lee).</p>
+<p>Yeni dönem isimleri de aynı mantıkla devam etmeli. Her isim bir sanatçı, mimar, yönetmen veya kavram referansı taşır. İsmin kendisi hiçbir zaman açıklanmaz — merak uyandırır.</p>
+<p><strong>Asla:</strong> Tanımlayıcı isimler (Large Bowl, Cocktail Glass). <strong>Her zaman:</strong> Şifreli, kültürel, kişisel isimler.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 06 PHOTOGRAPHY -->
+<section class="s" id="photo">
+<div class="sn">06 — Fotoğraf Bible</div>
+<h2 class="st">Çekim Rehberi</h2>
+
+<div class="g2">
+<div>
+<h3>Layer 1: Hero Çekim</h3>
+<p><strong>Işık:</strong> Caravaggio tarzı chiaroscuro. Tek yön, sıcak, dramatik. Gölgeler derin ve keskin.</p>
+<p><strong>Fon:</strong> Karanlık — siyah kadife veya koyu ahşap. Barok doku referansları: kadife kumaş, altın çerçeve, dantel.</p>
+<p><strong>Post-prodüksiyon:</strong> Bazı versiyonlar krom/gümüş metallizasyon. Split kompozisyon (yarı sıcak / yarı soğuk) hero format. Renk grading: sıcak highlight'lar, soğuk gölgeler.</p>
+<p><strong>Format:</strong> Kare (1:1) veya portre (4:5). Asla landscape.</p>
+</div>
+<div>
+<h3>Layer 3: Yaşam Çekim</h3>
+<p><strong>Işık:</strong> Doğal. Mevcut ışık. Gece: flash (deneylerdeki 4.png gibi). Gündüz: pencere ışığı, overexposed.</p>
+<p><strong>Fon:</strong> Gerçek mekanlar. Kafe, sokak, ev, atölye. Asla stüdyo.</p>
+<p><strong>Post-prodüksiyon:</strong> S/B dominant. Yüksek grain. Kontrast orta-düşük (gri tonlar zengin). Film simülasyonu: Tri-X 400 veya HP5.</p>
+<p><strong>Format:</strong> Kare (1:1). Bazen 6:7 (medium format hissi).</p>
+</div>
+</div>
+
+<div class="img-grid img-grid-2" style="margin-top:1.5rem">
+<div><img src="img_baroque3.png" alt="Hero dark"><div class="img-cap">Layer 1 örnek — Caravaggio ışık + ürün</div></div>
+<div><img src="img_grain_bw.png" alt="Life grain"><div class="img-cap">Layer 3 örnek — grain + gerçek yaşam</div></div>
+</div>
+</section>
+
+<!-- 07 VIDEO -->
+<section class="s-ac" id="video">
+<div class="i">
+<div class="sn">07 — Video Bible</div>
+<h2 class="st">Hareketli Görüntü</h2>
+<div class="g2">
+<div>
+<h3>Format A: Hero Film (30-60sn)</h3>
+<p>Split dünya konseptinin video versiyonu. Başlar sıcak barok sahnede — yavaşça krom metalleşmeye geçer. Veya: aynı sahne iki kez gösterilir, biri sıcak biri soğuk.</p>
+<p><strong>Hız:</strong> %30-40 ağır çekim. <strong>Ses:</strong> Klasik enstrüman (cello/keman) + metalik ambient layer. <strong>Renk:</strong> İlk yarı sıcak, ikinci yarı soğuk.</p>
+</div>
+<div>
+<h3>Format B: Proses ASMR (2-3dk)</h3>
+<p>Atölye çekimi. Cam üfleme + metal işleme. Sabit kamera, uzun plan. Ses: ASMR kalitesinde proses sesleri — cam tıkırtısı, metal fırçalama, ateş hışırtısı.</p>
+<p><strong>Grade:</strong> Desaturated ama sıcak. Siyahlar derin. <strong>Format:</strong> 16:9 web, 9:16 stories, 1:1 sosyal.</p>
+</div>
+</div>
+<div class="g2">
+<div>
+<h3>Format C: Life Clips (5-15sn)</h3>
+<p>Grainy, handheld, doğal. Gerçek anlar: bardak doluyor, sofra kuruluyor, biri kahve içiyor. Analog film hissi. Stories ve Reels için.</p>
+</div>
+<div>
+<h3>Format D: Event Recap (45-90sn)</h3>
+<p>Etkinlik belgelemesi. S/B + grain + flash anlar. Hızlı kesim, müzikli. Sonunda logo + sessizlik.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 08 TYPOGRAPHY -->
+<section class="s" id="typo">
+<div class="sn">08 — Tipografi Sistemi</div>
+<h2 class="st">Üç Font, Üç Karakter</h2>
+
+<div class="g3">
+<div class="card">
+<h4>Display / Başlık</h4>
+<p style="font-family:'Playfair Display',serif;font-size:1.8rem;font-style:italic;margin-bottom:.5rem">Playfair Display</p>
+<p style="font-size:.72rem">Yüksek kontrastlı geçiş serifi. Barok zarafetin tipografik karşılığı. Hero başlıklar, booklet chapter title'ları, web hero text. İtalik dominant kullanım.</p>
+</div>
+<div class="card">
+<h4>Body / Gövde</h4>
+<p style="font-family:'Archivo',sans-serif;font-size:1.3rem;font-weight:300;margin-bottom:.5rem">Archivo Light</p>
+<p style="font-size:.72rem">Mimari, geometrik, yapısal. Endüstriyel hissiyat ama okunabilir. Gövde metinleri, açıklamalar, web paragrafları. Weight 300 (light) dominant.</p>
+</div>
+<div class="card">
+<h4>Mono / Detay</h4>
+<p style="font-family:'IBM Plex Mono',monospace;font-size:1rem;font-weight:300;margin-bottom:.5rem">IBM Plex Mono</p>
+<p style="font-size:.72rem">Teknik, ölçülmüş, endüstriyel. Etiketler, tarihler, teknik bilgi, navigasyon, küçük metin. Her zaman uppercase + letter-spacing. Boyut her zaman küçük.</p>
+</div>
+</div>
+<p style="margin-top:1rem"><strong>Logo tipografisi:</strong> Mevcut özel EDETRI wordmark korunuyor. Yeni dönemde chrome/metal render versiyonu ekleniyor (mevcut görsellerdeki gibi).</p>
+</section>
+
+<!-- 09 COLOR -->
+<section class="s-dk" id="color">
+<div class="i">
+<div class="sn">09 — Renk Sistemi</div>
+<h2 class="st">Palet</h2>
+
+<div class="cs">
+<div class="cw" style="background:#eee8e0"><span style="color:#1a1916">Ivory<br>Ana</span></div>
+<div class="cw" style="background:#f6f3ee"><span style="color:#1a1916">Off-White<br>Ana</span></div>
+<div class="cw" style="background:#b8b0a4"><span style="color:#1a1916">Silver<br>Metal</span></div>
+<div class="cw" style="background:#b07030"><span style="color:#fff">Copper<br>Aksan</span></div>
+<div class="cw" style="background:#0a0908"><span style="color:#b8b0a4">Black<br>Fon</span></div>
+<div class="cw" style="background:#601828"><span style="color:#eee8e0">Burgundy<br>Detay</span></div>
+<div class="cw" style="background:#c0a060"><span style="color:#1a1916">Gold<br>Vurgu</span></div>
+</div>
+
+<div class="g2" style="margin-top:1.5rem">
+<div>
+<h3>Karanlık Mod (Dominant)</h3>
+<p>Çoğu iletişim karanlık fon üzerinde. Siyah (#0a0908) fon, krem (#eee8e0) metin, bakır (#b07030) aksanlar. Gümüş (#b8b0a4) ikincil metin. Bu mod hero görseller, web, sosyal medya, dijital iletişim için.</p>
+</div>
+<div>
+<h3>Açık Mod (Seçici)</h3>
+<p>Booklet iç sayfalar, fatura, packaging, litografi ürün görselleri. Krem (#f6f3ee) fon, koyu (#1a1916) metin, bakır aksanlar. Bu mod "kâğıt" hisseden her şey için. Dijital'de sadece web ürün detay sayfalarında.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 10 WEBSITE -->
+<section class="s-lt" id="web">
+<div class="i">
+<div class="sn">10 — Website Bible</div>
+<h2 class="st">Web Yapısı</h2>
+<p class="ss" style="color:var(--dk)">Ana yapı: OBJECTS + TABLES eşit ağırlıkta. İnsanlar EDETRI'nin hem ürün hem deneyim markası olduğunu anlamalı.</p>
+
+<div class="g2">
+<div>
+<h3>Sayfa Yapısı</h3>
+<p style="color:var(--dk)"><strong>HOME:</strong> Hero video (autoplay, mute, loop — Layer 1 film) + manifesto satırı + alt grid (Objects | Tables)</p>
+<p style="color:var(--dk)"><strong>OBJECTS:</strong> Ürün arşivi. Grid görünüm. Hover: wireframe → drip geçişi. Tıklama: ürün detay + hikâye + 5 format görsel.</p>
+<p style="color:var(--dk)"><strong>TABLES:</strong> Event arşivi. Tarihsel sıralama. Her event: galeri + kısa metin + video clip.</p>
+<p style="color:var(--dk)"><strong>WORLD:</strong> About + Press + Stockists. Split görsel (Layer 1) hero olarak.</p>
+<p style="color:var(--dk)"><strong>SHOP:</strong> E-ticaret. Temiz, fonksiyonel. Ürün fotoğrafları Layer 2 (litografi açık fon).</p>
+</div>
+<div>
+<h3>Etkileşim Detayları</h3>
+<p style="color:var(--dk)"><strong>Hover effect:</strong> Ürün görseli wireframe'den drip versiyona morph oluyor. Veya: S/B'den renkliye geçiş.</p>
+<p style="color:var(--dk)"><strong>Scroll:</strong> Yavaş, ağırbaşlı. Parallax minimal — sadece hero bölümde. İçerik bölümlerinde sade scroll.</p>
+<p style="color:var(--dk)"><strong>Müzik/Ses:</strong> Yok. Web sessiz. Video autoplay mute.</p>
+<p style="color:var(--dk)"><strong>Tipografi:</strong> Playfair Display başlıklar, Archivo gövde, IBM Plex Mono etiketler/nav.</p>
+<p style="color:var(--dk)"><strong>Tema:</strong> Karanlık dominant. Açık mod sadece Shop ürün detay sayfalarında.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 11 BOOKLET -->
+<section class="s" id="booklet">
+<div class="sn">11 — Booklet Bible</div>
+<h2 class="st">Basılı Yayın Sistemi</h2>
+
+<div class="g2">
+<div>
+<h3>Format & Basım</h3>
+<p><strong>Boyut:</strong> 18×18cm kare. Elde tutulabilir, rafa dayanabilir.</p>
+<p><strong>Basım:</strong> Riso baskı (iç sayfalar — grain doku doğal oluşur) + offset (kapak + hero spread'ler).</p>
+<p><strong>Kapak:</strong> Siyah 350gr uncoated karton. Logo: gümüş folyo kabartma. Sırt: açık dikiş, siyah iplik.</p>
+<p><strong>Kağıt:</strong> İç: 120gr uncoated krem (Munken veya benzeri). Hero spread'ler: 170gr coated mat siyah.</p>
+</div>
+<div>
+<h3>İçerik Yapısı</h3>
+<p><strong>Chapter 1 — Manifesto:</strong> "Tarnished Grace" metni. Split hero görsel. Tam sayfa.</p>
+<p><strong>Chapter 2 — Malzeme Atlası:</strong> Cam / Seramik / Metal. Her malzeme: proses fotoğrafı + kısa şiirsel metin.</p>
+<p><strong>Chapter 3 — Objects:</strong> Her ürün bir spread. Sol: Layer 2 görsel (litografi). Sağ: isim + hikâye + teknik.</p>
+<p><strong>Chapter 4 — Tables:</strong> Event arşivi. Fotoğraflar Layer 3 (grain). Kısa notlar.</p>
+<p><strong>Chapter 5 — Colophon:</strong> Ekip, teşekkür, teknik notlar.</p>
+<p><strong>Güncelleme:</strong> Her sezon yeni bir "ek chapter" ekleniyor. Zamanla koleksiyoner parçası olur.</p>
+</div>
+</div>
+</section>
+
+<!-- 12 EVENT -->
+<section class="s-dk" id="event">
+<div class="i">
+<div class="sn">12 — Event Design Bible</div>
+<h2 class="st">Mekân = Manifesto</h2>
+
+<div class="img-grid img-grid-2">
+<div><img src="img_cocktail.png" alt="Cocktail concept"><div class="img-cap">Kokteyl servis konsepti — wire + chrome doku</div></div>
+<div><img src="img_grain_bw.png" alt="Table concept"><div class="img-cap">Sofra sahnesi — yaşanmış, bırakılmış</div></div>
+</div>
+
+<div class="g2" style="margin-top:2rem">
+<div>
+<h3>Mekan İlkeleri</h3>
+<p><strong>Zıtlık:</strong> Raw/endüstriyel mekan + EDETRI zarafeti. Beton + dantel. Metal masa + keten örtü.</p>
+<p><strong>Işık:</strong> Karanlık baz + spot + mum. Sıcak-soğuk çatışma. Metal yansımaları hesaplı.</p>
+<p><strong>Ses:</strong> Ambient — cam tıkırtısı, su, düşük cello. Hissedilen ama fark edilmeyen.</p>
+<p><strong>Sofra:</strong> Asimetrik düzen. "Birileri az önce kalkmış" hissi. Erimiş mum, buruşuk keten, cam kırıkları (atölye artığı).</p>
+</div>
+<div>
+<h3>Servis & Davetiye</h3>
+<p><strong>İçecekler:</strong> EDETRI camlarında. Her bardak doğal olarak farklı — bu varyasyon vitrin gibi sergilenir.</p>
+<p><strong>Davetiye:</strong> Fiziksel. Siyah karton, gümüş folyo baskı. İçinde küçük bir cam/metal parça (atölye artığı). "Kırıklar da güzeldir."</p>
+<p><strong>Booklet:</strong> Etkinlikte dağıtım. Her misafir eve bir EDETRI Bible ile döner.</p>
+<p><strong>Video:</strong> Loop projeksiyon (Layer 1 film) + sonrası recap (Layer 3 grain).</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 13 SOCIAL -->
+<section class="s" id="social">
+<div class="sn">13 — Sosyal Medya Bible</div>
+<h2 class="st">Instagram Sistemi</h2>
+
+<div class="g2">
+<div>
+<h3>Feed Grid Döngüsü</h3>
+<p>4'lü tekrar eden döngü:</p>
+<p><strong>1. Hero/Dark</strong> — Layer 1 veya Layer 2 dark (ürün portre, krom, wireframe). Siyah dominant.</p>
+<p><strong>2. Life/Grain</strong> — Layer 3 (S/B, grain, yaşam sahnesi, event). Ham, otantik.</p>
+<p><strong>3. Detail/Texture</strong> — Yakın çekim. Metal doku, cam yüzey, drip detay, bakır patina. Malzeme hero.</p>
+<p><strong>4. Type/Quote</strong> — Tipografik kart. Manifesto satırı veya ürün ismi. Playfair italic + siyah veya krem fon.</p>
+<p style="margin-top:.8rem">Bu 4'lü döngü grid'i her zaman tutarlı tutar. 3'lü sıra her zaman 1 karanlık + 1 açık + 1 karışık.</p>
+</div>
+<div>
+<h3>Stories & Reels</h3>
+<p><strong>Stories:</strong> Layer 3 dominant. Grain, S/B, anlık. Atölye sneak peek, sofra kurulumu, detay. Minimal metin (IBM Plex Mono küçük, beyaz).</p>
+<p><strong>Reels:</strong> İki format. (A) Proses: cam üfleme / metal işleme, ASMR sesleri, 15-30sn. (B) Atmosphere: ağır çekim, objelerin hareketi, müzikli, 15sn.</p>
+<p><strong>Ton:</strong> Asla "satış dili." Asla emoji. Asla hashtag spam. Kısa, şiirsel, kasıtlı. İngilizce dominant.</p>
+<p><strong>Frekans:</strong> Haftada 2-3 feed post. Haftada 4-5 story. Ayda 2-3 reel.</p>
+</div>
+</div>
+</section>
+
+<!-- 14 DO/DONT -->
+<section class="s-dk" id="donts">
+<div class="i">
+<div class="sn">14 — Yap / Yapma</div>
+<h2 class="st">Kesin Kurallar</h2>
+
+<div class="g2">
+<div>
+<h3 style="color:#6a8a5a">✓ YAP</h3>
+<div class="rule rule-do"><h4>Zamanlar arası gerilim kur</h4><p>Her görselde iki farklı dönem/doku/his bir arada olsun.</p></div>
+<div class="rule rule-do"><h4>Grain ekle</h4><p>Layer 3'te her zaman. Layer 1 ve 2'de seçici olarak, hafifçe.</p></div>
+<div class="rule rule-do"><h4>Metal aksanı fısıldatsın</h4><p>Bir çizgi, bir yansıma, bir folyo detay yeterli. Az ama kesin.</p></div>
+<div class="rule rule-do"><h4>Asimetri kullan</h4><p>Sofra düzeni, grid layout, tipografi yerleşimi — hiçbir zaman simetrik.</p></div>
+<div class="rule rule-do"><h4>"Bırakılmış" his yarat</h4><p>Her sahne birileri az önce buradaymış gibi olsun.</p></div>
+<div class="rule rule-do"><h4>İngilizce dili koru</h4><p>Ana iletişim dili İngilizce. Türkçe sadece yasal zorunluluklar ve yerel event detaylarında.</p></div>
+</div>
+<div>
+<h3 style="color:#8a3030">✗ YAPMA</h3>
+<div class="rule rule-dont"><h4>Tam simetrik kompozisyon</h4><p>Her şey ortada, dengeli, güvenli = sıkıcı. EDETRI asla ortada durmuyor.</p></div>
+<div class="rule rule-dont"><h4>Stok fotoğraf estetiği</h4><p>Parlak, HDR, aşırı saturated, "lifestyle" klişeleri. Aile sofrasında gülen insanlar = HAYIR.</p></div>
+<div class="rule rule-dont"><h4>Rengarenk palet</h4><p>Tüm renk paleti nötr + bakır/altın aksanlar. Asla parlak mavi, yeşil, pembe.</p></div>
+<div class="rule rule-dont"><h4>Fazla metin</h4><p>Görseller konuşsun. Metin minimal, şiirsel, keskin. Uzun açıklamalar = zayıflık.</p></div>
+<div class="rule rule-dont"><h4>Emoji, hashtag spam, "satış" dili</h4><p>"%20 indirim!" "Son 3 ürün!" = marka ölümü. EDETRI asla satmaz — davet eder.</p></div>
+<div class="rule rule-dont"><h4>Tek bir layer'a sıkışma</h4><p>Sadece hero = yorucu. Sadece grain = ucuz. Sadece wireframe = soğuk. Üç katman dönüşümlü.</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CLOSING -->
+<section class="s" style="text-align:center;padding:5rem 2rem">
+<div class="img-full" style="max-width:600px;margin:0 auto 2rem"><img src="img_split.png" alt="Final hero"></div>
+<div style="font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.5vw,2rem);font-style:italic;margin-bottom:.8rem">"Gümüş parıldar, sonra kararır,<br>sonra tekrar parlatılır.<br>Her döngü onu daha güzel yapar."</div>
+<div style="width:40px;height:1px;background:var(--cu);margin:1.5rem auto"></div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:.42rem;letter-spacing:.3em;color:var(--wg)">EDETRI — TARNISHED GRACE — CREATIVE BIBLE V2 — 2026</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:.38rem;letter-spacing:.2em;color:var(--wg);margin-top:.3rem">ISTANBUL — PARIS</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:.35rem;letter-spacing:.35em;color:var(--wg);margin-top:1rem">C O N F I D E N T I A L</div>
+</section>
+
+</body></html>
