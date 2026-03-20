@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EDETRI — Creative Bible V2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Unbounded:wght@200;300;700&display=swap');
+
+:root {
+  --ink:   #0d0c0a;
+  --deep:  #181610;
+  --char:  #252218;
+  --mid:   #3a3628;
+  --ash:   #7c7668;
+  --bone:  #b8b0a2;
+  --cream: #e8e0d4;
+  --paper: #f4f0e8;
+  --cu:    #a0622e;
+  --wine:  #5a1e28;
+  --gold:  #b09050;
+  --silver:#9a9890;
+  --c1:    #a0622e;
+  --c2:    #3a4858;
+  --c3:    #7a5a40;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  line-height:1.75;
+  overflow-x:hidden;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity:0.03;pointer-events:none;z-index:9999;
+}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(13,12,10,.97);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(160,98,46,.1);
+  padding:.7rem 2.5rem;
+  display:flex;gap:0;align-items:center;
+  overflow-x:auto;
+}
+.nav-logo{
+  font-family:'DM Mono',monospace;
+  font-size:.42rem;letter-spacing:.4em;
+  color:var(--cu);text-transform:uppercase;
+  white-space:nowrap;margin-right:2rem;
+  flex-shrink:0;
+}
+nav a{
+  font-family:'DM Mono',monospace;
+  font-size:.38rem;letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ash);text-decoration:none;
+  white-space:nowrap;transition:color .25s;
+  padding:.2rem .7rem;
+}
+nav a:hover{color:var(--cream);}
+
+/* COVER */
+.cover{
+  min-height:100vh;
+  background:var(--ink);
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  padding:2.5rem;
+  position:relative;overflow:hidden;
+}
+.cover-glow{
+  position:absolute;
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(160,98,46,.06) 0%,transparent 65%);
+  bottom:-250px;right:-150px;pointer-events:none;
+}
+.cover-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.cover-eyebrow{
+  font-family:'DM Mono',monospace;font-size:.44rem;
+  letter-spacing:.35em;color:var(--ash);text-transform:uppercase;
+}
+.cover-meta{
+  font-family:'DM Mono',monospace;font-size:.4rem;
+  letter-spacing:.12em;color:var(--ash);text-transform:uppercase;
+  text-align:right;line-height:2.2;
+}
+.cover-body{
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:0 0 3rem;
+}
+.cover-kicker{
+  font-family:'DM Mono',monospace;font-size:.42rem;
+  letter-spacing:.35em;color:var(--cu);text-transform:uppercase;
+  margin-bottom:1.8rem;
+}
+.cover-h1{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(3rem,8.5vw,8rem);
+  color:var(--cream);line-height:.95;letter-spacing:-.02em;
+}
+.cover-h1 em{font-style:italic;color:var(--cu);}
+.cover-h1 .indent{padding-left:4rem;}
+.cover-desc{
+  margin-top:2rem;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:1.05rem;
+  color:var(--ash);max-width:500px;line-height:1.9;
+  border-left:1px solid rgba(160,98,46,.3);padding-left:1.2rem;
+}
+.cover-bottom{
+  border-top:1px solid rgba(255,255,255,.05);
+  padding-top:1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.cover-pills{display:flex;gap:2rem;}
+.cover-pill{
+  font-family:'DM Mono',monospace;
+  font-size:.38rem;letter-spacing:.1em;
+  color:var(--ash);text-transform:uppercase;
+}
+.cover-pill strong{
+  display:block;color:var(--bone);font-weight:400;
+  font-size:.5rem;margin-bottom:.15rem;
+}
+
+/* SECTION CONTAINERS */
+.sec{padding:5.5rem 2.5rem;max-width:1200px;margin:0 auto;}
+.sec-dark{background:var(--ink);color:var(--cream);padding:5.5rem 2.5rem;}
+.sec-dark .inner{max-width:1200px;margin:0 auto;}
+.sec-char{background:var(--char);color:var(--cream);padding:5.5rem 2.5rem;}
+.sec-char .inner{max-width:1200px;margin:0 auto;}
+.sec-deep{background:var(--deep);color:var(--cream);padding:5.5rem 2.5rem;}
+.sec-deep .inner{max-width:1200px;margin:0 auto;}
+
+/* TYPE */
+.eyebrow{
+  font-family:'DM Mono',monospace;font-size:.42rem;
+  letter-spacing:.4em;text-transform:uppercase;
+  color:var(--cu);margin-bottom:.5rem;
+}
+h2{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(2rem,4.5vw,4rem);
+  line-height:1.05;letter-spacing:-.01em;
+  margin-bottom:.5rem;
+}
+h2 em{font-style:italic;color:var(--cu);}
+.lead{
+  font-size:1.05rem;font-style:italic;
+  color:var(--ash);max-width:600px;
+  line-height:1.9;margin-bottom:3rem;
+}
+.sec-dark .lead,.sec-char .lead,.sec-deep .lead{color:var(--bone);}
+h3{
+  font-family:'Cormorant Garamond',serif;font-weight:400;
+  font-size:1.5rem;margin:2.5rem 0 .6rem;
+}
+h3 em{font-style:italic;color:var(--cu);}
+p{font-size:.88rem;max-width:66ch;margin-bottom:.9rem;line-height:1.9;}
+.sec-dark p,.sec-char p,.sec-deep p{color:var(--bone);}
+blockquote{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:1.45rem;line-height:1.55;
+  border-left:1px solid var(--cu);padding-left:1.5rem;
+  margin:2.5rem 0;max-width:52ch;
+}
+.sec-dark blockquote,.sec-char blockquote,.sec-deep blockquote{color:var(--cream);}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;margin:1.5rem 0;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:1.5rem 0;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.5rem 0;}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:1.6rem;}
+.card-light{background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.07);padding:1.6rem;}
+.card h4,.card-light h4{
+  font-family:'Cormorant Garamond',serif;font-weight:400;
+  font-size:1.15rem;margin-bottom:.4rem;
+}
+.card p{color:var(--ash);font-size:.8rem;max-width:none;margin:0;}
+.card-light p{color:var(--mid);font-size:.8rem;max-width:none;margin:0;}
+
+/* TAGS */
+.tag{
+  display:inline-block;
+  font-family:'DM Mono',monospace;font-size:.36rem;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:.22rem .55rem;border:1px solid var(--ash);
+  color:var(--ash);margin:2px;
+}
+.tag-cu{border-color:var(--cu);color:var(--cu);}
+
+/* DIVIDER */
+.div{display:flex;align-items:center;gap:1.5rem;margin:3.5rem 0;}
+.div::before,.div::after{content:'';flex:1;height:1px;}
+.sec .div::before,.sec .div::after{background:rgba(0,0,0,.1);}
+.sec-dark .div::before,.sec-dark .div::after,
+.sec-char .div::before,.sec-char .div::after,
+.sec-deep .div::before,.sec-deep .div::after{background:rgba(255,255,255,.07);}
+.div-dot{width:5px;height:5px;border-radius:50%;background:var(--cu);}
+
+/* CONCEPT BAND */
+.cband{
+  min-height:55vh;
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:4rem 2.5rem;
+  position:relative;overflow:hidden;
+}
+.cband-1{background:var(--ink);}
+.cband-2{background:var(--deep);}
+.cband-3{background:var(--char);}
+.cn{
+  font-family:'Unbounded',sans-serif;font-weight:200;
+  font-size:clamp(6rem,18vw,16rem);line-height:1;
+  position:absolute;right:1.5rem;bottom:-1.5rem;
+  opacity:.035;color:var(--cream);pointer-events:none;
+}
+.clabel{
+  font-family:'DM Mono',monospace;font-size:.42rem;
+  letter-spacing:.4em;text-transform:uppercase;margin-bottom:1rem;
+}
+.cband-1 .clabel{color:var(--cu);}
+.cband-2 .clabel{color:#6a8aa8;}
+.cband-3 .clabel{color:#c09878;}
+.ctitle{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(2.5rem,6.5vw,5.8rem);
+  color:var(--cream);line-height:.96;letter-spacing:-.015em;
+}
+.ctitle em{font-style:italic;}
+.cband-1 .ctitle em{color:var(--cu);}
+.cband-2 .ctitle em{color:#8ab4cc;}
+.cband-3 .ctitle em{color:#c09878;}
+.ctagline{
+  margin-top:1.5rem;font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:1.05rem;color:var(--ash);
+  max-width:480px;
+  border-left:1px solid rgba(255,255,255,.1);padding-left:1rem;
+}
+
+/* REAL IMAGE DISPLAY */
+.img-block{
+  width:100%;aspect-ratio:4/3;
+  object-fit:cover;display:block;
+  filter:grayscale(15%) contrast(1.05);
+}
+.img-block-sq{
+  width:100%;aspect-ratio:1/1;
+  object-fit:cover;display:block;
+  filter:grayscale(15%) contrast(1.05);
+}
+.img-block-tall{
+  width:100%;aspect-ratio:3/4;
+  object-fit:cover;display:block;
+  filter:grayscale(15%) contrast(1.05);
+}
+.img-caption{
+  font-family:'DM Mono',monospace;
+  font-size:.38rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ash);
+  padding:.5rem 0 0;line-height:1.5;
+}
+
+/* UPLOADED IMAGE (from user) */
+.ref-block{
+  position:relative;overflow:hidden;
+}
+.ref-block img{
+  width:100%;display:block;
+  aspect-ratio:1/1;object-fit:cover;
+}
+.ref-block .ref-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:.6rem .8rem;
+  background:linear-gradient(transparent,rgba(0,0,0,.85));
+  font-family:'DM Mono',monospace;
+  font-size:.38rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cream);
+}
+
+/* PHOTO SCENE CARD */
+.scene{
+  display:grid;grid-template-columns:260px 1fr;
+  gap:0;margin:1.5rem 0;overflow:hidden;
+}
+.scene:nth-child(even){direction:rtl;}
+.scene:nth-child(even)>*{direction:ltr;}
+@media(max-width:768px){
+  .scene,.scene:nth-child(even){grid-template-columns:1fr;direction:ltr;}
+}
+.scene-img{min-height:180px;overflow:hidden;}
+.scene-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.scene-info{
+  background:var(--deep);padding:1.5rem;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.scene-info h4{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.15rem;margin-bottom:.4rem;color:var(--cream);
+}
+.scene-info p{font-size:.78rem;color:var(--bone);max-width:none;margin:0 0 .5rem;}
+
+/* TENSION MAP */
+.tension-row{
+  display:grid;grid-template-columns:160px 1fr 160px;
+  gap:1rem;align-items:center;
+  padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.tension-row:last-child{border:none;}
+.ta{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:.95rem;color:var(--bone);text-align:right;
+}
+.tb2{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:.95rem;color:var(--bone);
+}
+.tbar{
+  height:2px;
+  background:linear-gradient(to right,var(--cu),var(--silver));
+  position:relative;
+}
+.tdot{
+  width:8px;height:8px;border-radius:50%;background:var(--cu);
+  position:absolute;top:-3px;
+  box-shadow:0 0 8px rgba(160,98,46,.5);
+}
+
+/* TABLE */
+.matrix{width:100%;border-collapse:collapse;margin:1.5rem 0;}
+.matrix th{
+  font-family:'DM Mono',monospace;font-size:.38rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--cu);padding:.6rem .8rem;
+  border-bottom:1px solid rgba(255,255,255,.08);text-align:left;
+}
+.matrix td{
+  font-size:.8rem;color:var(--bone);
+  padding:.65rem .8rem;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  vertical-align:top;
+}
+.matrix tr:hover td{background:rgba(255,255,255,.02);}
+
+/* PALETTE */
+.palette{display:flex;height:52px;margin:1.5rem 0;overflow:hidden;}
+.swatch{flex:1;position:relative;}
+.swatch span{
+  position:absolute;bottom:.4rem;left:.5rem;
+  font-family:'DM Mono',monospace;
+  font-size:.3rem;letter-spacing:.05em;
+  text-transform:uppercase;line-height:1.5;
+}
+
+/* SPEC */
+.spec{
+  border-left:2px solid var(--cu);
+  padding:1.2rem 1.5rem;margin:.8rem 0;
+}
+.sec-dark .spec,.sec-char .spec,.sec-deep .spec{background:rgba(255,255,255,.03);}
+.spec-label{
+  font-family:'DM Mono',monospace;font-size:.38rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cu);margin-bottom:.3rem;
+}
+.spec p{font-size:.82rem;max-width:none;margin:0;}
+
+/* TIMELINE */
+.tl-item{
+  display:grid;grid-template-columns:90px 2px 1fr;
+  gap:1rem;margin-bottom:2rem;
+}
+.tl-time{
+  font-family:'DM Mono',monospace;font-size:.42rem;
+  letter-spacing:.1em;color:var(--cu);
+  text-transform:uppercase;text-align:right;padding-top:.15rem;
+}
+.tl-line{
+  background:linear-gradient(var(--cu),var(--ash));
+  position:relative;
+}
+.tl-line::before{
+  content:'';position:absolute;top:4px;left:-3px;
+  width:7px;height:7px;border-radius:50%;background:var(--cu);
+}
+.tl-body h4{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.08rem;margin-bottom:.2rem;color:var(--cream);
+}
+.tl-body p{font-size:.78rem;color:var(--bone);max-width:none;margin:0;}
+
+/* MOSAIC */
+.mosaic{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:200px;
+  gap:4px;margin:2rem 0;
+}
+.mosaic .tall{grid-row:span 2;}
+.mosaic .wide{grid-column:span 2;}
+.mosaic-item{overflow:hidden;position:relative;}
+.mosaic-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.mosaic-item .mo{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.75));
+  padding:.5rem .7rem;
+  font-family:'DM Mono',monospace;font-size:.35rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--cream);
+  z-index:2;
+}
+@media(max-width:768px){
+  .mosaic{grid-template-columns:1fr 1fr;grid-auto-rows:160px;}
+}
+
+footer{
+  background:var(--ink);text-align:center;padding:4rem 2rem;
+}
+footer .fq{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:1.6rem;color:var(--cream);margin-bottom:.8rem;
+}
+footer p{
+  font-family:'DM Mono',monospace;font-size:.4rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ash);max-width:none;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">EDETRI · Bible V2</div>
+  <a href="#intro">Giriş</a>
+  <a href="#dna">DNA</a>
+  <a href="#c1">01 · Liturgy</a>
+  <a href="#c2">02 · Contraband</a>
+  <a href="#c3">03 · Morning After</a>
+  <a href="#event">Event = Ürün</a>
+  <a href="#system">Sistem</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="cover-glow"></div>
+  <div class="cover-top">
+    <div class="cover-eyebrow">E D E T R I</div>
+    <div class="cover-meta">Creative Bible V2<br>Istanbul — Paris<br>2026 · Confidential</div>
+  </div>
+  <div class="cover-body">
+    <div class="cover-kicker">Visual Identity · Event · Object · Print · Digital</div>
+    <h1 class="cover-h1">
+      <span>Üç</span>
+      <span class="indent"><em>Yön,</em></span>
+      <span>Bir Dünya.</span>
+    </h1>
+    <p class="cover-desc">
+      EDETRI sadece tabak ve bardak satmıyor.<br>
+      Sofrayı ve sofranın etrafındaki anı tasarlıyor.<br>
+      Bu bible ikisini eşit ağırlıkta taşır.
+    </p>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-pills">
+      <div class="cover-pill"><strong>01</strong>Liturgy of the Table</div>
+      <div class="cover-pill"><strong>02</strong>Contraband Tenderness</div>
+      <div class="cover-pill"><strong>03</strong>Morning After</div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:.36rem;letter-spacing:.2em;color:var(--ash);text-transform:uppercase;">V2 · 2026</div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="sec" id="intro">
+  <div class="eyebrow">00 — Temel Sorun</div>
+  <h2>İnsanlar<br><em>Anlamıyor.</em></h2>
+  <p class="lead">EDETRI event de yapıyor. Tabak ve bardak da satıyor. Ama insanlar bir tanesini görüyor. Bu bible bu ikiyi eşit anlatmak için var.</p>
+
+  <div class="g2">
+    <div>
+      <h3>Şimdiki Sorun</h3>
+      <p>Web sitesi objeleri gösteriyor ama event'i yeterince anlatmıyor. Sosyal medya bazen event, bazen ürün — aralarında görsel dil bağlantısı yok. Ziyaretçi EDETRI'nin ne yaptığını tam olarak okuyamıyor.</p>
+      <p>Bu ayrışma marka algısını zayıflatıyor: ürün alacak biri event sayfasını görmüyor, event isteyecek biri ürünün kalitesini kavramıyor.</p>
+    </div>
+    <div>
+      <h3>Çözüm: Eşit Ağırlık</h3>
+      <p>EDETRI'nin teklifi şu: <em>obje de tasarlarız, sofrayı da kurarız, geceyi de yaratırız.</em> Bunlar ayrı servisler değil — aynı felsefenin üç tezahürü.</p>
+      <p>Her creative concept bu ikisini birlikte taşır. Her fotoğraf direktifi hem "ürün nasıl çekilir" hem "event nasıl belgelenir" sorusunu yanıtlar. Her booklet ikisini aynı sayfada gösterir.</p>
+    </div>
+  </div>
+
+  <div class="div"><div class="div-dot"></div></div>
+
+  <div class="g3">
+    <div class="card-light">
+      <h4>Bu Bible Kapsıyor</h4>
+      <p>Üç creative concept. Her birinde: görsel dil, fotoğraf direktifi, video grammar, website tonu, booklet sistemi, event direktifi, sosyal medya kuralları.</p>
+    </div>
+    <div class="card-light">
+      <h4>Kanallar</h4>
+      <p>Booklet. Website. Instagram feed + reels. Event mekan ve sofra tasarımı. Press kit. Ambalaj ve kart. Her kanal aynı dünyanın farklı yüzü.</p>
+    </div>
+    <div class="card-light">
+      <h4>Asla Değişmeyen</h4>
+      <p>Film grain. O logotype karakteri. Yaşanmışlık hissi. Karanlık romantizm. Açıklama değil ima. Türkçe-Fransızca-İngilizce karışımı. EDETRI hiçbir şeyi fazla söylemez.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DNA -->
+<section class="sec-dark" id="dna">
+  <div class="inner">
+    <div class="eyebrow">00B — Marka DNA</div>
+    <h2>EDETRI'nin<br><em>Karakteri</em></h2>
+    <p class="lead">Üç concept buradan büyüyor. DNA değişmez — sadece rengi ve sesi değişir.</p>
+
+    <div style="margin:2rem 0;">
+      <div class="tension-row">
+        <div class="ta">Romantik</div>
+        <div class="tbar"><div class="tdot" style="left:62%"></div></div>
+        <div class="tb2">Soğuk</div>
+      </div>
+      <div class="tension-row">
+        <div class="ta">El Yapımı Sıcaklık</div>
+        <div class="tbar"><div class="tdot" style="left:50%"></div></div>
+        <div class="tb2">Endüstriyel Hassasiyet</div>
+      </div>
+      <div class="tension-row">
+        <div class="ta">Yaşanmış</div>
+        <div class="tbar"><div class="tdot" style="left:68%"></div></div>
+        <div class="tb2">Steril</div>
+      </div>
+      <div class="tension-row">
+        <div class="ta">Eğlenceli</div>
+        <div class="tbar"><div class="tdot" style="left:55%"></div></div>
+        <div class="tb2">Cool / Umursamaz</div>
+      </div>
+      <div class="tension-row">
+        <div class="ta">İstanbul</div>
+        <div class="tbar"><div class="tdot" style="left:50%"></div></div>
+        <div class="tb2">Paris</div>
+      </div>
+      <div class="tension-row">
+        <div class="ta">Obje</div>
+        <div class="tbar"><div class="tdot" style="left:50%"></div></div>
+        <div class="tb2">Event</div>
+      </div>
+    </div>
+
+    <blockquote>"Fresh ama romantik. Hafif karanlık, kirli ama temiz. Yaşanmışlıklı, eğlenceli — ama hâlâ cool. Umursamadan."</blockquote>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">Görsel Referans Evreni</div>
+    <p style="margin-bottom:1.5rem;">Senin çalışmalarından + sanat tarihinden + güncel tasarım dünyasından. Bunların hepsi aynı anda geçerli.</p>
+
+    <!-- MOSAIC: karışık referanslar -->
+    <div class="mosaic">
+      <!-- Caravaggio karanlık dramatik ışık -->
+      <div class="mosaic-item tall">
+        <img src="https://images.metmuseum.org/CRDImages/ep/original/DT1579.jpg" alt="Caravaggio dark dramatic light" onerror="this.parentElement.style.background='#252218'">
+        <div class="mo">Caravaggio — Tenebrism</div>
+      </div>
+      <!-- Dutch masters still life -->
+      <div class="mosaic-item wide">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Jan_Davidsz._de_Heem_-_Vase_of_Flowers_-_NGA.jpg/1280px-Jan_Davidsz._de_Heem_-_Vase_of_Flowers_-_NGA.jpg" alt="Dutch masters still life" onerror="this.parentElement.style.background='#1a1814'">
+        <div class="mo">Dutch Masters Still Life</div>
+      </div>
+      <!-- user ref: eriyen cam siyah fon -->
+      <div class="mosaic-item">
+        <img src="/mnt/user-data/uploads/5-2.png" alt="EDETRI eriyen cam" onerror="this.parentElement.style.background='#0d0c0a'">
+        <div class="mo">EDETRI — Eriyen Cam ↑</div>
+      </div>
+      <!-- user ref: sofra karanlık -->
+      <div class="mosaic-item">
+        <img src="/mnt/user-data/uploads/1.png" alt="EDETRI sofra" onerror="this.parentElement.style.background='#181610'">
+        <div class="mo">EDETRI — Çelik+Sofra ↑</div>
+      </div>
+      <!-- user ref: okey paris -->
+      <div class="mosaic-item wide">
+        <img src="/mnt/user-data/uploads/2-3.png" alt="EDETRI paris okey" onerror="this.parentElement.style.background='#1c1814'">
+        <div class="mo">EDETRI — Paris, Okey, Dis-Moi ↑</div>
+      </div>
+    </div>
+
+    <div class="g3" style="margin-top:2rem">
+      <div class="card">
+        <h4>Ses Tonu</h4>
+        <p>Az kelime. Güçlü bırakış. Asla açıklamaz — ima eder. "Handmade", "artisanal", "premium" kullanılmaz. EDETRI bunları kanıtlar, söylemez.</p>
+      </div>
+      <div class="card">
+        <h4>Dil Karışımı</h4>
+        <p>Türkçe + Fransızca + İngilizce geçişler kasıtsız hissettirmeli. "Beşiktaş, 23:40. Pablo." yeterli. Markanın iki şehri var — ikisi de konuşur.</p>
+      </div>
+      <div class="card">
+        <h4>İzleyici Kim</h4>
+        <p>Referanslarını bilen ama göstermek zorunda hissetmeyen biri. İyi bir martini ile iyi bir karnıyarığın aynı masada olabileceğini anlayan. Bir event'i için stil arayan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CONCEPT 01 — LITURGY OF THE TABLE
+============================================= -->
+<div class="cband cband-1" id="c1">
+  <div class="cn">01</div>
+  <div class="clabel">Concept 01 — Ana Dil · En Güçlü Aday</div>
+  <h2 class="ctitle">Liturgy of<br><em>the Table</em></h2>
+  <p class="ctagline">Sofra bir ritüeldir. Obje ikonadır. Işık mucizedir. Event ise o mucizenin sahnesidir.</p>
+</div>
+
+<section class="sec-dark">
+  <div class="inner">
+    <div class="eyebrow">01 — Ruh</div>
+    <h2>Sakral <em>Ama Laik</em></h2>
+    <p class="lead">Dini değil — sakral. Her sofra kurma eylemi yüzyıllık bir ritüelin devamı. EDETRI o ritüelin hem objesi hem mimarı.</p>
+
+    <div class="g2">
+      <div>
+        <p>Bu concept Caravaggio'nun ışığından beslenyor — senin Dis-Moi + Baküs kolajındaki o ilk içgüdü tam burada. Işık bir taraftan giriyor, nesnenin %60'ı karanlıkta. Obje ikonlaşıyor. Event sahneye dönüşüyor.</p>
+        <p>Liturgy'nin güçlü olduğu yer şu: hem ürün fotoğrafı hem event belgeleme aynı dil ile çalışıyor. Bir tabağın tek ışıkla çekilmiş fotoğrafı ile bir event sofrasının aydınlatması aynı grameri paylaşıyor.</p>
+      </div>
+      <div>
+        <p>Referans sanatçılar: Caravaggio (ışık-gölge gerilimi), Zurbarán (natürmort sessizliği + sakral obje), Clara Peeters (sofra objelerinin yakın portresi). Bunlar "biz de Caravaggio yapıyoruz" değil — bu ışık anlayışının sofra fotoğrafına taşınması.</p>
+        <p>Event referansı: Rick Owens furniture dünyasındaki o karanlık-ağır-kırılgan atmosfer. Tek uzun çelik masa, mum, spot — minimalist ama dramatik.</p>
+      </div>
+    </div>
+
+    <blockquote>"Baküs elinde Dis-Moi tutarken karnıyarık da masadaydı. İkisi de oradaydı. İkisi de haklıydı."</blockquote>
+
+    <!-- Görsel referanslar: Caravaggio + user's own work -->
+    <div class="g2" style="margin-top:2rem">
+      <div>
+        <img class="img-block" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Michelangelo_Caravaggio_007.jpg/1280px-Michelangelo_Caravaggio_007.jpg" alt="Caravaggio Bacchus chiaroscuro" onerror="this.style.background='#252218';this.style.minHeight='200px'">
+        <p class="img-caption">Caravaggio, Bacchus (c.1596) — Tek ışık, dramatik gölge, sofra objesi. Senin Caravaggio kolajının arka planı tam bu.</p>
+      </div>
+      <div>
+        <img class="img-block" src="/mnt/user-data/uploads/caravaggio-2.png" alt="EDETRI Caravaggio Dis-Moi" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
+        <p class="img-caption">EDETRI — Senin çalışman. Dis-Moi wireframe Baküs'ün elinde. Liturgy'nin sezgisel başlangıç noktası.</p>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Görsel Dil</div>
+    <h3>Renk <em>Sistemi</em></h3>
+    <div class="palette">
+      <div class="swatch" style="background:#0d0c0a"><span style="color:#7c7668">Ink<br>Ana</span></div>
+      <div class="swatch" style="background:#252218"><span style="color:#7c7668">Char<br>Derin</span></div>
+      <div class="swatch" style="background:#b8b0a2"><span style="color:#252218">Bone<br>Nötr</span></div>
+      <div class="swatch" style="background:#e8e0d4"><span style="color:#252218">Cream<br>Işık</span></div>
+      <div class="swatch" style="background:#a0622e"><span style="color:#e8e0d4">Copper<br>Aksan</span></div>
+      <div class="swatch" style="background:#5a1e28"><span style="color:#e8e0d4">Wine<br>Gölge</span></div>
+      <div class="swatch" style="background:#b09050"><span style="color:#252218">Gold<br>Detay</span></div>
+    </div>
+    <p>Renkli fotoğraflarda renk paleti bu. Siyah-beyaz görsellerde bone ve cream aksan olarak kalır. Copper sadece metal dokunma noktaları için (ambalaj klips, booklet folyo).</p>
+
+    <h3>Tipografi</h3>
+    <div class="g3">
+      <div class="card">
+        <h4 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.8rem;">Display</h4>
+        <p>Cormorant Garamond Italic. Başlıklar, ürün isimleri, kapak. Büyük, nefes alan, asla bold.</p>
+        <span class="tag tag-cu">weight 300</span>
+      </div>
+      <div class="card">
+        <h4 style="font-family:'DM Mono',monospace;font-size:.9rem;letter-spacing:.15em;">MONO / LABEL</h4>
+        <p>DM Mono Light. Metadata, etiketler, teknik notlar. Çok küçük — dikkat çekmez, referans olur.</p>
+        <span class="tag tag-cu">0.4–0.55rem</span>
+      </div>
+      <div class="card">
+        <h4>Body</h4>
+        <p>Cormorant Garamond Regular. Kısa cümleler. Max 60 karakter per satır. EDETRI çok konuşmaz.</p>
+        <span class="tag tag-cu">0.85–0.95rem</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-char">
+  <div class="inner">
+    <div class="eyebrow">01 — Fotoğraf Direktifi</div>
+    <h2>Obje ve Event:<br><em>Aynı Işık</em></h2>
+    <p class="lead">Liturgy'nin en güçlü tarafı: ürün fotoğrafı ile event belgeleme aynı dili kullanıyor. Biri diğerini anlatıyor.</p>
+
+    <!-- Scene A: Obje -->
+    <div class="scene">
+      <div class="scene-img">
+        <img src="https://images.squarespace-cdn.com/content/v1/5d5a4ad45e6b9c0001c7b72a/1621524978654-YH0ZQRWVNZF9MK0AVNMO/Dark+Moody+Stoneware.jpg" alt="dark dramatic ceramic photography" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Obje — Tek Işık Portresi</h4>
+        <p>Tek tungsten veya mum. Sağdan ya da soldan — asla önden. Nesnenin %55–65'i karanlıkta. Fon siyah ya da çok koyu kahve. 85mm f/2.8. Grain sonradan: 12–18% luminance, monochrome.</p>
+        <p>Bu sahne EDETRI'nin e-ticaret görseli <em>değil</em> — ikonik ürün portresi. Satış sayfası için ayrı, daha açık versiyon çekilir.</p>
+        <div><span class="tag tag-cu">85mm</span><span class="tag tag-cu">f/2.8</span><span class="tag tag-cu">tungsten</span><span class="tag tag-cu">no fill</span></div>
+      </div>
+    </div>
+
+    <!-- Scene B: Sofra -->
+    <div class="scene">
+      <div class="scene-img">
+        <img src="https://images.squarespace-cdn.com/content/v1/5e3b7c3cc8e5b14f1fcc1a6e/1619134078291-T5E6SNZF0H7K5YYBXQY8/dark-moody-tablescape-candles.jpg" alt="dark moody tablescape candles" onerror="this.parentElement.style.background='#181610';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Sofra — Yaşanmış Masa</h4>
+        <p>EDETRI objeleri masada. Leke, mum damlası, ekmek kırıntısı: bunlar "kaza" değil, sahnenin parçası. Boşluk cömert: masanın %25–30'u boş. Kamera 40–50 derece açıda.</p>
+        <p>Bu sahne hem sosyal medya hem event sonrası belgeleme için çalışır. Bir gece yarısı çekimi ile bir ertesi sabah çekimi farklı enerji verir — ikisi de istenir.</p>
+        <div><span class="tag tag-cu">45°</span><span class="tag tag-cu">lived-in</span><span class="tag tag-cu">multi-object</span></div>
+      </div>
+    </div>
+
+    <!-- Scene C: Event -->
+    <div class="scene">
+      <div class="scene-img">
+        <img src="/mnt/user-data/uploads/1.png" alt="EDETRI çelik tel masa sofra karanlık" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Event — Senin Dili ↑</h4>
+        <p>Bu görsel Liturgy event direktifini tam gösteriyor: çelik tel masa (industrial materyal), üzerinde EDETRI seramiği, karanlık fon, spot ışık. B&W grain. Sahne gotik bir katedrali andırıyor ama karnıyarık ve kruvasan masada.</p>
+        <p>Event çekimlerinde bu dil: fixed camera, obje öne, insanlar blur veya yarı çerçevede. Belgeleme değil — atmosfer yaratma.</p>
+        <div><span class="tag tag-cu">B&W</span><span class="tag tag-cu">fixed cam</span><span class="tag tag-cu">high grain</span></div>
+      </div>
+    </div>
+
+    <!-- Scene D: Atölye / Proses -->
+    <div class="scene">
+      <div class="scene-img">
+        <img src="https://images.squarespace-cdn.com/content/v1/5f6f5d2b9e7f5b3ae4e4c4c4/1623456789012-ABCDEFGHIJKLMN/glassblowing-dark-dramatic.jpg" alt="glassblowing dark dramatic" onerror="this.parentElement.style.background='#1a0a02';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Proses — Atölye</h4>
+        <p>Cam üfleme, seramik şekillendirme. Erimiş cam turuncu, karanlık fon, ateş ışığı. Makro veya yakın çekim. Bu görsel hem sosyal medya hem booklet için güçlü — markanın "el yapımı" iddiasını gösterir, söylemez.</p>
+        <div><span class="tag tag-cu">macro</span><span class="tag tag-cu">fire light</span><span class="tag tag-cu">process</span></div>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Fotoğrafta Yasak</div>
+    <div class="g3" style="margin-top:1rem">
+      <div class="card">
+        <h4>❌ Ring light / Softbox</h4>
+        <p>Işık kaynağı hissedilmeli. Düz, eşit aydınlatma Liturgy'yi öldürür. Gölge hero'dur.</p>
+      </div>
+      <div class="card">
+        <h4>❌ Beyaz seamless backdrop</h4>
+        <p>Her sahnenin bir yeri, bir hikayesi var. Stüdyo arka planı EDETRI'ye yabancı.</p>
+      </div>
+      <div class="card">
+        <h4>❌ Kuş bakışı flat lay</h4>
+        <p>Yemek blogu estetiği değiliz. Açı her zaman 20–70 derece arası. İstisna yok.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-dark">
+  <div class="inner">
+    <div class="eyebrow">01 — Video Grammar</div>
+    <h2>Liturgy'nin<br><em>Hareketi</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Atmosferik Loop <em>(15–45sn)</em></h3>
+        <p>Website hero + event mekan ekranları. Ses yok. Loop. İçerik sırasıyla: eriyen mum → cam yüzeyinde ışık yansıması → el EDETRI objesine uzanıyor → sofra close-up → fade to black. %40–50 ağır çekim (120fps → 24fps). Hard cut — dissolve asla.</p>
+        <div style="margin-top:.6rem"><span class="tag tag-cu">mute</span><span class="tag tag-cu">loop</span><span class="tag tag-cu">120fps</span><span class="tag tag-cu">hard cut</span></div>
+      </div>
+      <div>
+        <h3>Proses Filmi <em>(90sn–3dk)</em></h3>
+        <p>Atölye: cam üfleme, form verme, soğuma. Fixed camera — kamera hareket etmez. Ses: gerçek atölye sesi (cam, metal, nefes) + minimal cello ya da sinyal. Altyazı yok, narrasyon yok. Film izler gibi — başı ve sonu belirsiz.</p>
+        <div style="margin-top:.6rem"><span class="tag tag-cu">fixed cam</span><span class="tag tag-cu">ambient audio</span><span class="tag tag-cu">no subtitle</span></div>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="spec-label">Event Video</div>
+      <p>Event belgeleme: aynı atmosferik dil. İnsanlar hero değil — obje ve ışık hero. Eller, omuzlar, blur yüzler tamam. Event'in "ne oldu" belgesi değil, "nasıl hissettirdi" belgesi. Uzunluk: 30–60sn. Format: 1:1 veya 4:5 sosyal medya için, 16:9 website için ayrıca.</p>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Website</div>
+    <h2>Web'de <em>Liturgy</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Obje Sayfası</h3>
+        <p>Full-bleed karanlık görsel. Sağda minimal bilgi: isim, materyal, boyut, fiyat. Hikaye yok — soru soran sorar. Hover: görsel değişir (farklı açı veya detay). Grid: en az 2, en fazla 3 kolon.</p>
+      </div>
+      <div>
+        <h3>Event / Tables Sayfası</h3>
+        <p>Bu sayfa şu an çok zayıf. Olması gereken: büyük atmosferik görseller + çok kısa metin. "Sofrayı ve geceyi birlikte tasarlıyoruz." Örnekler görsel olarak konuşur. İletişim formu değil — "Konuşalım" butonu.</p>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="spec-label">Kritik Değişiklik: OBJECTS = TABLES</div>
+      <p>Ana navigasyonda "Products" ile "Events" eşit ağırlıkta. Ya da daha iyisi: ikisi birleştirilir. "TABLES" tek sayfa — yukarıda hazır sofra satışı, aşağıda event servisi. Ziyaretçi ikisini aynı anda görür, zihinsel bağ kurar.</p>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Booklet</div>
+    <h2>Basılı <em>Dünya</em></h2>
+
+    <div class="g3">
+      <div class="card">
+        <h4>Format</h4>
+        <p>20×20cm. Kare. 28–36 sayfa. Offset + riso aksan (tek renk). Kağıt: Munken Lynx 150g gövde, Gmund Cotton kapak. Açık dikiş cilt. Her sezon bir chapter numarası.</p>
+      </div>
+      <div class="card">
+        <h4>İçerik Yapısı</h4>
+        <p>Obje ve event sayfaları eşit bölünür. Her yayılım ya tek obje portresi ya olay sofra sahnesi. İkisi de aynı ışık diliyle çekilmiş — okuyucu "bu ürün mü yoksa event mi?" diye sormaz. İkisi de EDETRI.</p>
+      </div>
+      <div class="card">
+        <h4>Metin</h4>
+        <p>Obje için: isim + bir cümle. Event için: yer + tarih + bir cümle. Asla açıklama. Türkçe-Fransızca-İngilizce karışabilir. Son sayfa: el yazısı ile küçük bir not.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CONCEPT 02 — CONTRABAND TENDERNESS
+============================================= -->
+<div class="cband cband-2" id="c2">
+  <div class="cn">02</div>
+  <div class="clabel">Concept 02 — En Cesur Seçenek · Sosyal Medya Gücü</div>
+  <h2 class="ctitle">Contraband<br><em>Tenderness</em></h2>
+  <p class="ctagline">Yanlış yerde, yanlış zamanda — ama kesinlikle doğru obje. Ve kesinlikle doğru gece.</p>
+</div>
+
+<section class="sec-dark">
+  <div class="inner">
+    <div class="eyebrow">02 — Ruh</div>
+    <h2>Zarafet <em>Yerinden Edilince</em></h2>
+    <p class="lead">Güzel obje, beklenmediği yerde daha güçlü konuşur. Event, beklenmediği mekanda daha akılda kalır.</p>
+
+    <div class="g2">
+      <div>
+        <p>Okey masasında Dis-Moi. Skatepark'ta coupe bardak. Kırık kaldırımda çelik tel servis masası. Bu görüntüler EDETRI'yi "sofra markası" sınırından çıkarıp bir bakış açısına — bir duruşa — dönüştürüyor.</p>
+        <p>Bu concept için kritik keşif: İstanbul–Paris ikiliği burada en net anlatılıyor. Karnıyarık ve kruvasan aynı tabakta (senin o güçlü çalışman) tam Contraband ruhunu taşıyor.</p>
+      </div>
+      <div>
+        <p>Event direktifi için bu concept şunu söylüyor: EDETRI event'lerini beklenen mekanda yapmıyor. Endüstriyel bir depoda, eski bir dükkanın arkasında, bir vapur iskelesi kenarında — EDETRI objeleri orada oturuyorsa orada oturuyordur.</p>
+        <p>Siyah-beyaz bu conceptin ana dili. Renk kaldırılınca bağlam nötr hale geliyor, obje öne çıkıyor. Wireframe objeler de bu dünyada çalışıyor — gerçek mekanda hayalet obje.</p>
+      </div>
+    </div>
+
+    <!-- Referanslar: user's work -->
+    <div class="g2" style="margin-top:2rem">
+      <div>
+        <img class="img-block" src="/mnt/user-data/uploads/9-2-low.png" alt="EDETRI skateboard paris" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
+        <p class="img-caption">EDETRI — Skatepark + coupe bardak. Contraband'ın en saf ifadesi. Bu kavram ilerletilebilir: event mekan seçiminde de aynı mantık.</p>
+      </div>
+      <div>
+        <img class="img-block" src="/mnt/user-data/uploads/2-3.png" alt="EDETRI paris okey dis-moi" onerror="this.style.background='#181610';this.style.minHeight='200px'">
+        <p class="img-caption">EDETRI — Paris sokağı, okey masası, Dis-Moi wireframe. İki şehri, iki kültürü, iki nesli tek karede birleştiriyor.</p>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">02 — Görsel Dil</div>
+    <h3>Renk: <em>Siyah-Beyaz + İki Aksan</em></h3>
+    <div class="palette">
+      <div class="swatch" style="background:#0d0c0a"><span style="color:#7c7668">Ink<br>Ana</span></div>
+      <div class="swatch" style="background:#3a3628"><span style="color:#7c7668">Mid<br>Doku</span></div>
+      <div class="swatch" style="background:#9a9890"><span style="color:#0d0c0a">Silver<br>Gri</span></div>
+      <div class="swatch" style="background:#e8e0d4"><span style="color:#252218">Cream<br>Vurgu</span></div>
+      <div class="swatch" style="background:#ffffff"><span style="color:#252218">White<br>Wireframe</span></div>
+      <div class="swatch" style="background:#a0622e"><span style="color:#e8e0d4">Copper<br>Tek Aksan</span></div>
+    </div>
+    <p>Renkli görsel minimum. Renk geldiğinde copper aksan olarak gelir — logodan, ambalajdan, ya da sahneye gizlenmiş bir detaydan.</p>
+  </div>
+</section>
+
+<section class="sec-char">
+  <div class="inner">
+    <div class="eyebrow">02 — Fotoğraf + Event Direktifi</div>
+    <h2>Contraband <em>Sahneleri</em></h2>
+
+    <div class="scene">
+      <div class="scene-img">
+        <img src="/mnt/user-data/uploads/1.png" alt="EDETRI çelik sofra B&W" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>İki Şehir, Bir Sofra ↑</h4>
+        <p>Karnıyarık + kruvasan — aynı EDETRI tabağında. Bu konsept sofra event'leri için de doğrudan uygulanabilir: İstanbul-Paris menüsü, EDETRI objeleri, tek uzun çelik masa. B&W. Yüksek grain. Açıklama gerektirmez.</p>
+        <div><span class="tag" style="border-color:#3a4858;color:#8ab0c8">real product</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">B&W</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">no caption needed</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-img">
+        <img src="/mnt/user-data/uploads/7-1.png" alt="EDETRI coupe B&W wireframe" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Wireframe Üçlüsü ↑</h4>
+        <p>Bu görsel çok işe yarıyor çünkü arka plan organik bir doku — wireframe soyut çizgilerle çelişiyor, ama aynı siyah-beyaz tonda buluşuyor. Yeni koleksiyon teaser'ları için bu format: gerçek obje henüz yok, wireframe var. "Geliyor" demeden "geliyor" diyor.</p>
+        <div><span class="tag" style="border-color:#3a4858;color:#8ab0c8">wireframe</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">teaser</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">pre-launch</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-img">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=450&fit=crop" alt="industrial space event" onerror="this.parentElement.style.background='#181610';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Event Mekânı — Yanlış Yer</h4>
+        <p>Contraband event estetiği: endüstriyel mekan, beklenmemiş lokasyon. Depo, terk edilmiş mağaza, çatı katı, iskele. EDETRI objeleri o mekânda oturuyorsa orada oturuyordur. Mekanın "kusurları" sahnenin parçası — düzeltilmez, vurgulanır.</p>
+        <div><span class="tag" style="border-color:#3a4858;color:#8ab0c8">unexpected venue</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">raw space</span></div>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">02 — Wireframe Kuralları</div>
+    <div class="g3">
+      <div class="card">
+        <h4>✓ Ne Zaman?</h4>
+        <p>Yeni ürün teaser'ı. Pre-launch içerik. "Bu dünyaya geliyor" anlatısı. Gerçek sahneye entegre, ışık eşleşmesi titiz yapılmış.</p>
+      </div>
+      <div class="card">
+        <h4>✓ Nasıl?</h4>
+        <p>Beyaz çizgi, şeffaf — objenin iç yapısı görünmeli. Grain arka planla eşdeğer oranda wireframe'e de uygulanmalı. B&W arka planla çalışır.</p>
+      </div>
+      <div class="card">
+        <h4>❌ Ne Zaman Değil?</h4>
+        <p>E-ticaret satış görseli olarak asla. Işık eşleşmesi yapılmadan. Renkli arka plan üzerinde. Gerçek ürün hazırken wireframe kullanmak.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-deep">
+  <div class="inner">
+    <div class="eyebrow">02 — Video + Website + Booklet</div>
+    <h2>Contraband <em>Sistemleri</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Video Mantığı</h3>
+        <p>Dokümanter stili. El kamerası — hafif titreme kabul edilebilir. Kesim hızlı: 2–4sn per shot. B&W. Müzik: post-punk, minimal elektronik, ya da hiç — sadece ortam sesi (sokak gürültüsü, taş üstünde cam).</p>
+        <p>İçerik: gerçek hayat sahneleri + EDETRI objesi. Okey oynanıyor, obje masada. Sokakta yürünüyor, birinin elinde EDETRI bardak var. Event kurulumu belgeleniyor — ama reklam gibi değil.</p>
+      </div>
+      <div>
+        <h3>Website Tonu</h3>
+        <p>Contraband en iyi editoryal galeri olarak çalışır — ürün sayfası değil, lookbook. Görsel grid dominant. Caption'lar kısa ve beklenmedik: "Paris. Okey. Dis-Moi." Renk: siyah-beyaz görseller + minimal copper aksan.</p>
+        <p>Event sayfası Contraband dilinde: unexpected venue görselleri, kurulum anı, obje-mekân diyalogu. "Bize gelenlerin getirdiği" anlatısı.</p>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="spec-label">Booklet — Contraband Versiyonu</div>
+      <p>17×22cm. Dikey. Gazete kağıdı (newsprint) veya kraft. Tek renk: siyah. Spiral cilt veya metal klips. İçerik: fotoğraf heavy — yer adı + ürün adı. "Beşiktaş, 23:40. Pablo." Anlatı yok, izleyici tamamlar. Bu booklet düzenli değil, özel baskı: event'lerde dağıtılır, koleksiyonerlere gider.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CONCEPT 03 — MORNING AFTER
+============================================= -->
+<div class="cband cband-3" id="c3">
+  <div class="cn">03</div>
+  <div class="clabel">Concept 03 — En Sıcak · Website Girişi · Instagram</div>
+  <h2 class="ctitle">Morning<br><em>After</em></h2>
+  <p class="ctagline">Gece bitti. Sofra hâlâ konuşuyor. Ve EDETRI hâlâ orada.</p>
+</div>
+
+<section class="sec-char">
+  <div class="inner">
+    <div class="eyebrow">03 — Ruh</div>
+    <h2>Gecenin <em>İzleri</em></h2>
+    <p class="lead">Geceyi anlatan obje değil — gecenin üzerinde bıraktığı iz. EDETRI sonradan da güzel. Event sabah da konuşuyor.</p>
+
+    <div class="g2">
+      <div>
+        <p>Erimiş mum. Ruj izi. Boş bardak. Ekmek kırıntısı. Buruşmuş peçete. Bu görseller bir hikayenin son karesini gösteriyor — ama o hikaye izleyicinin hayal gücünde tamamlanıyor. EDETRI o gecede vardı.</p>
+        <p>Bu concept event'ler için altın değerinde: bir event sonrası bu dilde çekilmiş görseller, izleyiciye "o gecede olmak isterdim" hissini veriyor. Reklam değil — özlem.</p>
+      </div>
+      <div>
+        <p>Üç conceptin en az "marka" hissettireni — ama en çok "yaşam" hissettireni. Obje ikincil değil, ama sahne onların etrafında kurulmuyor. Sahne yaşandı, objeler orada kaldı.</p>
+        <p>Renk: bu concept tek renkli çalışan. Overexposed, warm, sabah ışığı. Grain hafif — kağıt dokusu zaten üstlenir.</p>
+      </div>
+    </div>
+
+    <!-- Referans: user's work + external -->
+    <div class="g2" style="margin-top:2rem">
+      <div>
+        <img class="img-block" src="/mnt/user-data/uploads/8-4-2.png" alt="EDETRI rönesans portre metalik" onerror="this.style.background='#2c2a25';this.style.minHeight='200px'">
+        <p class="img-caption">EDETRI — Rönesans portresi + metalik EDETRI obje. Morning After'ın "bir önceki gece nasıldı?" sorusunu bu görsel soruyor. Ürün abiyeye entegre — geceye ait.</p>
+      </div>
+      <div>
+        <img class="img-block" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=450&fit=crop" alt="restaurant table morning after warm" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
+        <p class="img-caption">Referans atmosfer: sabah ışığı, boş bardaklar, warm overexposed. Bu enerji EDETRI event sonrası belgeleme için hedef ton.</p>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <h3>Renk <em>Sistemi</em></h3>
+    <div class="palette">
+      <div class="swatch" style="background:#f5f0e5"><span style="color:#3a3628">Linen<br>Ana</span></div>
+      <div class="swatch" style="background:#e8dcc8"><span style="color:#3a3628">Parchment<br>Sıcak</span></div>
+      <div class="swatch" style="background:#c8b898"><span style="color:#3a3628">Wheat<br>Yaşanmış</span></div>
+      <div class="swatch" style="background:#7a3820"><span style="color:#e8dcc8">Wine<br>Leke</span></div>
+      <div class="swatch" style="background:#1a1410"><span style="color:#c8b898">Char<br>Gölge</span></div>
+      <div class="swatch" style="background:#a0622e"><span style="color:#e8dcc8">Copper<br>Aksan</span></div>
+    </div>
+    <p>Fotoğraflarda overexpose: +1 ile +1.5 stop. WB: sıcak (tungsten ambiance veya golden hour). Sonradan Lightroom'da daha da ısıtılır.</p>
+  </div>
+</section>
+
+<section class="sec-dark">
+  <div class="inner">
+    <div class="eyebrow">03 — Fotoğraf + Event Direktifi</div>
+    <h2>Morning After <em>Sahneleri</em></h2>
+
+    <div class="scene">
+      <div class="scene-img">
+        <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=600&h=400&fit=crop" alt="morning breakfast warm light table" onerror="this.parentElement.style.background='#f0ebe0';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Sabah Işığı</h4>
+        <p>Pencere ışığı dominant. +1.5 stop overexpose. Sıcak WB. Shallow DOF: obje net, çevre flow. İzler hero: ruj izi, mum damlası, leke. Kurulum değil — yakalanmış an. Bu sabah fotoğrafları hem ürünü hem event'in ertesi sabahını anlatır.</p>
+        <div><span class="tag" style="border-color:#7a5a40;color:#c09878">+1.5 exp</span><span class="tag" style="border-color:#7a5a40;color:#c09878">warm WB</span><span class="tag" style="border-color:#7a5a40;color:#c09878">f/2</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-img">
+        <img src="/mnt/user-data/uploads/6-4.png" alt="EDETRI eriyen metal kase beyaz" onerror="this.parentElement.style.background='#f0ebe0';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Eriyen Hafıza ↑</h4>
+        <p>Senin gümüş eriyen kase görselin. Off-white zemin, grain, eriyen form — "sonra ne oldu?" sorusunu soran bir görüntü. Bu Morning After'ın obje dili: sanki gecenin sıcağında biraz eridi. Booklet kapağı adayı.</p>
+        <div><span class="tag" style="border-color:#7a5a40;color:#c09878">off-white bg</span><span class="tag" style="border-color:#7a5a40;color:#c09878">grain</span><span class="tag" style="border-color:#7a5a40;color:#c09878">melting form</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-img">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=400&fit=crop" alt="restaurant interior warm atmospheric" onerror="this.parentElement.style.background='#1a1410';this.parentElement.style.minHeight='180px'">
+      </div>
+      <div class="scene-info">
+        <h4>Event Sonrası Atmosfer</h4>
+        <p>Event bitti, masa hâlâ kurulu. Misafirler gitti ama izleri var. Bu fotoğraflar event'i "satmaz" — özlemini yaratır. Sosyal medya için en güçlü event içeriği: sahne değil, an. EDETRI objeleri o anın parçası.</p>
+        <div><span class="tag" style="border-color:#7a5a40;color:#c09878">post-event</span><span class="tag" style="border-color:#7a5a40;color:#c09878">warm light</span><span class="tag" style="border-color:#7a5a40;color:#c09878">lived-in</span></div>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">03 — Video + Website + Booklet</div>
+    <h2>Morning After <em>Sistemleri</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Video</h3>
+        <p>Kısa form: 20–60sn. Reels boyutu ama yüksek kalite. İçerik: sofranın kaldırılması değil, sabah haliyle bulunması. El EDETRI objesine uzanıyor, kahve demlenirken obje arka planda. Ses: diegetic (bardak, kahve, dış ses yok).</p>
+        <p>Event için: kurulum anı değil, kurulumun tamamlandığı an. İlk misafir geldiğinde. Son bardak kaldırılırken.</p>
+      </div>
+      <div>
+        <h3>Website</h3>
+        <p>En sıcak concept — website hero için doğru giriş noktası. Hero: overexposed sabah görseli. Scroll'da soğur: daha dramatik Liturgy görselleri gelir. Bu geçiş izleyiciye "bu marka hem bu kadar sıcak hem bu kadar dramatik olabilir" der.</p>
+        <p>Renk: paper background + warm accent. Üç concept içinde tek açık fonlu.</p>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="spec-label">Booklet — Morning After Versiyonu</div>
+      <p>18×24cm. Dikey. Coated + uncoated kağıt mix — bazı sayfalar parlak, bazıları mat. İçerik: bir gecenin başından sabahına kronolojik akış. Obje ve event sayfaları dönüşümlü. Kapak: beyaz zemin, tek iz (mum damlası? ruj? şarap?). Minimal metin. Bu format düzenli koleksiyon booklet'i için ideal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     EVENT = ÜRÜN BÖLÜMÜ
+============================================= -->
+<section class="sec" id="event">
+  <div class="eyebrow">Kritik Bölüm — Event ve Obje</div>
+  <h2>İkisi <em>Eşit.</em><br>İkisi Aynı Dil.</h2>
+  <p class="lead">EDETRI'nin anlaşılmama sorunu buradan geliyor: event ve obje ayrı dünyalar gibi görünüyor. Bu bible bu ayrışmayı bitirir.</p>
+
+  <div class="g2">
+    <div>
+      <h3>Şimdiki Algı</h3>
+      <p>Ziyaretçi siteye girdiğinde ürünleri görüyor. Events sayfasına gitmezse event'in varlığından haberi olmuyor. Sosyal medyada bazen ürün, bazen event — aralarında görsel bağ yok.</p>
+      <p>Sonuç: "bardak-tabak satan İstanbul markası" olarak algılanıyor. Event arayan biri EDETRI'yi aklına getirmiyor.</p>
+    </div>
+    <div>
+      <h3>Yeni Algı</h3>
+      <p>Her ürün görseli bir sofranın parçası olarak gösterilir. Her event görseli EDETRI objeleri olmadan tamamlanmış sayılmaz. Booklet ikisini aynı sayfada taşır. Website "Objects + Tables" diye iki eşit kanala bölünür.</p>
+      <p>Sonuç: "sofra ve event tasarlayan" marka. Ürün almak isteyen event servisini de öğreniyor. Event isteyen obje kalitesini de görüyor.</p>
+    </div>
+  </div>
+
+  <div class="div"><div class="div-dot"></div></div>
+
+  <h3>Her Conceptte <em>Event Nasıl Anlatılır?</em></h3>
+
+  <div class="g3" style="margin-top:1.5rem">
+    <div class="card-light">
+      <h4>Liturgy Event'i</h4>
+      <p>Dramatik mekan. Karanlık, tek uzun masa, spot ışık, mum. EDETRI objeleri merkezi kaplıyor. Fotoğraf: tıpkı ürün fotoğrafı gibi chiaroscuro — ama sofra kurulu, misafirler bekleniyor. Event "kutsal" bir atmosfer kuruyor.</p>
+      <span class="tag tag-cu">uzun masa</span><span class="tag tag-cu">spot+mum</span><span class="tag tag-cu">karanlık mekan</span>
+    </div>
+    <div class="card-light">
+      <h4>Contraband Event'i</h4>
+      <p>Unexpected mekan. Depo, çatı katı, iskele. Masa standard değil — belki çelik tel, belki ham ahşap. EDETRI objeleri o "yanlış" mekanda "doğru" hissettiriyor. Okunması gereken mesaj: "biz her yerde güzel bir an kurabiliriz."</p>
+      <span class="tag" style="border-color:#3a4858;color:#8ab0c8">endüstriyel mekan</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">B&W</span>
+    </div>
+    <div class="card-light">
+      <h4>Morning After Event'i</h4>
+      <p>Sıcak mekan. Yüksek tavanlı eski bir bina, güneş giren pencereler. Sofra kurulu ama "çok mükemmel" değil — cömert boşluklar var, misafir bekliyor. Post-event görselleri altın: sabah ışığında EDETRI objeleri o gecenin izlerini taşıyor.</p>
+      <span class="tag" style="border-color:#7a5a40;color:#c09878">sıcak mekan</span><span class="tag" style="border-color:#7a5a40;color:#c09878">doğal ışık</span>
+    </div>
+  </div>
+
+  <div class="div"><div class="div-dot"></div></div>
+
+  <h3>Website'de <em>Eşit Ağırlık</em></h3>
+  <div class="g2">
+    <div>
+      <div class="spec" style="border-color:var(--cu)">
+        <div class="spec-label">Navigasyon Önerisi</div>
+        <p>Şimdiki: ABOUT · PRODUCTS · EVENTS · PRESS<br><br>
+        Önerilen: ABOUT · OBJECTS · TABLES · PRESS<br><br>
+        "OBJECTS" = satılık objeler. "TABLES" = event servisi + hazır sofra önerileri. İkisi eşit font büyüklüğünde, eşit görsel ağırlıkta. TABLES sayfası event'lerin nasıl göründüğünü objelerle birlikte anlatır.</p>
+      </div>
+    </div>
+    <div>
+      <div class="spec" style="border-color:var(--cu)">
+        <div class="spec-label">Instagram İçerik Dağılımı</div>
+        <p>Hedef oran: %50 obje · %50 event/sofra.<br><br>
+        Şimdiki durum muhtemelen %80 obje. Bu oranı değiştirmek için her prodüksiyon gününde event sahneleri de çekilmeli — sadece "satılık ürün" değil, "bu ürünlerin hayat bulduğu sofra."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SISTEM — ORTAK KURALLAR
+============================================= -->
+<section class="sec-dark" id="system">
+  <div class="inner">
+    <div class="eyebrow">Sistem — Değişmeyen Kurallar</div>
+    <h2>Her Conceptte<br><em>Sabit Olan</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Logo Kullanımı</h3>
+        <p>EDETRI logotype — o blackletter-art nouveau karakter — asla bozulmaz, yeniden çizilmez, efekt eklenmez. Metallic versiyon sadece büyük format: kapak, tabela, event branding. Küçük boyutlarda temiz.</p>
+        <p>Yerleşim: sol üst veya sağ alt — asla merkez. Başlık ile yarışmaz. Sahnede kaybolabilir — bu güzel. Senin görsellerinde logotype tam doğru yerde, bu devam etmeli.</p>
+      </div>
+      <div>
+        <h3>Grain Standardı</h3>
+        <p>Her görsel grain alır. Dijital için: 12–18% luminance noise, monochrome grain (Lightroom). Film tarama: olduğu gibi. Video: grain overlay %6–10 opacity, 24fps loop.</p>
+        <p>Büyük baskılarda (booklet) grain azaltılır — kağıt dokusu üstlenir. Ekranda görünen grain ile basılı grain farklı davranır, test edilmeli.</p>
+      </div>
+    </div>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <h3>Kanal — Concept <em>Matrisi</em></h3>
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Kanal</th>
+          <th>Birincil Concept</th>
+          <th>İkincil</th>
+          <th>Asla</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Website — Hero</td>
+          <td>Morning After (sıcak giriş)</td>
+          <td>Liturgy (dramatik)</td>
+          <td>Contraband (çok çarpıcı)</td>
+        </tr>
+        <tr>
+          <td>Website — Objects Sayfası</td>
+          <td>Liturgy (ikonik portre)</td>
+          <td>—</td>
+          <td>Steril beyaz stüdyo</td>
+        </tr>
+        <tr>
+          <td>Website — Tables Sayfası</td>
+          <td>Liturgy + Morning After</td>
+          <td>Contraband (unexpected)</td>
+          <td>Event kataloğu estetiği</td>
+        </tr>
+        <tr>
+          <td>Instagram Feed</td>
+          <td>Liturgy ağırlık</td>
+          <td>Contraband sürpriz, M.After sıcaklık</td>
+          <td>Stüdyo beyaz, flat lay</td>
+        </tr>
+        <tr>
+          <td>Instagram Reels</td>
+          <td>Contraband + Morning After</td>
+          <td>—</td>
+          <td>Liturgy (çok yavaş)</td>
+        </tr>
+        <tr>
+          <td>Booklet (ana)</td>
+          <td>Liturgy</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Booklet (özel baskı)</td>
+          <td>Contraband (event dağıtım)</td>
+          <td>Morning After</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Event Mekan + Sofra</td>
+          <td>Liturgy (atmosfer)</td>
+          <td>Contraband (unexpected)</td>
+          <td>Morning After (henüz kurulmadan)</td>
+        </tr>
+        <tr>
+          <td>Press Kit</td>
+          <td>Liturgy</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Ambalaj + Kart</td>
+          <td>Liturgy tonu, Copper detay</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="div"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">Sosyal Medya Kuralları</div>
+    <div class="g3" style="margin-top:1.5rem">
+      <div class="card">
+        <h4>Grid Dengesi</h4>
+        <p>Art arda iki siyah-beyaz görsel → üçüncü tonlu. Art arda iki çok koyu → bir açık. Obje ve sofra/event görselleri dönüşümlü. %50/%50 hedefi.</p>
+      </div>
+      <div class="card">
+        <h4>Caption Tonu</h4>
+        <p>Kısa. Türkçe/Fransızca/İngilizce serbestçe. Açıklama yok. Soru yok. Hashtag: max 3, küçük, son satırda. "Dis-Moi. Paris, Şubat." yeterli.</p>
+      </div>
+      <div class="card">
+        <h4>Stories vs Feed</h4>
+        <p>Feed: her üç concept. Stories: Morning After enerji — spontan, sıcak, kısa. Reels: Contraband enerji — unexpected, belgesel, keskin. Stories'de event kurulumu ve ertesi sabah görselleri güçlü.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="sec-deep" id="roadmap">
+  <div class="inner">
+    <div class="eyebrow">Roadmap</div>
+    <h2>Ne Zaman <em>Ne</em></h2>
+    <p class="lead">Bible uygulanabilir olmalı. Bu sırayla.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-time">Hemen</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>İki Karar</h4>
+          <p>1. Ana concept seçimi (önerim: Liturgy ana dil, diğerleri yan kanallara). 2. Website navigasyonu: PRODUCTS → OBJECTS + TABLES. Bu iki değişiklik bile algıyı dönüştürür.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">0–2 Hafta</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Test Çekimi</h4>
+          <p>1 günlük çekim: hem obje portresi (Liturgy) hem sofra sahnesi (event kurulumu). Bu görsellerle bible testi: doğru ışık, doğru grain, doğru açı mı? Onaylanırsa tam prodüksiyon.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">2–6 Hafta</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Prodüksiyon Round 1</h4>
+          <p>Website hero görselleri. Aktif tüm ürünler için Liturgy portresi. İlk sofra/event sahneleri. 1 adet atmosferik loop video. Booklet görsel seçimi başlar.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">6–12 Hafta</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Booklet + Website Yenilemesi</h4>
+          <p>Booklet Chapter 01 baskısı (obje + event eşit dağılım). Website görsel güncellemesi. Tables sayfası canlıya giriyor. Proses filmi (atölye).</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">3–6 Ay</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Metal Koleksiyon + Event Lansmanı</h4>
+          <p>Yeni ürünler Liturgy + Contraband dilinde. İlk "Tender Metal" event'i. Contraband booklet özel baskısı event'te dağıtılır. Chapter 02 planlaması.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fq">"Işık bir taraftan giriyor.<br>Metal yansıtıyor. Cam içinden geçiriyor."</div>
+  <p style="margin-bottom:.3rem">EDETRI · Creative Bible V2 · 2026</p>
+  <p>Istanbul — Paris · Confidential</p>
+</footer>
+
+</body>
+</html>
