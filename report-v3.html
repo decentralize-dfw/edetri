@@ -255,16 +255,19 @@ blockquote{
   width:100%;aspect-ratio:4/3;
   object-fit:cover;display:block;
   filter:grayscale(15%) contrast(1.05);
+  min-height:180px;background:#1a1814;
 }
 .img-block-sq{
   width:100%;aspect-ratio:1/1;
   object-fit:cover;display:block;
   filter:grayscale(15%) contrast(1.05);
+  min-height:180px;background:#1a1814;
 }
 .img-block-tall{
   width:100%;aspect-ratio:3/4;
   object-fit:cover;display:block;
   filter:grayscale(15%) contrast(1.05);
+  min-height:240px;background:#1a1814;
 }
 .img-caption{
   font-family:'DM Mono',monospace;
@@ -300,8 +303,8 @@ blockquote{
 @media(max-width:768px){
   .scene,.scene:nth-child(even){grid-template-columns:1fr;direction:ltr;}
 }
-.scene-img{min-height:180px;overflow:hidden;}
-.scene-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.scene-img{min-height:180px;overflow:hidden;background:#1a1814;}
+.scene-img img{width:100%;height:100%;object-fit:cover;display:block;min-height:180px;}
 .scene-info{
   background:var(--deep);padding:1.5rem;
   display:flex;flex-direction:column;justify-content:center;
@@ -410,8 +413,8 @@ blockquote{
 }
 .mosaic .tall{grid-row:span 2;}
 .mosaic .wide{grid-column:span 2;}
-.mosaic-item{overflow:hidden;position:relative;}
-.mosaic-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.mosaic-item{overflow:hidden;position:relative;min-height:200px;}
+.mosaic-item img{width:100%;height:100%;object-fit:cover;display:block;min-height:200px;}
 .mosaic-item .mo{
   position:absolute;bottom:0;left:0;right:0;
   background:linear-gradient(transparent,rgba(0,0,0,.75));
@@ -571,27 +574,27 @@ footer p{
     <div class="mosaic">
       <!-- Caravaggio karanlık dramatik ışık -->
       <div class="mosaic-item tall">
-        <img src="https://images.metmuseum.org/CRDImages/ep/original/DT1579.jpg" alt="Caravaggio dark dramatic light" onerror="this.parentElement.style.background='#252218'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Michelangelo_Caravaggio_007.jpg/800px-Michelangelo_Caravaggio_007.jpg" alt="Caravaggio dark dramatic light" onerror="this.parentElement.style.background='#252218'">
         <div class="mo">Caravaggio — Tenebrism</div>
       </div>
       <!-- Dutch masters still life -->
       <div class="mosaic-item wide">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Jan_Davidsz._de_Heem_-_Vase_of_Flowers_-_NGA.jpg/1280px-Jan_Davidsz._de_Heem_-_Vase_of_Flowers_-_NGA.jpg" alt="Dutch masters still life" onerror="this.parentElement.style.background='#1a1814'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Jan_Davidsz._de_Heem_-_Vase_of_Flowers_-_NGA.jpg/800px-Jan_Davidsz._de_Heem_-_Vase_of_Flowers_-_NGA.jpg" alt="Dutch masters still life" onerror="this.parentElement.style.background='#1a1814'">
         <div class="mo">Dutch Masters Still Life</div>
       </div>
       <!-- user ref: eriyen cam siyah fon -->
       <div class="mosaic-item">
-        <img src="/mnt/user-data/uploads/5-2.png" alt="EDETRI eriyen cam" onerror="this.parentElement.style.background='#0d0c0a'">
+        <img src="https://xrweb.studio/edetri/image/5-2.png" alt="EDETRI eriyen cam" onerror="this.parentElement.style.background='#0d0c0a'">
         <div class="mo">EDETRI — Eriyen Cam ↑</div>
       </div>
       <!-- user ref: sofra karanlık -->
       <div class="mosaic-item">
-        <img src="/mnt/user-data/uploads/1.png" alt="EDETRI sofra" onerror="this.parentElement.style.background='#181610'">
+        <img src="https://xrweb.studio/edetri/image/1.png" alt="EDETRI sofra" onerror="this.parentElement.style.background='#181610'">
         <div class="mo">EDETRI — Çelik+Sofra ↑</div>
       </div>
       <!-- user ref: okey paris -->
       <div class="mosaic-item wide">
-        <img src="/mnt/user-data/uploads/2-3.png" alt="EDETRI paris okey" onerror="this.parentElement.style.background='#1c1814'">
+        <img src="https://xrweb.studio/edetri/image/2-3.png" alt="EDETRI paris okey" onerror="this.parentElement.style.background='#1c1814'">
         <div class="mo">EDETRI — Paris, Okey, Dis-Moi ↑</div>
       </div>
     </div>
@@ -645,11 +648,11 @@ footer p{
     <!-- Görsel referanslar: Caravaggio + user's own work -->
     <div class="g2" style="margin-top:2rem">
       <div>
-        <img class="img-block" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Michelangelo_Caravaggio_007.jpg/1280px-Michelangelo_Caravaggio_007.jpg" alt="Caravaggio Bacchus chiaroscuro" onerror="this.style.background='#252218';this.style.minHeight='200px'">
+        <img class="img-block" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Michelangelo_Caravaggio_007.jpg/800px-Michelangelo_Caravaggio_007.jpg" alt="Caravaggio Bacchus chiaroscuro" onerror="this.style.background='#252218';this.style.minHeight='200px'">
         <p class="img-caption">Caravaggio, Bacchus (c.1596) — Tek ışık, dramatik gölge, sofra objesi. Senin Caravaggio kolajının arka planı tam bu.</p>
       </div>
       <div>
-        <img class="img-block" src="/mnt/user-data/uploads/caravaggio-2.png" alt="EDETRI Caravaggio Dis-Moi" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
+        <img class="img-block" src="https://xrweb.studio/edetri/image/caravaggio-2.png" alt="EDETRI Caravaggio Dis-Moi" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
         <p class="img-caption">EDETRI — Senin çalışman. Dis-Moi wireframe Baküs'ün elinde. Liturgy'nin sezgisel başlangıç noktası.</p>
       </div>
     </div>
@@ -699,7 +702,7 @@ footer p{
     <!-- Scene A: Obje -->
     <div class="scene">
       <div class="scene-img">
-        <img src="https://images.squarespace-cdn.com/content/v1/5d5a4ad45e6b9c0001c7b72a/1621524978654-YH0ZQRWVNZF9MK0AVNMO/Dark+Moody+Stoneware.jpg" alt="dark dramatic ceramic photography" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+        <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&h=450&fit=crop" alt="dark dramatic ceramic photography" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>Obje — Tek Işık Portresi</h4>
@@ -712,7 +715,7 @@ footer p{
     <!-- Scene B: Sofra -->
     <div class="scene">
       <div class="scene-img">
-        <img src="https://images.squarespace-cdn.com/content/v1/5e3b7c3cc8e5b14f1fcc1a6e/1619134078291-T5E6SNZF0H7K5YYBXQY8/dark-moody-tablescape-candles.jpg" alt="dark moody tablescape candles" onerror="this.parentElement.style.background='#181610';this.parentElement.style.minHeight='180px'">
+        <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=450&fit=crop" alt="dark moody tablescape candles" onerror="this.parentElement.style.background='#181610';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>Sofra — Yaşanmış Masa</h4>
@@ -725,7 +728,7 @@ footer p{
     <!-- Scene C: Event -->
     <div class="scene">
       <div class="scene-img">
-        <img src="/mnt/user-data/uploads/1.png" alt="EDETRI çelik tel masa sofra karanlık" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+        <img src="https://xrweb.studio/edetri/image/1.png" alt="EDETRI çelik tel masa sofra karanlık" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>Event — Senin Dili ↑</h4>
@@ -738,7 +741,7 @@ footer p{
     <!-- Scene D: Atölye / Proses -->
     <div class="scene">
       <div class="scene-img">
-        <img src="https://images.squarespace-cdn.com/content/v1/5f6f5d2b9e7f5b3ae4e4c4c4/1623456789012-ABCDEFGHIJKLMN/glassblowing-dark-dramatic.jpg" alt="glassblowing dark dramatic" onerror="this.parentElement.style.background='#1a0a02';this.parentElement.style.minHeight='180px'">
+        <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&h=450&fit=crop" alt="glassblowing dark dramatic" onerror="this.parentElement.style.background='#1a0a02';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>Proses — Atölye</h4>
@@ -863,11 +866,11 @@ footer p{
     <!-- Referanslar: user's work -->
     <div class="g2" style="margin-top:2rem">
       <div>
-        <img class="img-block" src="/mnt/user-data/uploads/9-2-low.png" alt="EDETRI skateboard paris" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
+        <img class="img-block" src="https://xrweb.studio/edetri/image/9-2-low.png" alt="EDETRI skateboard paris" onerror="this.style.background='#1a1814';this.style.minHeight='200px'">
         <p class="img-caption">EDETRI — Skatepark + coupe bardak. Contraband'ın en saf ifadesi. Bu kavram ilerletilebilir: event mekan seçiminde de aynı mantık.</p>
       </div>
       <div>
-        <img class="img-block" src="/mnt/user-data/uploads/2-3.png" alt="EDETRI paris okey dis-moi" onerror="this.style.background='#181610';this.style.minHeight='200px'">
+        <img class="img-block" src="https://xrweb.studio/edetri/image/2-3.png" alt="EDETRI paris okey dis-moi" onerror="this.style.background='#181610';this.style.minHeight='200px'">
         <p class="img-caption">EDETRI — Paris sokağı, okey masası, Dis-Moi wireframe. İki şehri, iki kültürü, iki nesli tek karede birleştiriyor.</p>
       </div>
     </div>
@@ -895,7 +898,7 @@ footer p{
 
     <div class="scene">
       <div class="scene-img">
-        <img src="/mnt/user-data/uploads/1.png" alt="EDETRI çelik sofra B&W" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+        <img src="https://xrweb.studio/edetri/image/1.png" alt="EDETRI çelik sofra B&W" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>İki Şehir, Bir Sofra ↑</h4>
@@ -906,7 +909,7 @@ footer p{
 
     <div class="scene">
       <div class="scene-img">
-        <img src="/mnt/user-data/uploads/7-1.png" alt="EDETRI coupe B&W wireframe" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
+        <img src="https://xrweb.studio/edetri/image/7-1.png" alt="EDETRI coupe B&W wireframe" onerror="this.parentElement.style.background='#1a1814';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>Wireframe Üçlüsü ↑</h4>
@@ -1001,7 +1004,7 @@ footer p{
     <!-- Referans: user's work + external -->
     <div class="g2" style="margin-top:2rem">
       <div>
-        <img class="img-block" src="/mnt/user-data/uploads/8-4-2.png" alt="EDETRI rönesans portre metalik" onerror="this.style.background='#2c2a25';this.style.minHeight='200px'">
+        <img class="img-block" src="https://xrweb.studio/edetri/image/8-4-2.png" alt="EDETRI rönesans portre metalik" onerror="this.style.background='#2c2a25';this.style.minHeight='200px'">
         <p class="img-caption">EDETRI — Rönesans portresi + metalik EDETRI obje. Morning After'ın "bir önceki gece nasıldı?" sorusunu bu görsel soruyor. Ürün abiyeye entegre — geceye ait.</p>
       </div>
       <div>
@@ -1043,7 +1046,7 @@ footer p{
 
     <div class="scene">
       <div class="scene-img">
-        <img src="/mnt/user-data/uploads/6-4.png" alt="EDETRI eriyen metal kase beyaz" onerror="this.parentElement.style.background='#f0ebe0';this.parentElement.style.minHeight='180px'">
+        <img src="https://xrweb.studio/edetri/image/6-4.png" alt="EDETRI eriyen metal kase beyaz" onerror="this.parentElement.style.background='#f0ebe0';this.parentElement.style.minHeight='180px'">
       </div>
       <div class="scene-info">
         <h4>Eriyen Hafıza ↑</h4>
