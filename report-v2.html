@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EDETRI — Creative Bible V2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Unbounded:wght@200;300;700&display=swap');
+
+:root {
+  --ink:    #0d0c0a;
+  --deep:   #181610;
+  --char:   #252218;
+  --mid:    #3a3628;
+  --ash:    #7c7668;
+  --bone:   #b8b0a2;
+  --cream:  #e8e0d4;
+  --paper:  #f4f0e8;
+
+  /* concept accents */
+  --cu:     #a0622e;
+  --rust:   #7a3820;
+  --silver: #9a9890;
+  --gold:   #b09050;
+  --wine:   #5a1e28;
+  --sage:   #5a6850;
+
+  --c1:     #a0622e;  /* concept 1 */
+  --c2:     #3a4858;  /* concept 2 */
+  --c3:     #6a4838;  /* concept 3 */
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* GRAIN */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top:0; z-index:100;
+  background: rgba(13,12,10,.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(160,98,46,.1);
+  padding: .75rem 2rem;
+  display: flex; gap:2rem; align-items:center;
+  overflow-x:auto;
+}
+nav .nav-logo {
+  font-family:'DM Mono',monospace;
+  font-size:.42rem; letter-spacing:.4em;
+  color:var(--cu); text-transform:uppercase;
+  white-space:nowrap; margin-right:1rem;
+}
+nav a {
+  font-family:'DM Mono',monospace;
+  font-size:.42rem; letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ash); text-decoration:none;
+  white-space:nowrap; transition:color .25s;
+}
+nav a:hover { color:var(--cream); }
+
+/* ─── COVER ─── */
+.cover {
+  min-height:100vh;
+  background: var(--ink);
+  display:grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 2.5rem;
+  position:relative; overflow:hidden;
+}
+.cover-glow {
+  position:absolute; 
+  width:600px; height:600px;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(160,98,46,.05) 0%, transparent 65%);
+  bottom:-200px; right:-100px;
+  pointer-events:none;
+}
+.cover-glow2 {
+  position:absolute;
+  width:400px; height:400px;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(90,30,40,.04) 0%, transparent 65%);
+  top:-100px; left:-80px;
+  pointer-events:none;
+}
+.cover-top {
+  display:flex; justify-content:space-between; align-items:flex-start;
+}
+.cover-eyebrow {
+  font-family:'DM Mono',monospace;
+  font-size:.44rem; letter-spacing:.35em;
+  color:var(--ash); text-transform:uppercase;
+}
+.cover-meta {
+  font-family:'DM Mono',monospace;
+  font-size:.4rem; letter-spacing:.12em;
+  color:var(--ash); text-transform:uppercase;
+  text-align:right; line-height:2.2;
+}
+.cover-body {
+  display:flex; flex-direction:column;
+  justify-content:center;
+  padding: 3rem 0;
+}
+.cover-kicker {
+  font-family:'DM Mono',monospace;
+  font-size:.42rem; letter-spacing:.35em;
+  color:var(--cu); text-transform:uppercase;
+  margin-bottom:1.8rem;
+}
+.cover-h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  font-size: clamp(2.8rem,7.5vw,7rem);
+  color:var(--cream);
+  line-height:.98;
+  letter-spacing:-.015em;
+}
+.cover-h1 em { font-style:italic; color:var(--cu); }
+.cover-h1 .line2 { padding-left: 3rem; }
+.cover-desc {
+  margin-top:2.2rem;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:1.1rem;
+  color:var(--ash);
+  max-width:520px;
+  line-height:1.9;
+  border-left:1px solid rgba(160,98,46,.3);
+  padding-left:1.2rem;
+}
+.cover-bottom {
+  border-top:1px solid rgba(255,255,255,.05);
+  padding-top:1.5rem;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.cover-index {
+  display:flex; gap:1.5rem;
+}
+.cover-index-item {
+  font-family:'DM Mono',monospace;
+  font-size:.38rem; letter-spacing:.1em;
+  color:var(--ash); text-transform:uppercase;
+}
+.cover-index-item strong {
+  display:block;
+  color:var(--bone); font-weight:400;
+  font-size:.5rem;
+}
+
+/* ─── SECTION SHELLS ─── */
+.sec {
+  padding: 6rem 2.5rem;
+  max-width:1200px;
+  margin:0 auto;
+}
+.sec-dark {
+  background:var(--ink);
+  color:var(--cream);
+  padding:6rem 2.5rem;
+}
+.sec-dark .sec-inner { max-width:1200px; margin:0 auto; }
+
+.sec-char {
+  background:var(--char);
+  color:var(--cream);
+  padding:6rem 2.5rem;
+}
+.sec-char .sec-inner { max-width:1200px; margin:0 auto; }
+
+.sec-deep {
+  background:var(--deep);
+  color:var(--cream);
+  padding:6rem 2.5rem;
+}
+.sec-deep .sec-inner { max-width:1200px; margin:0 auto; }
+
+/* ─── TYPE SYSTEM ─── */
+.eyebrow {
+  font-family:'DM Mono',monospace;
+  font-size:.42rem; letter-spacing:.4em;
+  text-transform:uppercase;
+  color:var(--cu);
+  margin-bottom:.5rem;
+}
+.sec-dark .eyebrow, .sec-char .eyebrow, .sec-deep .eyebrow { color:var(--cu); }
+
+h2 {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  font-size: clamp(2rem,4vw,3.8rem);
+  line-height:1.08;
+  letter-spacing:-.01em;
+  margin-bottom:.6rem;
+}
+h2 em { font-style:italic; color:var(--cu); }
+
+.lead {
+  font-size:1.1rem;
+  font-style:italic;
+  color:var(--ash);
+  max-width:580px;
+  line-height:1.85;
+  margin-bottom:3rem;
+}
+.sec-dark .lead, .sec-char .lead, .sec-deep .lead { color:var(--bone); }
+
+h3 {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:400;
+  font-size:1.55rem;
+  margin:2.5rem 0 .6rem;
+  letter-spacing:.01em;
+}
+h3 em { font-style:italic; color:var(--cu); }
+
+p {
+  font-size:.92rem;
+  max-width:64ch;
+  margin-bottom:.9rem;
+  color:var(--mid);
+  line-height:1.85;
+}
+.sec-dark p, .sec-char p, .sec-deep p { color:var(--bone); }
+
+blockquote {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:1.5rem;
+  line-height:1.55;
+  border-left:1px solid var(--cu);
+  padding-left:1.5rem;
+  margin:2.5rem 0;
+  max-width:52ch;
+  color:var(--mid);
+}
+.sec-dark blockquote, .sec-char blockquote, .sec-deep blockquote { color:var(--bone); }
+
+/* ─── GRIDS ─── */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin:2rem 0; }
+.g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin:2rem 0; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin:2rem 0; }
+@media(max-width:768px){
+  .g2,.g3,.g4 { grid-template-columns:1fr; }
+}
+
+/* ─── CARDS ─── */
+.card {
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  padding:1.8rem;
+}
+.card-light {
+  background:rgba(0,0,0,.03);
+  border:1px solid rgba(0,0,0,.07);
+  padding:1.8rem;
+}
+.card h4 {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:400;
+  font-size:1.2rem;
+  margin-bottom:.5rem;
+}
+.card p, .card-light p { font-size:.82rem; color:var(--ash); max-width:none; margin:0; }
+.card-light p { color:var(--mid); }
+
+.tag {
+  display:inline-block;
+  font-family:'DM Mono',monospace;
+  font-size:.38rem; letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:.25rem .6rem;
+  border:1px solid var(--ash);
+  color:var(--ash);
+  margin:2px;
+}
+.tag-cu { border-color:var(--cu); color:var(--cu); }
+.tag-c2 { border-color:var(--c2); color:var(--c2); }
+.tag-c3 { border-color:var(--c3); color:var(--c3); }
+
+/* ─── DIVIDER ─── */
+.div-line {
+  display:flex; align-items:center; gap:1.5rem;
+  margin:3rem 0;
+}
+.div-line::before, .div-line::after {
+  content:''; flex:1;
+  height:1px; background:rgba(0,0,0,.1);
+}
+.sec-dark .div-line::before, .sec-dark .div-line::after,
+.sec-char .div-line::before, .sec-char .div-line::after,
+.sec-deep .div-line::before, .sec-deep .div-line::after {
+  background:rgba(255,255,255,.08);
+}
+.div-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--cu);
+}
+
+/* ─── CONCEPT HEADER BANDS ─── */
+.concept-band {
+  min-height:60vh;
+  display:flex; flex-direction:column;
+  justify-content:flex-end;
+  padding:4rem 2.5rem;
+  position:relative; overflow:hidden;
+}
+.concept-band-1 { background:var(--ink); }
+.concept-band-2 { background:var(--deep); }
+.concept-band-3 { background:var(--char); }
+
+.concept-number {
+  font-family:'Unbounded',sans-serif;
+  font-weight:200;
+  font-size:clamp(5rem,15vw,14rem);
+  line-height:1;
+  position:absolute;
+  right:2rem; bottom:-1rem;
+  opacity:.04;
+  color:var(--cream);
+  pointer-events:none;
+  letter-spacing:-.04em;
+}
+.concept-label {
+  font-family:'DM Mono',monospace;
+  font-size:.42rem; letter-spacing:.4em;
+  text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.concept-band-1 .concept-label { color:var(--cu); }
+.concept-band-2 .concept-label { color:var(--c2); }
+.concept-band-3 .concept-label { color:var(--c3); }
+
+.concept-title {
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  font-size:clamp(2.4rem,6vw,5.5rem);
+  color:var(--cream);
+  line-height:.98;
+  letter-spacing:-.015em;
+}
+.concept-title em { font-style:italic; }
+.concept-band-1 .concept-title em { color:var(--cu); }
+.concept-band-2 .concept-title em { color:#8ab0c8; }
+.concept-band-3 .concept-title em { color:#c09878; }
+
+.concept-tagline {
+  margin-top:1.5rem;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:1.05rem;
+  color:var(--ash);
+  max-width:480px;
+  border-left:1px solid rgba(255,255,255,.12);
+  padding-left:1rem;
+}
+
+/* ─── PALETTE SWATCHES ─── */
+.palette {
+  display:flex; height:56px;
+  margin:1.5rem 0;
+  overflow:hidden;
+}
+.swatch {
+  flex:1; position:relative;
+}
+.swatch span {
+  position:absolute; bottom:.4rem; left:.5rem;
+  font-family:'DM Mono',monospace;
+  font-size:.32rem; letter-spacing:.06em;
+  text-transform:uppercase;
+  line-height:1.5;
+}
+
+/* ─── PHOTO SCENE CARDS ─── */
+.scene {
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:0; margin:1.5rem 0;
+  overflow:hidden;
+}
+.scene:nth-child(even) { direction:rtl; }
+.scene:nth-child(even) > * { direction:ltr; }
+@media(max-width:768px){
+  .scene,.scene:nth-child(even){ grid-template-columns:1fr; direction:ltr; }
+}
+.scene-vis {
+  background:var(--mid);
+  min-height:160px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+.scene-vis svg { width:100%; height:100%; position:absolute; inset:0; }
+.scene-info {
+  background:var(--deep);
+  padding:1.5rem;
+  display:flex; flex-direction:column; justify-content:center;
+}
+.scene-info h4 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.15rem; margin-bottom:.4rem; color:var(--cream);
+}
+.scene-info p { font-size:.78rem; color:var(--bone); max-width:none; margin:0 0 .6rem; }
+
+/* ─── TIMELINE ─── */
+.timeline { margin:2rem 0; }
+.tl-item {
+  display:grid;
+  grid-template-columns:80px 1px 1fr;
+  gap:1rem; margin-bottom:2rem;
+}
+.tl-time {
+  font-family:'DM Mono',monospace;
+  font-size:.42rem; letter-spacing:.1em;
+  color:var(--cu); text-transform:uppercase;
+  text-align:right; padding-top:.15rem;
+}
+.tl-line {
+  background:linear-gradient(var(--cu), var(--ash));
+  position:relative;
+}
+.tl-line::before {
+  content:''; position:absolute;
+  top:4px; left:-3px;
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--cu);
+}
+.tl-body h4 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem; margin-bottom:.2rem; color:var(--cream);
+}
+.tl-body p { font-size:.78rem; color:var(--bone); max-width:none; margin:0; }
+
+/* ─── TENSION MAP ─── */
+.tension { margin:1.5rem 0; }
+.tension-row {
+  display:grid;
+  grid-template-columns:1fr 160px 1fr;
+  gap:1rem; align-items:center;
+  padding:.7rem 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.tension-row:last-child { border:none; }
+.tension-a {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-size:.95rem;
+  color:var(--bone); text-align:right;
+}
+.tension-b {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-size:.95rem;
+  color:var(--bone);
+}
+.tension-bar {
+  height:2px;
+  background:linear-gradient(to right, var(--cu), var(--silver));
+  position:relative;
+}
+.tension-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--cu);
+  position:absolute; top:-3px;
+  box-shadow:0 0 8px rgba(160,98,46,.4);
+}
+
+/* ─── TOUCH MATRIX ─── */
+.matrix {
+  width:100%; border-collapse:collapse;
+  margin:1.5rem 0;
+}
+.matrix th {
+  font-family:'DM Mono',monospace;
+  font-size:.38rem; letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--cu);
+  padding:.6rem .8rem;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:left;
+}
+.matrix td {
+  font-size:.8rem;
+  color:var(--bone);
+  padding:.7rem .8rem;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  vertical-align:top;
+}
+.matrix tr:hover td { background:rgba(255,255,255,.02); }
+
+/* ─── FOOTER ─── */
+footer {
+  background:var(--ink);
+  text-align:center;
+  padding:4rem 2rem;
+}
+footer .ft-quote {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:1.6rem;
+  color:var(--cream);
+  margin-bottom:.8rem;
+}
+footer p {
+  font-family:'DM Mono',monospace;
+  font-size:.4rem; letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ash);
+  max-width:none;
+}
+
+/* ─── ACCENT CONCEPT COLORS on light bg ─── */
+.accent-c1 { color:var(--c1); }
+.accent-c2 { color:var(--c2); }
+.accent-c3 { color:var(--c3); }
+.border-c1 { border-left:2px solid var(--c1); padding-left:1rem; }
+.border-c2 { border-left:2px solid var(--c2); padding-left:1rem; }
+.border-c3 { border-left:2px solid var(--c3); padding-left:1rem; }
+
+/* ─── SPEC BLOCK ─── */
+.spec {
+  background:rgba(0,0,0,.04);
+  border-left:2px solid var(--cu);
+  padding:1.2rem 1.5rem;
+  margin:.8rem 0;
+}
+.sec-dark .spec, .sec-char .spec, .sec-deep .spec {
+  background:rgba(255,255,255,.03);
+}
+.spec-label {
+  font-family:'DM Mono',monospace;
+  font-size:.38rem; letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--cu); margin-bottom:.3rem;
+}
+.spec p { font-size:.82rem; max-width:none; margin:0; }
+
+/* ─── VIDEO GRAMMAR ─── */
+.vg {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  gap:3px; margin:1.5rem 0;
+}
+@media(max-width:768px){ .vg { grid-template-columns:1fr; } }
+.vg-item {
+  aspect-ratio:16/9;
+  position:relative; overflow:hidden;
+  background:var(--mid);
+  display:flex; align-items:flex-end;
+}
+.vg-item svg { position:absolute; inset:0; width:100%; height:100%; }
+.vg-label {
+  position:relative; z-index:2;
+  width:100%;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));
+  padding:.5rem .7rem;
+  font-family:'DM Mono',monospace;
+  font-size:.35rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--cream);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo">EDETRI · Bible V2</div>
+  <a href="#intro">Giriş</a>
+  <a href="#dna">DNA</a>
+  <a href="#c1">01 · Liturgy</a>
+  <a href="#c2">02 · Contraband</a>
+  <a href="#c3">03 · Morning After</a>
+  <a href="#system">Sistem</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     COVER
+═══════════════════════════════════════ -->
+<section class="cover">
+  <div class="cover-glow"></div>
+  <div class="cover-glow2"></div>
+
+  <div class="cover-top">
+    <div class="cover-eyebrow">E D E T R I</div>
+    <div class="cover-meta">
+      Creative Bible V2<br>
+      Istanbul — Paris<br>
+      2026
+    </div>
+  </div>
+
+  <div class="cover-body">
+    <div class="cover-kicker">Visual Identity & Creative Direction</div>
+    <h1 class="cover-h1">
+      <span>Üç</span>
+      <span class="line2"><em>Yön,</em></span>
+      <span>Bir Dünya.</span>
+    </h1>
+    <p class="cover-desc">
+      EDETRI'nin yeni görsel dilini, fotoğraf gramerini, video mantığını, 
+      booklet yapısını ve web yaklaşımını tanımlayan kılavuz.<br>
+      Üç concept. Hepsi kullanılabilir. Hepsi aynı kökten.
+    </p>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-index">
+      <div class="cover-index-item"><strong>01</strong>Liturgy of the Table</div>
+      <div class="cover-index-item"><strong>02</strong>Contraband Tenderness</div>
+      <div class="cover-index-item"><strong>03</strong>Morning After</div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:.38rem;letter-spacing:.2em;color:var(--ash);text-transform:uppercase;">Confidential</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     INTRO / NEDEN BU BIBLE
+═══════════════════════════════════════ -->
+<section class="sec" id="intro">
+  <div class="eyebrow">00 — Giriş</div>
+  <h2>Bu Bible<br><em>Ne İçin?</em></h2>
+  <p class="lead">Her kanalda, her kişinin kendi bildiğini uyguladığı değil — aynı dünyanın farklı yüzlerini gösterdiği bir marka.</p>
+
+  <div class="g2">
+    <div>
+      <h3>Bu Bible Kapsıyor</h3>
+      <p>Booklet tasarımı ve içerik sistemi. Fotoğraf yönü ve sahne direktifi. Video grammar ve kurgu mantığı. Website görsel dili ve UX tonu. Sosyal medya kompozisyon kuralları. Ambalaj ve dokunma noktaları. Event ve mekan direktifi.</p>
+    </div>
+    <div>
+      <h3>Nasıl Kullanılır</h3>
+      <p>Her concept kendi başına tutarlı bir evrendir. Biri seçilip tam uygulanabilir — ya da üçü bir arada, farklı kanallara bölüştürülerek çalışabilir. Ancak her kanalda tutarlılık şarttır: bir görselde Liturgy varsa o görselin video'su da Liturgy'dir.</p>
+    </div>
+  </div>
+
+  <div class="div-line"><div class="div-dot"></div></div>
+
+  <div class="g3">
+    <div class="card-light">
+      <h4>Neden Üç?</h4>
+      <p>EDETRI şu an kimliğini test ediyor. Üç concept, üç farklı içgüdüyü netleştiriyor. Biri seçilir, biri booklet için ayrılır, biri gelecek koleksiyona saklanır.</p>
+    </div>
+    <div class="card-light">
+      <h4>Ortak Zemin</h4>
+      <p>Üç concept de şunları paylaşır: film grain, karanlık romantizm, yaşanmışlık hissi, siyah-beyaz ile renk arasında gerilim, ve EDETRI logotype'ının o özgün karakteri.</p>
+    </div>
+    <div class="card-light">
+      <h4>Yasak Olan</h4>
+      <p>Steril beyaz fotoğraf. Sıkıcı ürün sayfası estetiği. Temiz mutfak görseli. Seri üretim hissi. Fazla açıklama. Güvensizlikten gelen fazla kelime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     MARKA DNA
+═══════════════════════════════════════ -->
+<section class="sec-dark" id="dna">
+  <div class="sec-inner">
+    <div class="eyebrow">00B — Marka DNA</div>
+    <h2>EDETRI'nin<br><em>Özü</em></h2>
+    <p class="lead">Üç concept buradan büyüyor. Bunları anlamadan hiçbir uygulama doğru olmaz.</p>
+
+    <div class="tension">
+      <div class="tension-row">
+        <div class="tension-a">Romantik</div>
+        <div class="tension-bar"><div class="tension-dot" style="left:60%"></div></div>
+        <div class="tension-b">Soğuk</div>
+      </div>
+      <div class="tension-row">
+        <div class="tension-a">El Yapımı</div>
+        <div class="tension-bar"><div class="tension-dot" style="left:52%"></div></div>
+        <div class="tension-b">Endüstriyel</div>
+      </div>
+      <div class="tension-row">
+        <div class="tension-a">Yaşanmış</div>
+        <div class="tension-bar"><div class="tension-dot" style="left:65%"></div></div>
+        <div class="tension-b">Steril</div>
+      </div>
+      <div class="tension-row">
+        <div class="tension-a">Sessiz</div>
+        <div class="tension-bar"><div class="tension-dot" style="left:40%"></div></div>
+        <div class="tension-b">Dramatik</div>
+      </div>
+      <div class="tension-row">
+        <div class="tension-a">İstanbul</div>
+        <div class="tension-bar"><div class="tension-dot" style="left:50%"></div></div>
+        <div class="tension-b">Paris</div>
+      </div>
+      <div class="tension-row">
+        <div class="tension-a">Eğlenceli</div>
+        <div class="tension-bar"><div class="tension-dot" style="left:55%"></div></div>
+        <div class="tension-b">Cool</div>
+      </div>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <blockquote>"Fresh ama dönem olarak romantik. Hafif karanlık, kirli ama temiz. Yaşanmışlıklı, eğlenceli, ama hâlâ cool — umursamadan."</blockquote>
+
+    <div class="g3" style="margin-top:2rem">
+      <div class="card">
+        <h4>Ses Tonu</h4>
+        <p>Az kelime. Güçlü bırakış. Asla açıklama yapmaz, ima eder. İngilizce-Türkçe-Fransızca arası geçişler doğal ve kasıtsız hissettirmeli.</p>
+      </div>
+      <div class="card">
+        <h4>İzleyici</h4>
+        <p>Referanslarını bilen, ama bunları göstermek zorunda hissetmeyen biri. Iyi bir martini ile iyi bir karnıyarığın aynı masada olabileceğini anlayan.</p>
+      </div>
+      <div class="card">
+        <h4>Yasak Kelimeler</h4>
+        <p>"Handcrafted." "Artisanal." "Luxury." "Premium." "Unique." — bunlar hiç kullanılmaz. EDETRI bunları kanıtlar, söylemez.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CONCEPT 01 — LITURGY OF THE TABLE
+═══════════════════════════════════════ -->
+<div class="concept-band concept-band-1" id="c1">
+  <div class="concept-number">01</div>
+  <div class="concept-label">Concept 01 — En Güçlü Adayınız</div>
+  <h2 class="concept-title">Liturgy of<br><em>the Table</em></h2>
+  <p class="concept-tagline">Sofra bir ritüeldir. Objeler ikonadır. Işık mucizedir.</p>
+</div>
+
+<section class="sec-dark">
+  <div class="sec-inner">
+    <div class="eyebrow">01 — Ruh</div>
+    <h2>Ne Demek<br><em>Liturgy?</em></h2>
+    <p class="lead">Dini değil — sakral. Her sofra kurma eylemini, yüzyıllık bir ritüelin devamı olarak görmek.</p>
+
+    <p>Dis-Moi'yı Baküs'ün elinde görüyoruz, eriyen cam sakramental bir nesne gibi duruyor, çelik tel masa bir katedral mobilyasını andırıyor — bunlar rastlantı değil. EDETRI'nin objeleri gündelik kullanım için değil, <em>bir anı inşa etmek</em> için var.</p>
+    <p>Bu concept, Caravaggio'nun ışığını, Zurbarán'ın natürmort sessizliğini, ve Akseli Gallen-Kallela'nın Kuzey mistisizmini alıp 2026 İstanbul-Paris eksenine taşır.</p>
+
+    <blockquote>"Işık bir taraftan giriyor. Metal yansıtıyor. Cam içinden geçiriyor. Seramik tutuyor."</blockquote>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow" style="margin-top:2rem">Görsel Dil</div>
+    <h3>Renk <em>Sistemi</em></h3>
+    <div class="palette">
+      <div class="swatch" style="background:#0d0c0a"><span style="color:#7c7668">Ink<br>Ana</span></div>
+      <div class="swatch" style="background:#252218"><span style="color:#7c7668">Char<br>Derin</span></div>
+      <div class="swatch" style="background:#b8b0a2"><span style="color:#252218">Bone<br>Nötr</span></div>
+      <div class="swatch" style="background:#e8e0d4"><span style="color:#252218">Cream<br>Açık</span></div>
+      <div class="swatch" style="background:#a0622e"><span style="color:#e8e0d4">Copper<br>Aksan</span></div>
+      <div class="swatch" style="background:#5a1e28"><span style="color:#e8e0d4">Wine<br>Gölge</span></div>
+      <div class="swatch" style="background:#b09050"><span style="color:#252218">Gold<br>Detay</span></div>
+    </div>
+
+    <h3>Tipografi <em>Kuralları</em></h3>
+    <div class="g3">
+      <div class="card">
+        <h4 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.8rem;color:var(--cream)">Display</h4>
+        <p>Cormorant Garamond Italic. Başlıklar, ürün isimleri, kapak. Büyük, nefes alan, hiç bold değil.</p>
+        <span class="tag tag-cu">weight 300-400</span>
+      </div>
+      <div class="card">
+        <h4 style="font-family:'DM Mono',monospace;font-size:1rem;color:var(--cream);letter-spacing:.15em">BODY / LABEL</h4>
+        <p>DM Mono Light. Metadata, etiketler, teknik bilgi. Asla paragraf olmaz — sadece kısa notlar.</p>
+        <span class="tag tag-cu">size 0.4–0.55rem</span>
+      </div>
+      <div class="card">
+        <h4 style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--bone)">Metin gövdesi serif ile — ama kısa cümleler. EDETRI çok konuşmaz.</h4>
+        <p>Body text: Cormorant Garamond Regular, 0.85–0.95rem. Max 60 karakter per satır.</p>
+        <span class="tag tag-cu">line-height 1.8</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-char">
+  <div class="sec-inner">
+    <div class="eyebrow">01 — Fotoğraf Direktifi</div>
+    <h2>Nasıl <em>Çekilir</em></h2>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#181410"/>
+        <rect x="0" y="0" width="55" height="160" fill="#c9a060" opacity=".05"/>
+        <rect x="54" y="0" width="1" height="160" fill="#a0622e" opacity=".12"/>
+        <ellipse cx="140" cy="80" rx="18" ry="35" fill="none" stroke="#c8c0b4" stroke-width=".5" opacity=".2"/>
+        <path d="M80 20 Q90 50 88 80 Q86 110 95 140" stroke="#a0622e" stroke-width=".4" fill="none" opacity=".3"/>
+        <circle cx="88" cy="80" r="2" fill="#a0622e" opacity=".3"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Sahne A — Tek Işık, Chiaroscuro</h4>
+        <p>Tek tungsten veya mum ışığı. Sağdan ya da soldan — asla önden. Nesnenin %60'ı karanlıkta kalır. Fon siyah ya da çok koyu kahve. 85mm f/2-2.8. Tripod. Grain sonradan eklenir.</p>
+        <div style="margin-top:.6rem"><span class="tag tag-cu">85mm</span><span class="tag tag-cu">f/2.8</span><span class="tag tag-cu">tungsten</span><span class="tag tag-cu">no fill</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#1a1610"/>
+        <rect x="0" y="90" width="220" height="70" fill="#252218" opacity=".8"/>
+        <path d="M40 90 Q60 70 80 90 Q100 110 120 88 Q140 68 160 88 Q180 108 200 90" stroke="#b8b0a2" stroke-width=".4" fill="none" opacity=".15"/>
+        <rect x="60" y="55" width="30" height="35" rx="2" fill="none" stroke="#c8c0b4" stroke-width=".6" opacity=".2"/>
+        <rect x="110" y="62" width="50" height="28" rx="15" fill="none" stroke="#a0622e" stroke-width=".5" opacity=".25"/>
+        <circle cx="185" cy="60" r="18" fill="none" stroke="#c8c0b4" stroke-width=".4" opacity=".15"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Sahne B — Sofra Porsiyonu</h4>
+        <p>Sofrada birden fazla EDETRI objesi. Masanın %30'u boş kalır — cömert boşluk. Leke, kırıntı, mum damlası hoşgelir. "Morning after" enerjisi. Kuş bakışı değil — 45 derece açı.</p>
+        <div style="margin-top:.6rem"><span class="tag tag-cu">45° angle</span><span class="tag tag-cu">lived-in</span><span class="tag tag-cu">no styling</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#0d0c0a"/>
+        <circle cx="110" cy="65" r="50" fill="#a0622e" opacity=".05"/>
+        <circle cx="110" cy="60" r="30" fill="#a0622e" opacity=".1"/>
+        <circle cx="110" cy="57" r="15" fill="#c8a060" opacity=".18"/>
+        <circle cx="110" cy="55" r="6" fill="#f0d080" opacity=".3"/>
+        <path d="M100 70 Q107 55 110 50 Q113 55 120 70 L115 110 Q112 115 108 115 L105 110Z" fill="none" stroke="#c8c0b4" stroke-width=".5" opacity=".2"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Sahne C — Mum Ritüeli</h4>
+        <p>Sadece mum ışığı. Obje ve mum birlikte. Cam yansımaları hero. Çok yavaş shutter (1/15-1/30). Hafif blur kabul edilebilir — bu hareket değil, titreme.</p>
+        <div style="margin-top:.6rem"><span class="tag tag-cu">candlelight only</span><span class="tag tag-cu">1/20s</span><span class="tag tag-cu">ISO 3200</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#f4f0e8"/>
+        <path d="M0 0 L80 0 L80 160 L0 160Z" fill="#e8e0d4" opacity=".6"/>
+        <path d="M78 0 L82 0 L82 160 L78 160Z" fill="#b8b0a2" opacity=".15"/>
+        <ellipse cx="150" cy="80" rx="30" ry="50" fill="none" stroke="#3a3628" stroke-width=".6" opacity=".15"/>
+        <circle cx="150" cy="45" r="3" fill="#a0622e" opacity=".4"/>
+        <path d="M145 50 Q147 55 150 58" stroke="#a0622e" stroke-width=".5" fill="none" opacity=".3"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Sahne D — Beyaz Gün, Master Referanslı</h4>
+        <p>Gün ışığı, ama sadece pencere kenarı. Sert kenar — diffuser yok. Açık fon, ama cansız değil: kumaş, taş, ahşap. Nesne f/4 ile tack-sharp. Bu sahne için grain hafif tutulur.</p>
+        <div style="margin-top:.6rem"><span class="tag tag-cu">window light</span><span class="tag tag-cu">hard edge</span><span class="tag tag-cu">f/4</span></div>
+      </div>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Fotoğrafta Yasak</div>
+    <div class="g3" style="margin-top:1rem">
+      <div class="card">
+        <h4>❌ Ring light / softbox</h4>
+        <p>Işığın kaynağı görünmeli veya hissedilmeli. Düz aydınlatma EDETRI'yi öldürür.</p>
+      </div>
+      <div class="card">
+        <h4>❌ Beyaz seamless</h4>
+        <p>Product photography backdrop yok. Her sahnenin bir hikayesi, bir yeri var.</p>
+      </div>
+      <div class="card">
+        <h4>❌ Kuş bakışı flat lay</h4>
+        <p>Yemek blogu estetiği değiliz. Açı daima 20–70 derece arası.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-dark">
+  <div class="sec-inner">
+    <div class="eyebrow">01 — Video Grammar</div>
+    <h2>Hareketli <em>Görüntü</em></h2>
+
+    <div class="vg">
+      <div class="vg-item">
+        <svg viewBox="0 0 320 180"><rect width="320" height="180" fill="#1a1410"/>
+        <circle cx="160" cy="90" r="50" fill="#a0622e" opacity=".04"/>
+        <path d="M80 30 Q120 20 130 60 Q140 100 120 120" stroke="#c8c0b4" stroke-width=".6" fill="none" opacity=".2"/>
+        <text x="160" y="165" text-anchor="middle" font-family="monospace" font-size="7" fill="#7c7668" letter-spacing=".1em">MACRO / STILL</text></svg>
+        <div class="vg-label">Makro — Hareketsiz</div>
+      </div>
+      <div class="vg-item">
+        <svg viewBox="0 0 320 180"><rect width="320" height="180" fill="#0d0c0a"/>
+        <path d="M0 90 Q80 70 160 90 Q240 110 320 90" stroke="#a0622e" stroke-width=".8" fill="none" opacity=".3"/>
+        <circle cx="160" cy="90" r="3" fill="#a0622e" opacity=".5"/>
+        <text x="160" y="165" text-anchor="middle" font-family="monospace" font-size="7" fill="#7c7668" letter-spacing=".1em">SLOW DRIFT</text></svg>
+        <div class="vg-label">Yavaş Kayış</div>
+      </div>
+      <div class="vg-item">
+        <svg viewBox="0 0 320 180"><rect width="320" height="180" fill="#181410"/>
+        <line x1="0" y1="0" x2="320" y2="180" stroke="#c8c0b4" stroke-width=".3" opacity=".08"/>
+        <line x1="320" y1="0" x2="0" y2="180" stroke="#c8c0b4" stroke-width=".3" opacity=".06"/>
+        <text x="160" y="165" text-anchor="middle" font-family="monospace" font-size="7" fill="#7c7668" letter-spacing=".1em">CUT — NO TRANSITION</text></svg>
+        <div class="vg-label">Hard Cut</div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-top:2rem">
+      <div>
+        <h3>Atmosferik Loop <em>(15–30sn)</em></h3>
+        <p>Website ve mekan ekranları için. Ses yok. Loop. İçerik: eriyen mum, cam üzerindeki buğu, metal yüzeyde ışık kayması, el hareketi. %50 ağır çekim (120fps → 24fps). Hard cut — dissolve yok.</p>
+        <div style="margin-top:.8rem">
+          <span class="tag tag-cu">mute</span><span class="tag tag-cu">loop</span><span class="tag tag-cu">120fps</span><span class="tag tag-cu">no music</span>
+        </div>
+      </div>
+      <div>
+        <h3>Proses Filmi <em>(90sn–3dk)</em></h3>
+        <p>Atölye: cam üfleme, form verme, soğuma. Fixed camera — kamera hareket etmez, nesne hareket eder. Ses: gerçek atölye sesi + minimal cello veya elektronik drone. Altyazı yok, narrasyon yok.</p>
+        <div style="margin-top:.8rem">
+          <span class="tag tag-cu">fixed cam</span><span class="tag tag-cu">ambient audio</span><span class="tag tag-cu">no narration</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div class="spec-label">Ses Direktifi</div>
+      <p>Müzik varsa: cello + sinyal / drone — asla pop, asla tanıdık bir şey. Field recording tercih edilir: cam tıkırtısı, seramik üzerine metal, su. Müzik objeden daha yüksek sesli olamaz.</p>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Website Dili</div>
+    <h2>Web'de <em>Liturgy</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Layout Mantığı</h3>
+        <p>Full-bleed görseller dominant. Metin görsel üzerinde değil, altında — ya da yanında küçük. Scroll yavaş ve kasıtlı hissettirmeli. Hover: metin değil, görsel değişir.</p>
+        <p>Ürün sayfası: tek büyük görsel, sağda minimal bilgi. Fiyat ve materyal var — hikaye yok. Kullanıcı kendisi sorar, marka anlatmaz.</p>
+      </div>
+      <div>
+        <h3>Renk ve Atmosfer</h3>
+        <p>Background: #0d0c0a (ink). Metin: #c8c0b4 (bone). Accent: copper. Hover state'lerde renk değil, opaklık değişir.</p>
+        <p>Loading ekranı: EDETRI logosu ortada, arkada çok yavaş dönen bir cam form. 1.5 saniye max — sonra anında içerik.</p>
+      </div>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">01 — Booklet Sistemi</div>
+    <h2>Basılı <em>Dünya</em></h2>
+
+    <div class="g3">
+      <div class="card">
+        <h4>Format</h4>
+        <p>20×20cm. Kare. 28–36 sayfa. Baskı: offset + riso (tek renk aksan). Kağıt: Munken Lynx 150g gövde, Gmund Cotton kapak. Açık dikiş cilt.</p>
+      </div>
+      <div class="card">
+        <h4>İçerik Yapısı</h4>
+        <p>Kapak: ürün görseli — isim yok, sadece EDETRI. İlk yayılım: tek kelime ya da alıntı. Ürün spreads: sol büyük görsel, sağ küçük detay + materyal notu. Son sayfa: küçük el yazısı notu.</p>
+      </div>
+      <div class="card">
+        <h4>Sezon Sistemi</h4>
+        <p>Her koleksiyon bir chapter numarası alır. Kapak rengi değişir, format sabit. Chapter 01 şimdiki, Chapter 02 metal dönemi. Biriktirilebilir tasarım.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CONCEPT 02 — CONTRABAND TENDERNESS
+═══════════════════════════════════════ -->
+<div class="concept-band concept-band-2" id="c2">
+  <div class="concept-number">02</div>
+  <div class="concept-label">Concept 02 — En Cesur Seçenek</div>
+  <h2 class="concept-title">Contraband<br><em>Tenderness</em></h2>
+  <p class="concept-tagline">Yanlış yerde, yanlış zamanda — ama kesinlikle doğru obje.</p>
+</div>
+
+<section class="sec-dark">
+  <div class="sec-inner">
+    <div class="eyebrow">02 — Ruh</div>
+    <h2>Ne Demek<br><em>Contraband?</em></h2>
+    <p class="lead">Güzel obje, beklenmediği yerde. Zarafet, bağlamına aykırı olduğunda daha güçlü konuşur.</p>
+
+    <p>Skatepark'ta coupe bardak. Okey masasında Dis-Moi. Kırık kaldırımda çelik tel servis masası. Bu görseller EDETRI'yi "sofra markası" sınırından çıkarıyor ve bir bakış açısına — bir duruşa — dönüştürüyor.</p>
+    <p>Bu concept, lüks markalamanın en büyük tuzağından kaçınıyor: <em>beklenen güzellikten</em>. EDETRI'nin objelerinin değeri, onları "doğru" ortamdan çıkardığında da kaybolmadığını göstermek.</p>
+
+    <blockquote>"Karnıyarıklı tabak kürk matoyla gelen tepsinin önünde oturuyor. İkisi de haklı."</blockquote>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="g2">
+      <div>
+        <h3>Referans Nokta</h3>
+        <p>İstanbul–Paris ikiliği burada en net. Karnıyarık + kruvasan aynı tabakta (gördüğümüz o güçlü görsel). Okey masası + Dis-Moi. Boğaz vapuru + cam bardak. Bu çarpışmalar markayı yerel yapar — ama sadece İstanbul'a da hapsetmez.</p>
+      </div>
+      <div>
+        <h3>Siyah-Beyaz Seçimi</h3>
+        <p>Bu concept siyah-beyaz ağırlıklı çalışır. Renk kaldırılınca bağlam nötr hale geliyor, obje öne çıkıyor. Ama wireframe objeler bu dünyada çok işe yarıyor — gerçek mekanda hayalet obje, "henüz tam burada değil ama geliyor" hissi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-char">
+  <div class="sec-inner">
+    <div class="eyebrow">02 — Fotoğraf Direktifi</div>
+    <h2>Contraband <em>Sahneleri</em></h2>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#1a1814"/>
+        <rect x="0" y="100" width="220" height="60" fill="#252218"/>
+        <rect x="20" y="85" width="80" height="30" rx="2" fill="none" stroke="#9a9890" stroke-width=".5" opacity=".3"/>
+        <rect x="45" y="88" width="12" height="12" rx="1" fill="none" stroke="#9a9890" stroke-width=".4" opacity=".2"/>
+        <rect x="65" y="88" width="12" height="12" rx="1" fill="none" stroke="#9a9890" stroke-width=".4" opacity=".2"/>
+        <ellipse cx="160" cy="80" rx="20" ry="35" fill="none" stroke="#fff" stroke-width=".8" opacity=".2"/>
+        <line x1="150" y1="60" x2="170" y2="60" stroke="#fff" stroke-width=".5" opacity=".15"/>
+        <ellipse cx="160" cy="108" rx="20" ry="5" fill="none" stroke="#fff" stroke-width=".5" opacity=".1"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>İki Şehir, Bir Tabak</h4>
+        <p>Karnıyarık + kruvasan — EDETRI tabağında. Sahne gerçek: gerçek bir masada, gerçek ışıkta. Obje wireframe değil, gerçek ürün. B&W. Yüksek grain. Bu görsel sosyal medyada açıklama gerektirmez.</p>
+        <div style="margin-top:.6rem"><span class="tag" style="border-color:#3a4858;color:#8ab0c8">real product</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">B&W</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">high grain</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#1a1814"/>
+        <path d="M0 80 Q55 60 110 80 Q165 100 220 80" stroke="#9a9890" stroke-width=".5" fill="none" opacity=".2"/>
+        <rect x="50" y="55" width="120" height="50" fill="none" stroke="#9a9890" stroke-width=".3" opacity=".15"/>
+        <circle cx="80" cy="90" r="15" fill="none" stroke="#fff" stroke-width=".7" opacity=".2"/>
+        <circle cx="140" cy="85" r="20" fill="none" stroke="#fff" stroke-width=".6" opacity=".15"/>
+        <path d="M80 75 L80 105" stroke="#fff" stroke-width=".4" opacity=".1"/>
+        <path d="M130 65 L150 65" stroke="#fff" stroke-width=".5" opacity=".12"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Yanlış Yer, Doğru Obje</h4>
+        <p>Okey masası, sokak kahvesi, metro koridoru, inşaat alanı — EDETRI objesi bunlardan birinde. Kamera hayatı çekiyor, obje oraya aitti gibi duruyor. Fisheye veya geniş açı okunabilir.</p>
+        <div style="margin-top:.6rem"><span class="tag" style="border-color:#3a4858;color:#8ab0c8">28mm-35mm</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">real context</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#1c1814"/>
+        <circle cx="110" cy="80" r="60" fill="none" stroke="#9a9890" stroke-width="8" opacity=".3"/>
+        <circle cx="110" cy="80" r="55" fill="none" stroke="#1a1814" stroke-width="4" opacity=".5"/>
+        <ellipse cx="110" cy="80" rx="25" ry="40" fill="none" stroke="#fff" stroke-width=".7" opacity=".2"/>
+        <line x1="98" y1="55" x2="122" y2="55" stroke="#fff" stroke-width=".5" opacity=".15"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Çerçeve İçinde Çerçeve</h4>
+        <p>Fisheye lens veya dairesel obje çerçeve olarak kullanılıyor (skatepark ring gibi). EDETRI objesi merkezde. Bu yaklaşım objeyi bir "vizörden" gösterme hissi yaratıyor.</p>
+        <div style="margin-top:.6rem"><span class="tag" style="border-color:#3a4858;color:#8ab0c8">fisheye</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">frame-in-frame</span></div>
+      </div>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">02 — Wireframe Kullanım Kuralları</div>
+    <h3>Ne Zaman <em>Wireframe?</em></h3>
+    <p>Wireframe obje — gerçek fotoğraf üzerine 3D render veya illüstrasyon — bu conceptin özel silahı. Ama kullanım kuralları var:</p>
+
+    <div class="g3" style="margin-top:1.5rem">
+      <div class="card">
+        <h4>✓ Doğru Kullanım</h4>
+        <p>Teaser ve pre-launch içerikleri. "Bu obje bu dünyaya geliyor" anlatısı. Gerçek sahneye entegre, ama ışık eşleşmesi titiz yapılmış.</p>
+      </div>
+      <div class="card">
+        <h4>✓ Doğru Teknik</h4>
+        <p>Beyaz çizgi, şeffaf — objenin iç yapısı görünmeli. Grain arka planla aynı oranda wireframe'e de uygulanmalı. Gölge gerçekçi.</p>
+      </div>
+      <div class="card">
+        <h4>❌ Yanlış Kullanım</h4>
+        <p>Gerçek ürün satış görseli olarak. Işık eşleşmesi yapılmadan "üzerine yapıştırılmış" haliyle. Renkli arka plan üzerinde (B&W ile çalışır).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-dark">
+  <div class="sec-inner">
+    <div class="eyebrow">02 — Video & Web</div>
+    <h2>Contraband <em>Hareketleri</em></h2>
+
+    <div class="g2">
+      <div>
+        <h3>Video Mantığı</h3>
+        <p>Dokümanter stili. El kamerası — hafif titreme kabul edilebilir. Kesim hızlı: 2–4 saniye per shot. B&W. Müzik: post-punk, minimal elektronik, veya hiç müzik yok — sadece ortam sesi.</p>
+        <p>İçerik: gerçek hayat sahneleri + EDETRI objesi. Okey oynanıyor, obje masada. Vapurda çay içiliyor, obje yanında. Sahne kurulmamış gibi görünmeli — ama kurulmuş.</p>
+        <span class="tag" style="border-color:#3a4858;color:#8ab0c8">handheld</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">B&W</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">2–4s cuts</span>
+      </div>
+      <div>
+        <h3>Website Tonu</h3>
+        <p>Bu concept website'de en iyi editoryal galeri olarak çalışır — ürün sayfası değil, lookbook. Görsel grid dominant. Caption'lar kısa ve beklenmedik ("Paris. Okey. Dis-Moi.").</p>
+        <p>Renk: bu concept için website'de siyah-beyaz görseller + minimal copper accent. Renkli görseller yok.</p>
+        <span class="tag" style="border-color:#3a4858;color:#8ab0c8">editorial grid</span><span class="tag" style="border-color:#3a4858;color:#8ab0c8">short captions</span>
+      </div>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">02 — Booklet</div>
+    <h3>Contraband <em>Booklet</em></h3>
+    <div class="g2">
+      <div class="card">
+        <h4>Format ve Baskı</h4>
+        <p>17×22cm. Dikey. Gazete kağıdı (newsprint) veya kraft. Tek renk baskı: siyah. Kapak: kapasite fotoğrafı — stüdyo değil, hayat. Spiral cilt veya metal klips.</p>
+      </div>
+      <div class="card">
+        <h4>İçerik Yapısı</h4>
+        <p>Fotoğraf heavy. İki sayfalık yayılımlar dominant. Metin: sadece yer adı + ürün adı. "Beşiktaş, 23:40. Pablo." Anlatı yok — izleyici tamamlar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CONCEPT 03 — MORNING AFTER
+═══════════════════════════════════════ -->
+<div class="concept-band concept-band-3" id="c3">
+  <div class="concept-number">03</div>
+  <div class="concept-label">Concept 03 — En Sıcak Seçenek</div>
+  <h2 class="concept-title">Morning<br><em>After</em></h2>
+  <p class="concept-tagline">Gece bitti. Sofra hâlâ konuşuyor.</p>
+</div>
+
+<section class="sec-char">
+  <div class="sec-inner">
+    <div class="eyebrow">03 — Ruh</div>
+    <h2>Sabah ve <em>İzler</em></h2>
+    <p class="lead">Geceyi anlatan obje değil — gecenin üzerinde bıraktığı iz. EDETRI sonradan da güzel.</p>
+
+    <p>Erimiş mum. Ruj izi. Boş bardak. Ekmek kırıntısı. Buruşmuş peçete. Kül tablası. Bu görseller bir hikayenin son karesini gösteriyor — ama o hikayet izleyicinin hayal gücünde tamamlanıyor.</p>
+    <p>Bu concept en az "marka" hissettiren, en çok "yaşam" hissettiren yön. Objeler ikincil değil — ama sahne onların etrafında kurulmuyor. Sahne yaşandı, objeler orada kaldı.</p>
+
+    <blockquote>"Pablo'nun kenarında kalan o izin kimin olduğunu sormak istemiyoruz. Ama izin varlığı mükemmel."</blockquote>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="g2">
+      <div>
+        <h3>Renk Sistemi</h3>
+        <p>Bu concept renklidir — ama çok spesifik renkler. Sabah ışığı: warm, overexposed, hafif soluk. Kağıt beyazı değil, yaşanmış beyaz. Leke renkleri (şarap bordo, zeytinyağı sarısı, mum siyahı) aksan olarak kullanılır.</p>
+      </div>
+      <div>
+        <h3>Ton</h3>
+        <p>Üç conceptin en "flirty" olanı. En az ciddi — ama bu onun gücü. Lüks kırılganlık: obje sağlam, çevresi dağınık. Bu kontrast EDETRI'yi "steril güzellik" dünyasından kesin olarak ayırır.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec-dark">
+  <div class="sec-inner">
+    <div class="eyebrow">03 — Fotoğraf Direktifi</div>
+    <h2>Morning After <em>Sahneleri</em></h2>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#f0ebe0"/>
+        <rect x="0" y="0" width="220" height="160" fill="rgba(255,220,160,.15)"/>
+        <path d="M0 80 Q50 75 100 85 Q150 95 220 78" stroke="#d4c8b0" stroke-width=".4" fill="none" opacity=".4"/>
+        <ellipse cx="80" cy="90" rx="22" ry="38" fill="none" stroke="#3a3628" stroke-width=".6" opacity=".15"/>
+        <circle cx="80" cy="58" r="3" fill="#7a3820" opacity=".4"/>
+        <ellipse cx="160" cy="85" rx="28" ry="8" fill="none" stroke="#3a3628" stroke-width=".4" opacity=".12"/>
+        <path d="M155 78 Q160 75 165 78" stroke="#7a3820" stroke-width=".5" fill="none" opacity=".3"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Overexposed Sabah</h4>
+        <p>Pencere ışığı dominant. +1.5 stop overexpose. Sıcak ton (tungsten WB gün ışığında). Shallow DOF: obje net, çevre flow. İzler hero: ruj izi, mum damlası, leke. Kurulum değil, yakalanmış.</p>
+        <div style="margin-top:.6rem"><span class="tag" style="border-color:#6a4838;color:#c09878">+1.5 exp</span><span class="tag" style="border-color:#6a4838;color:#c09878">warm WB</span><span class="tag" style="border-color:#6a4838;color:#c09878">f/2</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#1c1610"/>
+        <path d="M40 60 Q80 50 90 80 Q100 110 80 130" stroke="#c8c0b4" stroke-width=".5" fill="none" opacity=".15"/>
+        <ellipse cx="140" cy="80" rx="25" ry="40" fill="none" stroke="#c8c0b4" stroke-width=".5" opacity=".15"/>
+        <rect x="110" y="120" width="60" height="1" fill="#a0622e" opacity=".25"/>
+        <circle cx="140" cy="120" r="2" fill="#a0622e" opacity=".3"/>
+        <path d="M110 118 Q125 115 140 118 Q155 121 170 118" stroke="#7a3820" stroke-width=".3" fill="none" opacity=".2"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Gece Sabaha Dönüşürken</h4>
+        <p>Karanlık sahne — ama bir köşede pencere gri-mavi gün doğumu. Mum sönmüş, duman izli. Obje yarı ışıkta. Bu sahne renkli çekilir: mavi-gri + sıcak turuncu kontrast.</p>
+        <div style="margin-top:.6rem"><span class="tag" style="border-color:#6a4838;color:#c09878">blue-hour</span><span class="tag" style="border-color:#6a4838;color:#c09878">color</span><span class="tag" style="border-color:#6a4838;color:#c09878">candle smoke</span></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-vis">
+        <svg viewBox="0 0 220 160"><rect width="220" height="160" fill="#f5f0e4"/>
+        <rect x="0" y="0" width="220" height="160" fill="rgba(255,230,180,.1)"/>
+        <path d="M30 120 Q70 80 110 100 Q150 120 190 90" stroke="#b8b0a0" stroke-width=".5" fill="none" opacity=".3"/>
+        <rect x="60" y="60" width="100" height="40" rx="3" fill="none" stroke="#b8b0a0" stroke-width=".4" opacity=".25"/>
+        <circle cx="85" cy="80" r="12" fill="none" stroke="#7a3820" stroke-width=".3" opacity=".2"/>
+        <circle cx="85" cy="80" r="5" fill="#7a3820" opacity=".1"/>
+        <path d="M110 68 Q120 75 115 85" stroke="#7a3820" stroke-width=".4" fill="none" opacity=".2"/></svg>
+      </div>
+      <div class="scene-info">
+        <h4>Kuş Bakışı İstisna</h4>
+        <p>Bu concept için tek kabul edilen kuş bakışı: masanın tamamı — ama steril değil, yaşanmış. %30 boşluk, %70 kaos (güzel kaos). Güneş gölgeleri var, sofra örtüsü buruşmuş.</p>
+        <div style="margin-top:.6rem"><span class="tag" style="border-color:#6a4838;color:#c09878">top-down</span><span class="tag" style="border-color:#6a4838;color:#c09878">lived-in</span><span class="tag" style="border-color:#6a4838;color:#c09878">sunlight</span></div>
+      </div>
+    </div>
+
+    <div class="div-line"><div class="div-dot"></div></div>
+
+    <div class="eyebrow">03 — Video & Web & Booklet</div>
+    <h2>Morning After <em>Sistemleri</em></h2>
+
+    <div class="g3">
+      <div class="card">
+        <h4>Video</h4>
+        <p>Kısa form. 20–60 saniye. Reels / TikTok boyutunda düşün ama kalite yüksek. İçerik: bir sofranın kurulması değil, kaldırılması — ya da sabah haliyle bulunması. Ses: diegetic (bardak sesi, kahve kaynaması, dış ses yok).</p>
+        <span class="tag" style="border-color:#6a4838;color:#c09878">20–60s</span><span class="tag" style="border-color:#6a4838;color:#c09878">diegetic audio</span>
+      </div>
+      <div class="card">
+        <h4>Website</h4>
+        <p>En sıcak, en erişilebilir concept — website için doğru giriş noktası. Hero section: overexposed sabah görseli. Scroll'da soğur — daha dramatik görseller gelir. Renk: paper + warm accent.</p>
+        <span class="tag" style="border-color:#6a4838;color:#c09878">warm paper bg</span><span class="tag" style="border-color:#6a4838;color:#c09878">overexposed hero</span>
+      </div>
+      <div class="card">
+        <h4>Booklet</h4>
+        <p>18×24cm. Dikine. Coated + uncoated kağıt mix — bazı sayfalar parlak, bazıları mat. İçerik: gece akşamından sabahına kronolojik anlatı. Kapak: beyaz zemin, tek iz (ruj? mum damlası? şarap?). Minimal metin.</p>
+        <span class="tag" style="border-color:#6a4838;color:#c09878">coated+uncoated</span><span class="tag" style="border-color:#6a4838;color:#c09878">chronological</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     ORTAK SİSTEM
+═══════════════════════════════════════ -->
+<section class="sec" id="system">
+  <div class="eyebrow">Sistem — Ortak Kurallar</div>
+  <h2>Her Concept'te<br><em>Değişmeyen</em></h2>
+  <p class="lead">Hangi concept seçilirse seçilsin, aşağıdaki kurallar uygulanır. Bunlar EDETRI kimliğinin kemiği.</p>
+
+  <div class="g2">
+    <div>
+      <h3>Logo Kullanımı</h3>
+      <p>EDETRI logotype — o blackletter-art nouveau karakter — asla bozulmaz, yeniden çizilmez, efekt eklenmez. Metallic versiyon (Image 4'teki gibi) sadece büyük format: kapak, tabela, event. Küçük boyutlarda temiz kullanım.</p>
+      <p>Yerleşim: sol üst veya sağ alt — asla merkez. Başlık ile yarışmaz. Sahnede kaybolabilir, bu güzel.</p>
+    </div>
+    <div>
+      <h3>Grain Standardı</h3>
+      <p>Her görsel grain alır. Miktar: dijital görsel için 12–18% luminance noise (Lightroom eşdeğeri). Film tarama için olduğu gibi. Video için: grain overlay, %6–10 opacity, 24fps ile loop edilmiş.</p>
+      <p>Grain rengi: monochrome grain, renk grain değil. Büyük baskılarda (booklet) grain azaltılır — kağıt dokusu zaten üstlenir.</p>
+    </div>
+  </div>
+
+  <div class="div-line"><div class="div-dot"></div></div>
+
+  <h3>Kanal — Concept <em>Matrisi</em></h3>
+  <p>Üç concept aynı anda kullanılabilir — ancak her kanal bir concepte bağlı kalmalı. Karıştırılmaz.</p>
+
+  <table class="matrix">
+    <thead>
+      <tr>
+        <th>Kanal</th>
+        <th>Önerilen Concept</th>
+        <th>Alternatif</th>
+        <th>Asla</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Website — Hero</td>
+        <td>Morning After (sıcak giriş)</td>
+        <td>Liturgy (dramatik)</td>
+        <td>Contraband</td>
+      </tr>
+      <tr>
+        <td>Website — Ürün Sayfası</td>
+        <td>Liturgy (obje ikonlaştırma)</td>
+        <td>—</td>
+        <td>Morning After, Contraband</td>
+      </tr>
+      <tr>
+        <td>Instagram Feed</td>
+        <td>Liturgy ağırlık, Contraband sürpriz</td>
+        <td>Morning After ara sıra</td>
+        <td>Stüdyo beyaz</td>
+      </tr>
+      <tr>
+        <td>Instagram Reels</td>
+        <td>Contraband / Morning After</td>
+        <td>—</td>
+        <td>Liturgy (çok yavaş)</td>
+      </tr>
+      <tr>
+        <td>Booklet</td>
+        <td>Liturgy (koleksiyon bible)</td>
+        <td>Contraband (özel baskı)</td>
+        <td>Morning After (çok hafif)</td>
+      </tr>
+      <tr>
+        <td>Event / Mekan</td>
+        <td>Liturgy (atmosfer)</td>
+        <td>—</td>
+        <td>Morning After (hazırlıklı görünür)</td>
+      </tr>
+      <tr>
+        <td>Press Kit</td>
+        <td>Liturgy</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Ambalaj / Kart</td>
+        <td>Liturgy tonu, Contraband detay</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="div-line"><div class="div-dot"></div></div>
+
+  <h3>Sosyal Medya <em>Grid Kuralları</em></h3>
+  <div class="g3">
+    <div class="card-light">
+      <h4>Renk Dengesi</h4>
+      <p>Feed'de art arda iki siyah-beyaz görsel. Üçüncü renkli olabilir. Asla art arda iki overexposed açık görsel. Kontrast görsel yanyana güzel.</p>
+    </div>
+    <div class="card-light">
+      <h4>Caption Tonu</h4>
+      <p>Kısa. Türkçe veya Fransızca veya İngilizce — dil karışabilir, bu güzel. Açıklama yok. Soru yok. Hashtag: max 3, küçük ve son satırda.</p>
+    </div>
+    <div class="card-light">
+      <h4>Repost / UGC</h4>
+      <p>Sadece görselin estetiği uyuyorsa. EDETRI objesi görünmese de grain + ışık + ton uyuyorsa paylaşılabilir. Yorum: kısa, sıcak, asla "amazing!"</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     ROADMAP
+═══════════════════════════════════════ -->
+<section class="sec-deep" id="roadmap">
+  <div class="sec-inner">
+    <div class="eyebrow">Roadmap</div>
+    <h2>Ne Zaman, <em>Ne</em></h2>
+    <p class="lead">Bible uygulanabilir olmalı. Öncelik sırasıyla.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-time">Hemen</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Concept Seçimi</h4>
+          <p>Üç conceptten biri ana kanal dili olarak seçilir. Diğerleri yan kanallara atanır. Bu seçim yapılmadan hiçbir üretim başlamaz.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">0–2 Hafta</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Test Çekimi</h4>
+          <p>Seçilen concept için 1 saatlik test çekimi. 3–4 sahne. Sonuçlar bu bible ile karşılaştırılır. Onaylanırsa tam prodüksiyon.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">2–6 Hafta</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Prodüksiyon Round 1</h4>
+          <p>Website için hero görselleri. Tüm aktif ürünler için Liturgy sahneleri (ürün görseli). 1 adet atmosferik loop video. Booklet Chapter 01 için görsel seçimi.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">6–12 Hafta</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Booklet Baskısı + Website</h4>
+          <p>Booklet Chapter 01 baskıya gider. Website görsel yenilenmesi. Proses filmi çekimi (atölye).</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">3–6 Ay</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Metal Koleksiyon Lansmanı</h4>
+          <p>Yeni ürünler için Contraband veya Liturgy görselleri. Event direktifi uygulaması. Chapter 02 booklet planlaması.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-time">6–12 Ay</div>
+        <div class="tl-line"></div>
+        <div class="tl-body">
+          <h4>Bible Revizyonu</h4>
+          <p>Ne işe yaradı? Hangi concept hangi kanalda güçlü çıktı? Bible güncellenir. Yeni chapter planlanır.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer>
+  <div class="ft-quote">"Işık bir taraftan giriyor.<br>Metal yansıtıyor. Cam içinden geçiriyor."</div>
+  <p style="margin-bottom:.3rem">EDETRI · Creative Bible V2 · 2026</p>
+  <p>Istanbul — Paris · Confidential</p>
+</footer>
+
+</body>
+</html>
