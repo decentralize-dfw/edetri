@@ -6,1316 +6,559 @@
 <title>EDETRI — Visual Archive</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #090807;
-    --cream: #e8e0d0;
-    --offwhite: #f4f0e8;
-    --silver: #b0a890;
-    --copper: #a86828;
-    --burgundy: #581020;
-    --gold: #b89850;
-    --dim: #2a2720;
-    --gap: 8px;
-    --edit-accent: #c87820;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--black);
-    color: var(--cream);
-    font-family: 'Archivo', sans-serif;
-    font-weight: 200;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Grain overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* ─── EDIT MODE INDICATOR ─── */
-  body.edit-mode {
-    --mode-border: var(--edit-accent);
-  }
-
-  .edit-mode-bar {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--edit-accent);
-    z-index: 9998;
-    animation: editPulse 2s ease-in-out infinite;
-  }
-
-  body.edit-mode .edit-mode-bar { display: block; }
-
-  @keyframes editPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-  /* ─── HEADER ─── */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(9,8,7,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(176,168,144,0.12);
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    transition: border-color 0.3s;
-  }
-
-  body.edit-mode header {
-    border-bottom-color: rgba(200,120,32,0.3);
-  }
-
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 17px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    color: var(--cream);
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .header-title span {
-    color: var(--copper);
-    font-style: italic;
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    background: none;
-    border: 1px solid rgba(176,168,144,0.3);
-    color: var(--silver);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    padding: 7px 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn:hover {
-    border-color: var(--copper);
-    color: var(--copper);
-  }
-
-  .btn-primary {
-    background: var(--copper);
-    border-color: var(--copper);
-    color: var(--black);
-    font-weight: 400;
-  }
-
-  .btn-primary:hover {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--black);
-  }
-
-  .btn-publish {
-    background: #2a5a2a;
-    border-color: #3a7a3a;
-    color: #7aba7a;
-    display: none;
-    animation: publishAppear 0.3s ease;
-  }
-
-  .btn-publish:hover {
-    background: #3a7a3a;
-    border-color: #5aaa5a;
-    color: #aadaaa;
-  }
-
-  body.edit-mode .btn-publish { display: inline-block; }
-
-  @keyframes publishAppear {
-    from { opacity: 0; transform: translateX(8px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-
-  .btn-edit-toggle {
-    position: relative;
-  }
-
-  body.edit-mode .btn-edit-toggle {
-    border-color: var(--edit-accent);
-    color: var(--edit-accent);
-    background: rgba(200,120,32,0.08);
-  }
-
-  .edit-badge {
-    display: none;
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--edit-accent);
-    border: 1px solid var(--black);
-  }
-
-  body.edit-mode .edit-badge { display: block; }
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--silver);
-    display: inline-block;
-    margin-right: 6px;
-    transition: background 0.3s;
-  }
-
-  .status-dot.loading { background: var(--gold); animation: pulse 1s infinite; }
-  .status-dot.ready { background: #5a8a5a; }
-  .status-dot.error { background: var(--burgundy); }
-
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  .status-text {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--silver);
-    letter-spacing: 0.06em;
-  }
-
-  /* ─── MASONRY GRID ─── */
-  .gallery-wrap {
-    padding: 24px var(--gap);
-  }
-
-  .masonry {
-    column-count: 5;
-    column-gap: var(--gap);
-  }
-
-  @media (max-width: 1400px) { .masonry { column-count: 4; } }
-  @media (max-width: 1100px) { .masonry { column-count: 3; } }
-  @media (max-width: 720px)  { .masonry { column-count: 3; } }
-  @media (max-width: 480px)  { .masonry { column-count: 3; } }
-
-  .card {
-    break-inside: avoid;
-    margin-bottom: var(--gap);
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-    border-radius: 2px;
-    background: var(--dim);
-    transition: outline 0.2s;
-  }
-
-  body.edit-mode .card:hover {
-    outline: 1px solid var(--edit-accent);
-  }
-
-  .card img {
-    display: block;
-    width: 100%;
-    height: auto;
-    transition: transform 0.4s ease;
-  }
-
-  .card:hover img { transform: scale(1.03); }
-
-  .card-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 20px 8px 8px;
-    background: linear-gradient(to top, rgba(9,8,7,0.85) 0%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    display: flex;
-    align-items: flex-end;
-    gap: 5px;
-  }
-
-  .card:hover .card-overlay { opacity: 1; }
-
-  .card-color {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-
-  .card-type {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 0.08em;
-    color: var(--cream);
-    text-transform: uppercase;
-    opacity: 0.85;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .card-placeholder {
-    width: 100%;
-    aspect-ratio: 3/4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: rgba(176,168,144,0.3);
-    letter-spacing: 0.08em;
-  }
-
-  /* ─── LOADING STATE ─── */
-  .loading-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    flex-direction: column;
-    gap: 16px;
-    color: var(--silver);
-  }
-
-  .loading-state p {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    opacity: 0.5;
-  }
-
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 1px solid rgba(176,168,144,0.2);
-    border-top-color: var(--copper);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ─── FULLSCREEN MODAL ─── */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(9,8,7,0.99);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s;
-  }
-
-  .modal-backdrop.open {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    flex-shrink: 0;
-    border-bottom: 1px solid rgba(176,168,144,0.08);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    background: linear-gradient(to bottom, rgba(9,8,7,0.9) 0%, transparent 100%);
-  }
-
-  .modal-close {
-    background: none;
-    border: none;
-    color: var(--silver);
-    font-size: 18px;
-    cursor: pointer;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-
-  .modal-close:hover { background: rgba(176,168,144,0.1); color: var(--cream); }
-
-  .modal-counter {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--silver);
-    letter-spacing: 0.08em;
-    opacity: 0.5;
-  }
-
-  .nav-arrows {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .nav-btn {
-    background: rgba(9,8,7,0.6);
-    border: 1px solid rgba(176,168,144,0.2);
-    color: var(--silver);
-    font-size: 14px;
-    width: 34px;
-    height: 34px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    border-radius: 2px;
-  }
-
-  .nav-btn:hover {
-    border-color: var(--copper);
-    color: var(--copper);
-  }
-
-  /* Fullscreen image layout */
-  .modal-image-full {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .modal-image-full img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-
-  /* Bottom info strip */
-  .modal-info-strip {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 48px 24px 20px;
-    background: linear-gradient(to top, rgba(9,8,7,0.9) 0%, transparent 100%);
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .modal-info-left {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    pointer-events: all;
-  }
-
-  .modal-color-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .modal-color-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.2);
-    flex-shrink: 0;
-  }
-
-  .modal-color-hex-text {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--silver);
-    letter-spacing: 0.08em;
-    opacity: 0.7;
-  }
-
-  /* Editable modal fields — normal mode: read-only styled */
-  .modal-field-type {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--cream);
-    opacity: 0.9;
-    background: none;
-    border: none;
-    outline: none;
-    pointer-events: none;
-    padding: 0;
-    width: 200px;
-    max-width: 40vw;
-  }
-
-  .modal-field-desc {
-    font-family: 'Archivo', sans-serif;
-    font-size: 12px;
-    font-weight: 300;
-    color: var(--silver);
-    opacity: 0.7;
-    background: none;
-    border: none;
-    outline: none;
-    pointer-events: none;
-    padding: 0;
-    width: 260px;
-    max-width: 50vw;
-    resize: none;
-    line-height: 1.4;
-  }
-
-  /* Edit mode modal fields */
-  body.edit-mode .modal-field-type,
-  body.edit-mode .modal-field-desc {
-    pointer-events: all;
-    background: rgba(42,39,32,0.7);
-    border: 1px solid rgba(200,120,32,0.3);
-    padding: 5px 8px;
-    border-radius: 1px;
-    color: var(--cream);
-    opacity: 1;
-    backdrop-filter: blur(8px);
-  }
-
-  body.edit-mode .modal-field-type:focus,
-  body.edit-mode .modal-field-desc:focus {
-    border-color: var(--edit-accent);
-    outline: none;
-  }
-
-  .modal-info-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    pointer-events: all;
-  }
-
-  .pinterest-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--silver);
-    text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    opacity: 0.4;
-    transition: opacity 0.2s;
-  }
-
-  .pinterest-link:hover { opacity: 0.9; color: var(--copper); }
-
-  .keyboard-hint {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--silver);
-    opacity: 0.25;
-    letter-spacing: 0.06em;
-  }
-
-  /* Modal edit button (opens editor panel) */
-  .modal-edit-btn {
-    display: none;
-    background: rgba(200,120,32,0.15);
-    border: 1px solid rgba(200,120,32,0.4);
-    color: var(--edit-accent);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    pointer-events: all;
-  }
-
-  .modal-edit-btn:hover {
-    background: rgba(200,120,32,0.25);
-  }
-
-  body.edit-mode .modal-edit-btn { display: inline-flex; align-items: center; gap: 6px; }
-
-  /* ─── EDITOR PANEL ─── */
-  .editor-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(580px, 100vw);
-    background: #0e0c0a;
-    border-left: 1px solid rgba(200,120,32,0.2);
-    z-index: 900;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-    box-shadow: -24px 0 60px rgba(0,0,0,0.6);
-  }
-
-  .editor-panel.open { transform: translateX(0); }
-
-  .editor-header {
-    padding: 14px 18px;
-    border-bottom: 1px solid rgba(200,120,32,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    background: rgba(200,120,32,0.04);
-  }
-
-  .editor-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--edit-accent);
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .editor-title::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--edit-accent);
-    animation: pulse 1.5s infinite;
-  }
-
-  .editor-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .editor-body {
-    flex: 1;
-    overflow-y: auto;
-  }
-
-  .editor-body::-webkit-scrollbar { width: 3px; }
-  .editor-body::-webkit-scrollbar-track { background: transparent; }
-  .editor-body::-webkit-scrollbar-thumb { background: rgba(200,120,32,0.2); }
-
-  .editor-col-headers {
-    display: grid;
-    grid-template-columns: 28px 44px 1fr 1fr;
-    gap: 8px;
-    padding: 8px 14px;
-    border-bottom: 1px solid rgba(200,120,32,0.12);
-    background: rgba(42,39,32,0.4);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  .editor-col-header {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    color: var(--edit-accent);
-    text-transform: uppercase;
-    opacity: 0.6;
-  }
-
-  .editor-row {
-    display: grid;
-    grid-template-columns: 28px 44px 1fr 1fr;
-    gap: 8px;
-    padding: 7px 14px;
-    border-bottom: 1px solid rgba(176,168,144,0.05);
-    align-items: start;
-    transition: background 0.15s;
-  }
-
-  .editor-row:hover { background: rgba(200,120,32,0.04); }
-
-  .editor-row-num {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: rgba(176,168,144,0.25);
-    padding-top: 4px;
-    text-align: right;
-  }
-
-  .editor-thumb {
-    width: 38px;
-    height: 38px;
-    object-fit: cover;
-    border-radius: 1px;
-    background: var(--dim);
-  }
-
-  .editor-input {
-    background: rgba(42,39,32,0.5);
-    border: 1px solid rgba(176,168,144,0.1);
-    color: var(--cream);
-    font-family: 'Archivo', sans-serif;
-    font-size: 12px;
-    font-weight: 300;
-    padding: 5px 8px;
-    width: 100%;
-    outline: none;
-    resize: none;
-    transition: border-color 0.2s;
-  }
-
-  .editor-input:focus { border-color: var(--edit-accent); }
-  .editor-input::placeholder { color: rgba(176,168,144,0.2); font-style: italic; }
-  textarea.editor-input { min-height: 38px; line-height: 1.4; }
-
-  /* ─── TOAST ─── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--dim);
-    border: 1px solid rgba(176,168,144,0.2);
-    color: var(--cream);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    padding: 10px 20px;
-    z-index: 9998;
-    transition: transform 0.3s;
-    pointer-events: none;
-    max-width: 90vw;
-    text-align: center;
-  }
-
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success { border-color: #3a7a3a; color: #7aba7a; }
-  .toast.error-t { border-color: var(--burgundy); color: #c05050; }
-
-  /* ─── SHORTCUT HINT ─── */
-  .shortcut-hint {
-    position: fixed;
-    bottom: 18px;
-    right: 18px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: rgba(176,168,144,0.2);
-    letter-spacing: 0.06em;
-    z-index: 50;
-    pointer-events: none;
-  }
-
-  /* ─── MOBILE ─── */
-  @media (max-width: 600px) {
-    header { padding: 10px 14px; }
-    .header-title { font-size: 13px; }
-    .status-text { display: none; }
-    .btn { font-size: 10px; padding: 6px 10px; }
-
-    .gallery-wrap { padding: 6px 4px; }
-    .masonry { column-count: 3; column-gap: 4px; }
-    .card { margin-bottom: 4px; }
-    .card-overlay { display: none; }
-
-    /* Mobile modal: fullscreen image */
-    .modal-backdrop { background: #000; }
-
-    .modal-info-strip {
-      padding: 60px 14px 14px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .modal-field-type {
-      font-size: 10px;
-      max-width: 80vw;
-      width: auto;
-    }
-
-    .modal-field-desc {
-      font-size: 11px;
-      max-width: 85vw;
-      width: auto;
-    }
-
-    .modal-info-right {
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .keyboard-hint { display: none; }
-
-    .editor-panel {
-      width: 100vw;
-      border-left: none;
-    }
-
-    .shortcut-hint { display: none; }
-  }
+:root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif;font-weight:200;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
+
+/* HEADER */
+#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px}
+.header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
+.header-title span{color:var(--copper);font-style:italic}
+.header-right{display:flex;align-items:center;gap:14px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
+.status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
+.status-dot.ready{background:#5a8a5a}
+.status-dot.error{background:var(--burgundy)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-text{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.06em}
+.btn-map{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 13px;cursor:pointer;transition:all .2s;white-space:nowrap;text-transform:uppercase}
+.btn-map:hover{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.08)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:6px;padding:0 0 12px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-chip{background:none;border:1px solid rgba(176,168,144,.18);color:rgba(176,168,144,.6);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;cursor:pointer;transition:all .2s;white-space:nowrap;border-radius:1px;flex-shrink:0}
+.filter-chip:hover{border-color:rgba(176,168,144,.5);color:var(--cream)}
+.filter-chip.active{background:var(--copper);border-color:var(--copper);color:var(--black);font-weight:400}
+.filter-chip.all-chip.active{background:rgba(176,168,144,.15);border-color:var(--silver);color:var(--cream)}
+
+/* MASONRY */
+.gallery-wrap{padding:24px 8px}
+.masonry{column-count:5;column-gap:8px}
+.card{break-inside:avoid;margin-bottom:8px;position:relative;cursor:pointer;overflow:hidden;border-radius:2px;background:var(--dim)}
+.card.hidden{display:none}
+.card img{display:block;width:100%;height:auto;transition:transform .4s ease}
+.card:hover img{transform:scale(1.03)}
+.card-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 8px 8px;background:linear-gradient(to top,rgba(9,8,7,.85),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;gap:5px}
+.card:hover .card-overlay{opacity:1}
+.card-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
+.card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* SIZE SLIDER */
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:10px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 18px;border-radius:2px}
+#sizeSliderWrap span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase}
+#sizeSlider{width:160px;accent-color:var(--copper);cursor:pointer}
+
+/* SPINNER */
+.spinner{width:24px;height:24px;border:1px solid rgba(176,168,144,.2);border-top-color:var(--copper);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(9,8,7,.99);z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-backdrop.open{opacity:1;pointer-events:all}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(to bottom,rgba(9,8,7,.9),transparent)}
+.modal-close{background:none;border:none;color:var(--silver);font-size:18px;cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s}
+.modal-close:hover{background:rgba(176,168,144,.1);color:var(--cream)}
+.modal-counter{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.08em;opacity:.5}
+.nav-arrows{display:flex;gap:8px}
+.nav-btn{background:rgba(9,8,7,.6);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:14px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;border-radius:2px}
+.nav-btn:hover{border-color:var(--copper);color:var(--copper)}
+.modal-image-full{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.modal-image-full img{width:100%;height:100%;object-fit:contain;display:block}
+.modal-info-strip{position:absolute;bottom:0;left:0;right:0;padding:80px 28px 24px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:10;pointer-events:none}
+.modal-info-left{display:flex;flex-direction:column;gap:8px;pointer-events:all}
+.modal-color-row{display:flex;align-items:center;gap:8px}
+.modal-color-dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
+.modal-color-hex{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.08em;opacity:.7}
+.modal-title{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,42px);font-weight:400;font-style:italic;color:var(--cream);line-height:1.15;max-width:60vw}
+.modal-desc-text{font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;color:var(--silver);opacity:.75;line-height:1.5;max-width:50vw}
+.modal-info-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:all}
+.pinterest-link{display:flex;align-items:center;gap:6px;color:var(--silver);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;opacity:.4;transition:opacity .2s}
+.pinterest-link:hover{opacity:.9;color:var(--copper)}
+.keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.25;letter-spacing:.06em}
+
+/* MAP VIEW */
+#mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none}
+#mapView:active{cursor:grabbing}
+#mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+.map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
+.map-ui-btn:hover{border-color:var(--copper);color:var(--copper)}
+#mapCloseBtn{right:18px}
+#mapShuffleBtn{right:128px}
+#mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
+.map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
+.map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
+#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
+#mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
+
+/* CLUSTER LABELS — always on top */
+.map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:500}
+.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:30px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
+.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:5px}
+
+/* ISLANDS */
+.map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.map-island:hover{z-index:999!important}
+.map-island-inner{position:relative;border-radius:2px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.55);transition:box-shadow .2s,outline .2s;width:100%;height:100%}
+.map-island:hover .map-island-inner{outline:1px solid rgba(168,104,40,.55);box-shadow:0 0 28px rgba(168,104,40,.12),0 14px 44px rgba(0,0,0,.75)}
+.map-island img{display:block;width:100%;height:100%;object-fit:cover}
+.map-island-hlabel{position:absolute;bottom:0;left:0;right:0;padding:18px 6px 5px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;opacity:0;transition:opacity .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-island:hover .map-island-hlabel{opacity:1}
+
+/* HOVER TOOLTIP */
+#mapTooltip{position:fixed;bottom:40px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
+#mapTooltip.visible{opacity:1}
+.tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2}
+.tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 
-<div class="edit-mode-bar"></div>
+<!-- MAP — shown immediately, full screen loader -->
+<div id="mapView">
+  <div class="map-title-label">EDETRI — Constellation</div>
+  <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
+  <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
+  <div id="mapStage"></div>
+  <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
+  <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
+  <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
+</div>
 
-<header>
-  <div class="header-title">EDETRI — <span>Visual Archive</span></div>
-  <div class="header-actions">
-    <div style="display:flex;align-items:center;gap:6px">
-      <span class="status-dot loading" id="statusDot"></span>
-      <span class="status-text" id="statusText">Loading...</span>
+<!-- HEADER — hidden until map closed -->
+<header id="siteHeader" style="display:none">
+  <div class="header-top">
+    <div class="header-title">EDETRI — <span>Visual Archive</span></div>
+    <div class="header-right">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="status-dot loading" id="statusDot"></span>
+        <span class="status-text" id="statusText">Loading...</span>
+      </div>
+      <button class="btn-map" onclick="openMap()">⊕ Map</button>
     </div>
-    <!-- Publish button — only visible in edit mode -->
-    <button class="btn btn-publish" id="publishBtn" onclick="publishToSheets()">▲ Publish</button>
-    <!-- Edit mode toggle -->
-    <button class="btn btn-edit-toggle" onclick="toggleEditMode()">
-      <span class="edit-badge"></span>
-      ✎ Edit <small style="opacity:0.5;margin-left:4px">Shift+E</small>
-    </button>
   </div>
+  <div class="filter-bar" id="filterBar"></div>
 </header>
 
-<main class="gallery-wrap">
-  <div class="loading-state" id="loadingState">
-    <div class="spinner"></div>
-    <p>Fetching visual archive...</p>
+<!-- GALLERY — hidden until map closed -->
+<main id="galleryWrap" style="display:none">
+  <div class="gallery-wrap">
+    <div class="masonry" id="masonry"></div>
   </div>
-  <div class="masonry" id="masonry" style="display:none"></div>
 </main>
 
-<!-- Fullscreen Modal -->
-<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true">
+<!-- SIZE SLIDER (masonry mode) -->
+<div id="sizeSliderWrap">
+  <span>Size</span>
+  <input type="range" id="sizeSlider" min="1" max="9" value="5" step="1" oninput="applySize(this.value)">
+</div>
 
-  <!-- Fullscreen image -->
-  <div class="modal-image-full">
-    <img id="modalImg" src="" alt="" referrerpolicy="no-referrer">
-  </div>
-
-  <!-- Top bar -->
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal-image-full"><img id="modalImg" src="" alt="" referrerpolicy="no-referrer"></div>
   <div class="modal-header">
     <div style="display:flex;align-items:center;gap:12px">
-      <button class="modal-close" onclick="closeModal()" title="Close (Esc)">✕</button>
+      <button class="modal-close" onclick="closeModal()">✕</button>
       <span class="modal-counter" id="modalCounter"></span>
     </div>
     <div class="nav-arrows">
-      <button class="nav-btn" onclick="navigateModal(-1)" title="Previous (←)">←</button>
-      <button class="nav-btn" onclick="navigateModal(1)" title="Next (→)">→</button>
+      <button class="nav-btn" onclick="navModal(-1)">←</button>
+      <button class="nav-btn" onclick="navModal(1)">→</button>
     </div>
   </div>
-
-  <!-- Bottom info strip -->
   <div class="modal-info-strip">
     <div class="modal-info-left">
       <div class="modal-color-row">
-        <div class="modal-color-dot" id="modalColorDot" style="display:none"></div>
-        <span class="modal-color-hex-text" id="modalColorHex"></span>
+        <div class="modal-color-dot" id="mColorDot" style="display:none"></div>
+        <span class="modal-color-hex" id="mColorHex"></span>
       </div>
-      <input class="modal-field-type" id="modalType" type="text" placeholder="Type…" oninput="autoSaveModal()" readonly>
-      <textarea class="modal-field-desc" id="modalDesc" placeholder="Description…" rows="2" oninput="autoSaveModal()" readonly></textarea>
+      <div class="modal-title" id="mTitle"></div>
+      <div class="modal-desc-text" id="mDesc"></div>
     </div>
     <div class="modal-info-right">
-      <!-- Open editor panel for this row -->
-      <button class="modal-edit-btn" id="modalEditBtn" onclick="openEditorForCurrent()">⊞ Edit row</button>
-      <a class="pinterest-link" id="modalPinterestLink" href="#" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
-        ↗ Pinterest
-      </a>
+      <a class="pinterest-link" id="mLink" href="#" target="_blank" rel="noopener">↗ Pinterest</a>
       <span class="keyboard-hint">← → nav · Esc close</span>
     </div>
   </div>
 </div>
 
-<!-- Editor Panel (only opens manually) -->
-<div class="editor-panel" id="editorPanel">
-  <div class="editor-header">
-    <span class="editor-title">Edit Mode — Field Editor</span>
-    <div class="editor-actions">
-      <button class="btn" onclick="copyForSheets()">⎘ Copy TSV</button>
-      <button class="btn btn-primary" onclick="publishToSheets()">▲ Publish</button>
-      <button class="modal-close" onclick="closeEditor()">✕</button>
-    </div>
-  </div>
-  <div class="editor-body">
-    <div class="editor-col-headers">
-      <span class="editor-col-header">#</span>
-      <span class="editor-col-header">Img</span>
-      <span class="editor-col-header">Type (F)</span>
-      <span class="editor-col-header">Description (G)</span>
-    </div>
-    <div id="editorRows"></div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<!-- Keyboard hint -->
-<div class="shortcut-hint">Shift+E → edit mode</div>
+<div id="toast"></div>
 
 <script>
-  // ─── CONFIG ────────────────────────────────────────────────────
-  const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
-  // Range: B10:G — B=imgUrl, C=?, D=color, E=pinterest, F=type, G=desc
-  // Original was C10:G (imgUrl=C, color=D, pinterest=E, type=F, desc=G)
-  // Now imgUrl comes from B, so range is B10:G
-  const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AG&gid=0`;
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
-  const LS_KEY = 'edetri-masonry-edits';
+const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AG&gid=0`;
 
-  let rows = [];
-  let currentIdx = -1;
-  let isEditMode = false;
-  let editorOpen = false;
+let rows = [], visibleIdx = [], currentIdx = -1;
+let mapBuilt = false, isShuffled = false;
+let mapAllItems = [];
+let panX = 0, panY = 0, scale = 1;
+let isPanning = false, panSX, panSY, panOX, panOY;
 
-  // ─── LOCAL STORAGE ─────────────────────────────────────────────
-  function loadEdits() {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); }
-    catch { return {}; }
-  }
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(GVIZ);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const json = JSON.parse(text.slice(text.indexOf('(')+1, text.lastIndexOf(')')));
+    if (json.status !== 'ok') throw new Error('Sheet unavailable — make sure it is public');
 
-  function saveEdit(rowNum, type, description) {
-    const edits = loadEdits();
-    edits[String(rowNum)] = { type, description };
-    localStorage.setItem(LS_KEY, JSON.stringify(edits));
-  }
-
-  // ─── FETCH & RENDER ────────────────────────────────────────────
-  async function init() {
-    try {
-      const res = await fetch(GVIZ_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      const jsonStr = text.slice(text.indexOf('(') + 1, text.lastIndexOf(')'));
-      const json = JSON.parse(jsonStr);
-      if (json.status !== 'ok') throw new Error('Spreadsheet data unavailable');
-
-      const records = json.table.rows.map(row =>
-        (row.c || []).map(cell => cell && cell.v != null ? String(cell.v) : '')
-      );
-      const edits = loadEdits();
-
-      // range=B10:G → columns: 0=B(imgUrl) 1=C 2=D(color) 3=E(pinterest) 4=F(type) 5=G(desc)
-      rows = [];
-      for (let i = 0; i < records.length; i++) {
-        const r = records[i];
-        const rowNum = i + 10;
-        const imgUrl = (r[0] || '').trim(); // B column
-        if (!imgUrl) continue;
-
-        const saved = edits[String(rowNum)] || {};
-        rows.push({
-          rowNum,
-          imgUrl,                               // B
-          // r[1] = C (unused / whatever is there)
-          color:        (r[2] || '').trim(),    // D
-          pinterestUrl: (r[3] || '').trim(),    // E
-          type:         saved.type        !== undefined ? saved.type        : (r[4] || '').trim(), // F
-          description:  saved.description !== undefined ? saved.description : (r[5] || '').trim(), // G
-        });
-      }
-
-      renderMasonry();
-      renderEditor();
-      setStatus('ready', `${rows.length} images`);
-    } catch (err) {
-      setStatus('error', 'Failed to load');
-      document.getElementById('loadingState').innerHTML =
-        `<p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-align:center;padding:40px">
-          Error: ${err.message}<br><br>
-          <span style="opacity:.5">Check console or try via local server instead of file://</span>
-        </p>`;
-    }
-  }
-
-  function renderMasonry() {
-    const masonry = document.getElementById('masonry');
-    masonry.innerHTML = '';
-    rows.forEach((row, idx) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.dataset.idx = idx;
-      card.onclick = () => openModal(idx);
-
-      const img = document.createElement('img');
-      img.src = row.imgUrl;
-      img.alt = row.type || '';
-      img.loading = 'lazy';
-      img.referrerPolicy = 'no-referrer';
-      img.onerror = () => {
-        img.style.display = 'none';
-        let ph = card.querySelector('.card-placeholder');
-        if (!ph) {
-          ph = document.createElement('div');
-          ph.className = 'card-placeholder';
-          card.insertBefore(ph, card.firstChild);
-        }
-        ph.style.background = row.color || 'var(--dim)';
-        ph.textContent = row.color || '—';
-      };
-
-      const overlay = document.createElement('div');
-      overlay.className = 'card-overlay';
-
-      if (row.color) {
-        const dot = document.createElement('div');
-        dot.className = 'card-color';
-        dot.style.background = row.color;
-        overlay.appendChild(dot);
-      }
-
-      if (row.type) {
-        const typeEl = document.createElement('span');
-        typeEl.className = 'card-type';
-        typeEl.textContent = row.type;
-        overlay.appendChild(typeEl);
-      }
-
-      card.appendChild(img);
-      card.appendChild(overlay);
-      masonry.appendChild(card);
-    });
-
-    document.getElementById('loadingState').style.display = 'none';
-    masonry.style.display = '';
-  }
-
-  // ─── MODAL ─────────────────────────────────────────────────────
-  function openModal(idx) {
-    currentIdx = idx;
-    const row = rows[idx];
-
-    document.getElementById('modalImg').src = row.imgUrl;
-
-    // Color dot
-    const dot = document.getElementById('modalColorDot');
-    const hexEl = document.getElementById('modalColorHex');
-    if (row.color) {
-      dot.style.background = row.color;
-      dot.style.display = 'block';
-      hexEl.textContent = row.color.toUpperCase();
-    } else {
-      dot.style.display = 'none';
-      hexEl.textContent = '';
-    }
-
-    // Fields
-    const typeEl = document.getElementById('modalType');
-    const descEl = document.getElementById('modalDesc');
-    typeEl.value = row.type || '';
-    descEl.value = row.description || '';
-
-    // In edit mode, make fields editable
-    setModalFieldsEditable(isEditMode);
-
-    // Pinterest
-    const link = document.getElementById('modalPinterestLink');
-    if (row.pinterestUrl) {
-      link.href = row.pinterestUrl;
-      link.style.display = 'flex';
-    } else {
-      link.style.display = 'none';
-    }
-
-    document.getElementById('modalCounter').textContent = `${idx + 1} / ${rows.length}`;
-    document.getElementById('modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal() {
-    autoSaveModal();
-    document.getElementById('modal').classList.remove('open');
-    document.body.style.overflow = '';
-    currentIdx = -1;
-  }
-
-  function navigateModal(dir) {
-    if (currentIdx < 0) return;
-    autoSaveModal();
-    openModal((currentIdx + dir + rows.length) % rows.length);
-  }
-
-  function autoSaveModal() {
-    if (currentIdx < 0 || !isEditMode) return;
-    const type = document.getElementById('modalType').value;
-    const description = document.getElementById('modalDesc').value;
-    rows[currentIdx].type = type;
-    rows[currentIdx].description = description;
-    saveEdit(rows[currentIdx].rowNum, type, description);
-    updateCardOverlay(currentIdx);
-    syncEditorRow(currentIdx);
-  }
-
-  function setModalFieldsEditable(editable) {
-    const typeEl = document.getElementById('modalType');
-    const descEl = document.getElementById('modalDesc');
-    if (editable) {
-      typeEl.removeAttribute('readonly');
-      descEl.removeAttribute('readonly');
-    } else {
-      typeEl.setAttribute('readonly', '');
-      descEl.setAttribute('readonly', '');
-    }
-  }
-
-  function openEditorForCurrent() {
-    // Open editor panel and scroll to current row
-    openEditor();
-    if (currentIdx >= 0) {
-      setTimeout(() => {
-        const rowEl = document.querySelector(`#editorRows [data-row-idx="${currentIdx}"]`);
-        if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 400);
-    }
-  }
-
-  // ─── EDIT MODE ─────────────────────────────────────────────────
-  function toggleEditMode() {
-    isEditMode = !isEditMode;
-    document.body.classList.toggle('edit-mode', isEditMode);
-    setModalFieldsEditable(isEditMode);
-
-    if (!isEditMode && editorOpen) {
-      closeEditor();
-    }
-
-    showToast(isEditMode ? '✎ Edit mode ON — fields unlocked' : '✓ Edit mode OFF', isEditMode ? '' : 'success');
-  }
-
-  // ─── EDITOR PANEL ──────────────────────────────────────────────
-  function renderEditor() {
-    const container = document.getElementById('editorRows');
-    container.innerHTML = '';
-    rows.forEach((row, idx) => {
-      const div = document.createElement('div');
-      div.className = 'editor-row';
-      div.dataset.rowIdx = idx;
-
-      const numEl = document.createElement('span');
-      numEl.className = 'editor-row-num';
-      numEl.textContent = row.rowNum;
-
-      const thumb = document.createElement('img');
-      thumb.className = 'editor-thumb';
-      thumb.src = row.imgUrl;
-      thumb.referrerPolicy = 'no-referrer';
-      thumb.alt = '';
-      thumb.loading = 'lazy';
-      thumb.onerror = () => { thumb.style.background = row.color || 'var(--dim)'; thumb.src = ''; };
-
-      const typeInput = document.createElement('input');
-      typeInput.className = 'editor-input editor-type';
-      typeInput.type = 'text';
-      typeInput.value = row.type || '';
-      typeInput.placeholder = 'Type…';
-      typeInput.oninput = () => {
-        rows[idx].type = typeInput.value;
-        saveEdit(row.rowNum, typeInput.value, rows[idx].description);
-        updateCardOverlay(idx);
-        if (currentIdx === idx) {
-          document.getElementById('modalType').value = typeInput.value;
-        }
-      };
-
-      const descInput = document.createElement('textarea');
-      descInput.className = 'editor-input editor-desc';
-      descInput.value = row.description || '';
-      descInput.placeholder = 'Description…';
-      descInput.rows = 2;
-      descInput.oninput = () => {
-        rows[idx].description = descInput.value;
-        saveEdit(row.rowNum, rows[idx].type, descInput.value);
-        updateCardOverlay(idx);
-        if (currentIdx === idx) {
-          document.getElementById('modalDesc').value = descInput.value;
-        }
-      };
-
-      div.appendChild(numEl);
-      div.appendChild(thumb);
-      div.appendChild(typeInput);
-      div.appendChild(descInput);
-      container.appendChild(div);
-    });
-  }
-
-  function openEditor() {
-    if (!isEditMode) {
-      showToast('Enable edit mode first (Shift+E)', 'error-t');
-      return;
-    }
-    document.getElementById('editorPanel').classList.add('open');
-    editorOpen = true;
-  }
-
-  function closeEditor() {
-    document.getElementById('editorPanel').classList.remove('open');
-    editorOpen = false;
-  }
-
-  function updateCardOverlay(idx) {
-    const card = document.querySelector(`.card[data-idx="${idx}"]`);
-    if (!card) return;
-    const overlay = card.querySelector('.card-overlay');
-    if (!overlay) return;
-    const typeEl = overlay.querySelector('.card-type');
-    const row = rows[idx];
-    if (row.type) {
-      if (typeEl) { typeEl.textContent = row.type; }
-      else {
-        const el = document.createElement('span');
-        el.className = 'card-type';
-        el.textContent = row.type;
-        overlay.appendChild(el);
-      }
-    } else if (typeEl) { typeEl.remove(); }
-  }
-
-  function syncEditorRow(idx) {
-    const rowEl = document.querySelector(`#editorRows [data-row-idx="${idx}"]`);
-    if (!rowEl) return;
-    const row = rows[idx];
-    const ti = rowEl.querySelector('.editor-type');
-    const di = rowEl.querySelector('.editor-desc');
-    if (ti && ti.value !== row.type) ti.value = row.type || '';
-    if (di && di.value !== row.description) di.value = row.description || '';
-  }
-
-  // ─── PUBLISH TO SHEETS ─────────────────────────────────────────
-  async function publishToSheets() {
-    if (!isEditMode) {
-      showToast('Enable edit mode first (Shift+E)', 'error-t');
-      return;
-    }
-
-    const publishBtn = document.getElementById('publishBtn');
-    const origText = publishBtn.textContent;
-    publishBtn.textContent = '⟳ Publishing…';
-    publishBtn.disabled = true;
-    showToast('Publishing to Google Sheets…');
-
-    const sorted = [...rows].sort((a, b) => a.rowNum - b.rowNum);
-    const payload = sorted.map(r => ({
-      row: r.rowNum,
-      type: r.type || '',
-      description: r.description || ''
-    }));
-
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'updateRows', rows: payload })
+    rows = [];
+    for (const row of (json.table.rows||[])) {
+      const c = (row.c||[]).map(x => x&&x.v!=null ? String(x.v) : '');
+      const imgUrl = (c[0]||'').trim();
+      if (!imgUrl) continue;
+      rows.push({
+        imgUrl,
+        color:        (c[2]||'').trim(),
+        pinterestUrl: (c[3]||'').trim(),
+        type:         (c[4]||'').trim(),
+        description:  (c[5]||'').trim()
       });
-      // no-cors returns opaque response — assume success if no throw
-      showToast(`✓ Published ${sorted.length} rows to Sheets`, 'success');
-    } catch (err) {
-      showToast(`✗ Publish failed: ${err.message}`, 'error-t');
-    } finally {
-      publishBtn.textContent = origText;
-      publishBtn.disabled = false;
     }
-  }
 
-  // ─── COPY FOR SHEETS ───────────────────────────────────────────
-  function copyForSheets() {
-    const sorted = [...rows].sort((a, b) => a.rowNum - b.rowNum);
-    const tsv = sorted.map(r => `${r.type || ''}\t${r.description || ''}`).join('\n');
-    navigator.clipboard.writeText(tsv).then(() => {
-      showToast(`✓ Copied ${sorted.length} rows — paste into F:G from row 10`);
-    }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = tsv;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showToast(`✓ Copied ${sorted.length} rows — paste into F:G from row 10`);
+    visibleIdx = rows.map((_,i)=>i);
+    renderFilters();
+    renderMasonry();
+    setStatus('ready', `${rows.length} images`);
+    buildMap();
+  } catch(e) {
+    setStatus('error','Failed to load');
+    document.getElementById('mapLoader').innerHTML =
+      `<div style="text-align:center;padding:40px 20px">
+        <p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;margin-bottom:12px">Error: ${e.message}</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(176,168,144,.4);letter-spacing:.06em">Make sure the Google Sheet is set to<br>"Anyone with the link can view"</p>
+      </div>`;
+  }
+}
+
+// ── FILTERS ───────────────────────────────────────────────────
+function renderFilters() {
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = '';
+  const types = [...new Set(rows.map(r=>r.type).filter(Boolean))].sort();
+  if (!types.length) return;
+
+  const all = mkChip('All','all',true); all.classList.add('all-chip');
+  all.onclick = () => applyFilter('all');
+  bar.appendChild(all);
+  types.forEach(t => { const c=mkChip(t,t,false); c.onclick=()=>applyFilter(t); bar.appendChild(c); });
+}
+
+function mkChip(label,f,active) {
+  const c=document.createElement('button');
+  c.className='filter-chip'+(active?' active':'');
+  c.textContent=label; c.dataset.f=f; return c;
+}
+
+function applyFilter(f) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
+  document.querySelectorAll('.card').forEach(card=>{
+    card.classList.toggle('hidden', f!=='all' && rows[+card.dataset.idx].type!==f);
+  });
+  visibleIdx = rows.map((_,i)=>i).filter(i=>f==='all'||rows[i].type===f);
+}
+
+// ── MASONRY ───────────────────────────────────────────────────
+function renderMasonry() {
+  const m = document.getElementById('masonry');
+  m.innerHTML = '';
+  rows.forEach((row,idx) => {
+    const card = document.createElement('div');
+    card.className='card'; card.dataset.idx=idx;
+    card.onclick = ()=>openModal(idx);
+    const img = document.createElement('img');
+    img.src=row.imgUrl; img.alt=row.type||''; img.loading='lazy'; img.referrerPolicy='no-referrer';
+    const ov = document.createElement('div'); ov.className='card-overlay';
+    if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; ov.appendChild(d); }
+    if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; ov.appendChild(s); }
+    card.appendChild(img); card.appendChild(ov); m.appendChild(card);
+  });
+}
+
+function applySize(v) { document.getElementById('masonry').style.columnCount = 10-parseInt(v); }
+
+// ── MAP BUILD ─────────────────────────────────────────────────
+function applyTransform() {
+  document.getElementById('mapStage').style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+}
+
+function buildMap() {
+  const stage = document.getElementById('mapStage');
+  stage.innerHTML = '';
+  mapAllItems = [];
+  isShuffled = false;
+  document.getElementById('mapShuffleBtn').classList.remove('active');
+
+  const VW=window.innerWidth, VH=window.innerHeight;
+  let seed=137;
+  const rng=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/0xffffffff; };
+
+  const types=[...new Set(rows.map(r=>r.type).filter(Boolean))];
+  const ungrouped=rows.filter(r=>!r.type);
+  const WORLD_W=3400, WORLD_H=2600;
+  const cols=Math.ceil(Math.sqrt(types.length||1));
+  const rcount=Math.ceil((types.length||1)/cols);
+  const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
+
+  const centers=types.map((_,i)=>({
+    x: cellW*(i%cols+0.5)+(rng()-.5)*cellW*.3,
+    y: cellH*(Math.floor(i/cols)+0.5)+(rng()-.5)*cellH*.3
+  }));
+
+  const allItems=[];
+
+  function placeCluster(group, cx, cy) {
+    const n=group.length;
+    group.forEach((row,j)=>{
+      const gi=rows.indexOf(row);
+      const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.8;
+      const ring=Math.floor(j/8);
+      const dist=60+ring*90+rng()*70;
+      const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
+      const sr=rng();
+      const w=sr<.12?120:sr<.38?85:58;
+      const h=sr<.12?160:sr<.38?112:77;
+      const ix=px-w/2, iy=py-h/2;
+      const rot=(rng()-.5)*6;
+
+      const island=document.createElement('div');
+      island.className='map-island';
+      island.style.cssText=`left:${ix}px;top:${iy}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg)`;
+      island.dataset.baseRot=rot; island.dataset.currentRot=rot;
+
+      const inner=document.createElement('div'); inner.className='map-island-inner';
+      const img=document.createElement('img');
+      img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy';
+      img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
+      const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
+      inner.appendChild(img); inner.appendChild(hl); island.appendChild(inner);
+
+      // drag vs click logic
+      let dragging=false, hasMoved=false, dsx, dsy, dsl, dst;
+      island.addEventListener('mousedown', e=>{
+        e.stopPropagation();
+        dragging=true; hasMoved=false;
+        dsx=e.clientX; dsy=e.clientY;
+        dsl=parseFloat(island.style.left); dst=parseFloat(island.style.top);
+        island.style.transition='none'; island.style.zIndex='1000';
+      });
+      window.addEventListener('mousemove', e=>{
+        if (!dragging) return;
+        const dx=(e.clientX-dsx)/scale, dy=(e.clientY-dsy)/scale;
+        if (Math.abs(dx)>3||Math.abs(dy)>3) hasMoved=true;
+        if (!hasMoved) return;
+        island.style.left=(dsl+dx)+'px'; island.style.top=(dst+dy)+'px';
+      });
+      window.addEventListener('mouseup', ()=>{
+        if (!dragging) return;
+        dragging=false; island.style.zIndex=''; island.style.transition='';
+        if (!hasMoved) {
+          openModal(gi);
+        } else {
+          const item=mapAllItems.find(x=>x.el===island);
+          if (item){ item.baseX=parseFloat(island.style.left); item.baseY=parseFloat(island.style.top); }
+        }
+      });
+
+      // hover: +10deg rotation + tooltip
+      island.addEventListener('mouseenter', ()=>{
+        const r=parseFloat(island.dataset.currentRot);
+        island.style.transform=`rotate(${r+10}deg)`;
+        document.getElementById('ttType').textContent=row.type||'';
+        document.getElementById('ttDesc').textContent=row.description||'';
+        if (row.type||row.description) document.getElementById('mapTooltip').classList.add('visible');
+      });
+      island.addEventListener('mouseleave', ()=>{
+        const r=parseFloat(island.dataset.currentRot);
+        island.style.transform=`rotate(${r}deg)`;
+        document.getElementById('mapTooltip').classList.remove('visible');
+      });
+
+      stage.appendChild(island);
+      allItems.push({el:island, baseX:ix, baseY:iy, baseRot:rot});
     });
   }
 
-  // ─── HELPERS ───────────────────────────────────────────────────
-  function setStatus(state, text) {
-    document.getElementById('statusDot').className = `status-dot ${state}`;
-    document.getElementById('statusText').textContent = text;
-  }
+  types.forEach((t,i)=>placeCluster(rows.filter(r=>r.type===t), centers[i].x, centers[i].y));
+  if (ungrouped.length) placeCluster(ungrouped, WORLD_W/2, WORLD_H*.88);
 
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast' + (type ? ` ${type}` : '');
-    t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
-  }
+  mapAllItems=allItems;
 
-  // ─── KEYBOARD SHORTCUTS ────────────────────────────────────────
-  document.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-      if (e.key === 'Escape') e.target.blur();
-      return;
-    }
-
-    // Shift+E → toggle edit mode
-    if (e.shiftKey && e.key === 'E') {
-      e.preventDefault();
-      toggleEditMode();
-      return;
-    }
-
-    const modal = document.getElementById('modal');
-    if (modal.classList.contains('open')) {
-      if (e.key === 'Escape') closeModal();
-      if (e.key === 'ArrowLeft')  navigateModal(-1);
-      if (e.key === 'ArrowRight') navigateModal(1);
-    }
+  // cluster labels (z-index 500)
+  types.forEach((t,i)=>{
+    const lbl=document.createElement('div'); lbl.className='map-cluster-label';
+    lbl.style.left=centers[i].x+'px'; lbl.style.top=(centers[i].y-75)+'px';
+    const nm=document.createElement('div'); nm.className='map-cluster-name'; nm.textContent=t;
+    const cnt=document.createElement('div'); cnt.className='map-cluster-count';
+    cnt.textContent=`${rows.filter(r=>r.type===t).length} items`;
+    lbl.appendChild(nm); lbl.appendChild(cnt); stage.appendChild(lbl);
   });
 
-  // Close modal clicking outside content
-  document.getElementById('modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('modal') ||
-        e.target === document.querySelector('.modal-image-full')) {
-      closeModal();
-    }
-  });
+  // fit to screen — use approximate sizes since DOM not yet painted
+  const W_EST=80, H_EST=100, PAD=80;
+  const minX=Math.min(...allItems.map(x=>x.baseX))-PAD;
+  const minY=Math.min(...allItems.map(x=>x.baseY))-PAD;
+  const maxX=Math.max(...allItems.map(x=>x.baseX+W_EST))+PAD;
+  const maxY=Math.max(...allItems.map(x=>x.baseY+H_EST))+PAD;
+  scale=Math.min(VW/(maxX-minX), VH/(maxY-minY), 1);
+  panX=(VW-(maxX-minX)*scale)/2 - minX*scale;
+  panY=(VH-(maxY-minY)*scale)/2 - minY*scale;
+  applyTransform();
 
-  // ─── INIT ──────────────────────────────────────────────────────
-  init();
+  document.getElementById('mapLoader').style.display='none';
+  mapBuilt=true;
+
+  // pan
+  const view=document.getElementById('mapView');
+  view.addEventListener('mousedown', e=>{
+    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')) return;
+    isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
+  });
+  window.addEventListener('mousemove', e=>{
+    if (!isPanning) return;
+    panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+  });
+  window.addEventListener('mouseup', ()=>{ isPanning=false; });
+
+  // scroll zoom
+  view.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const f=e.deltaY>0?.92:1.08;
+    const ns=Math.min(Math.max(scale*f,.1),5);
+    const rect=view.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    panX=mx-(mx-panX)*(ns/scale); panY=my-(my-panY)*(ns/scale);
+    scale=ns; applyTransform();
+  },{passive:false});
+
+  // touch pan
+  let t1x,t1y;
+  view.addEventListener('touchstart', e=>{
+    if (e.target.closest('.map-island')) return;
+    const t=e.touches[0]; isPanning=true; t1x=t.clientX; t1y=t.clientY; panOX=panX; panOY=panY;
+  },{passive:true});
+  view.addEventListener('touchmove', e=>{
+    if (!isPanning) return;
+    const t=e.touches[0]; panX=panOX+(t.clientX-t1x); panY=panOY+(t.clientY-t1y); applyTransform();
+  },{passive:true});
+  view.addEventListener('touchend', ()=>{ isPanning=false; });
+}
+
+function openMap() {
+  document.getElementById('siteHeader').style.display='none';
+  document.getElementById('galleryWrap').style.display='none';
+  document.getElementById('sizeSliderWrap').style.display='none';
+  document.getElementById('mapView').style.display='block';
+  document.body.style.overflow='hidden';
+  if (!mapBuilt && rows.length) buildMap();
+}
+
+function closeMap() {
+  document.getElementById('mapView').style.display='none';
+  document.getElementById('siteHeader').style.display='';
+  document.getElementById('galleryWrap').style.display='';
+  document.getElementById('sizeSliderWrap').style.display='flex';
+  document.body.style.overflow='';
+}
+
+// ── SHUFFLE ───────────────────────────────────────────────────
+function toggleShuffle() {
+  isShuffled=!isShuffled;
+  document.getElementById('mapShuffleBtn').classList.toggle('active',isShuffled);
+  isShuffled ? doShuffle() : returnCluster();
+}
+
+function doShuffle() {
+  let s=Date.now();
+  const rr=()=>{ s=(s*1664525+1013904223)>>>0; return s/0xffffffff; };
+  const VW=window.innerWidth/scale, VH=window.innerHeight/scale;
+  const offX=-panX/scale, offY=-panY/scale;
+  mapAllItems.forEach(item=>{
+    const PAD=20;
+    const w=parseInt(item.el.style.width)||80, h=parseInt(item.el.style.height)||100;
+    const tx=offX+PAD+rr()*(VW-w-PAD*2);
+    const ty=offY+PAD+rr()*(VH-h-PAD*2);
+    const rot=(rr()-.5)*22;
+    item.el.style.transition='left .7s cubic-bezier(.34,1.56,.64,1),top .7s cubic-bezier(.34,1.56,.64,1),transform .7s ease';
+    item.el.style.left=tx+'px'; item.el.style.top=ty+'px';
+    item.el.style.transform=`rotate(${rot}deg)`;
+    item.el.dataset.currentRot=rot;
+    item.shuffleX=tx; item.shuffleY=ty;
+  });
+  document.querySelectorAll('.map-cluster-label').forEach(l=>{l.style.transition='opacity .3s';l.style.opacity='0';});
+}
+
+function returnCluster() {
+  mapAllItems.forEach(item=>{
+    item.el.style.transition='left .6s cubic-bezier(.25,.46,.45,.94),top .6s cubic-bezier(.25,.46,.45,.94),transform .6s ease';
+    item.el.style.left=item.baseX+'px'; item.el.style.top=item.baseY+'px';
+    item.el.style.transform=`rotate(${item.baseRot}deg)`;
+    item.el.dataset.currentRot=item.baseRot;
+  });
+  document.querySelectorAll('.map-cluster-label').forEach(l=>{l.style.transition='opacity .4s .3s';l.style.opacity='1';});
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(idx) {
+  currentIdx=idx;
+  const row=rows[idx];
+  document.getElementById('modalImg').src=row.imgUrl;
+  const dot=document.getElementById('mColorDot'), hex=document.getElementById('mColorHex');
+  if (row.color){ dot.style.background=row.color; dot.style.display='block'; hex.textContent=row.color.toUpperCase(); }
+  else { dot.style.display='none'; hex.textContent=''; }
+  document.getElementById('mTitle').textContent=row.type||'';
+  document.getElementById('mDesc').textContent=row.description||'';
+  const lnk=document.getElementById('mLink');
+  if (row.pinterestUrl){ lnk.href=row.pinterestUrl; lnk.style.display='flex'; }
+  else lnk.style.display='none';
+  const pos=visibleIdx.indexOf(idx);
+  document.getElementById('modalCounter').textContent=`${pos>=0?pos+1:idx+1} / ${visibleIdx.length}`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function navModal(dir) {
+  if (currentIdx<0) return;
+  const pos=visibleIdx.indexOf(currentIdx);
+  if (pos<0) return;
+  openModal(visibleIdx[(pos+dir+visibleIdx.length)%visibleIdx.length]);
+}
+
+// ── STATUS ────────────────────────────────────────────────────
+function setStatus(s,t) {
+  document.getElementById('statusDot').className=`status-dot ${s}`;
+  document.getElementById('statusText').textContent=t;
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────
+document.addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  const m=document.getElementById('modal');
+  if (m.classList.contains('open')){
+    if (e.key==='Escape') closeModal();
+    if (e.key==='ArrowLeft') navModal(-1);
+    if (e.key==='ArrowRight') navModal(1);
+  } else if (document.getElementById('mapView').style.display!=='none'){
+    if (e.key==='Escape') closeMap();
+  }
+});
+
+document.getElementById('modal').addEventListener('click', e=>{
+  if (e.target===document.getElementById('modal')) closeModal();
+});
+
+init();
 </script>
 </body>
 </html>
