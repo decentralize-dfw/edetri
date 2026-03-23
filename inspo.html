@@ -36,6 +36,8 @@
     const SaveIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>);
     const LoaderIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>);
     const CheckIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>);
+    const ChevronLeftIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="15 18 9 12 15 6"></polyline></svg>);
+    const ChevronRightIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 18 15 12 9 6"></polyline></svg>);
 
     // --- AYARLAR ---
     const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
@@ -180,6 +182,19 @@
         }
       };
 
+      // Resimler arası ok ile gezinme fonksiyonu
+      const handleNavigate = (direction) => {
+        if (!selectedImg || images.length === 0) return;
+        const currentIndex = images.findIndex(img => img.id === selectedImg.id);
+        
+        let nextIndex = currentIndex + direction;
+        // Dizinin sonuna veya başına gelindiğinde başa/sona sarsın
+        if (nextIndex < 0) nextIndex = images.length - 1;
+        if (nextIndex >= images.length) nextIndex = 0;
+        
+        setSelectedImg(images[nextIndex]);
+      };
+
       const openModal = (img) => {
         setSelectedImg({ ...img });
       };
@@ -257,7 +272,8 @@
             <Modal 
               img={selectedImg} 
               onClose={closeModal} 
-              onSaveLocally={handleLocalSave} 
+              onSaveLocally={handleLocalSave}
+              onNavigate={handleNavigate}
             />
           )}
         </div>
@@ -265,51 +281,94 @@
     }
 
     // Tam Ekran Modal Bileşeni
-    function Modal({ img, onClose, onSaveLocally }) {
+    function Modal({ img, onClose, onSaveLocally, onNavigate }) {
       const [type, setType] = useState(img.type || '');
       const [description, setDescription] = useState(img.description || '');
 
-      // Modaldan çıkıldığı an (X, ESC veya Buton) otomatik kaydetmeyi tetikler
-      const handleSafeClose = () => {
-        // Yalnızca gerçekten bir şey değiştirildiyse kaydet
+      // Resim değiştiğinde form alanlarını yeni resmin bilgileriyle güncellemek için
+      useEffect(() => {
+        setType(img.type || '');
+        setDescription(img.description || '');
+      }, [img.id, img.type, img.description]);
+
+      // Yalnızca gerçekten bir şey değiştirildiyse kaydet
+      const saveCurrentChanges = () => {
         if (type !== (img.type || '') || description !== (img.description || '')) {
           onSaveLocally(img.id, type, description);
         }
+      };
+
+      // Modaldan çıkıldığı an otomatik kaydetmeyi tetikler
+      const handleSafeClose = () => {
+        saveCurrentChanges();
         onClose(); // Ana ekrana dön
+      };
+
+      // Oklarla gezinirken otomatik kaydetmeyi tetikler
+      const handleNavigateLocal = (direction) => {
+        saveCurrentChanges();
+        onNavigate(direction);
       };
 
       useEffect(() => {
         const handleKeyDown = (e) => {
+          // Eğer bir yazı alanına odaklanılmışsa, sağ/sol ok tuşları yazıda gezinmeye yarasın
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            if (e.key !== 'Escape') return; // Yalnızca ESC tuşu çalışsın
+          }
+
           if (e.key === 'Escape') {
             handleSafeClose();
+          } else if (e.key === 'ArrowRight') {
+            handleNavigateLocal(1); // Sonraki resim
+          } else if (e.key === 'ArrowLeft') {
+            handleNavigateLocal(-1); // Önceki resim
           }
         };
+        
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [type, description, img]); // type ve desc değiştikçe referansı günceller
+      }, [type, description, img, onNavigate, onSaveLocally, onClose]); // Güncel referansları tut
 
       return (
         <div className="fixed inset-0 z-50 bg-black flex flex-col md:flex-row">
           {/* Sol Taraf: Tam Ekran Resim Alanı */}
-          <div className="flex-1 h-[60vh] md:h-full relative flex items-center justify-center bg-black">
+          <div className="flex-1 h-[60vh] md:h-full relative flex items-center justify-center bg-black group">
             {/* Kapatma Butonu (Aynı zamanda kaydeder) */}
             <button 
               onClick={handleSafeClose}
-              className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 p-2.5 rounded-full transition duration-200"
+              className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 p-2.5 rounded-full transition duration-200"
             >
               <XIcon className="w-6 h-6 sm:w-8 sm:h-8" />
             </button>
 
+            {/* Sol Ok Butonu (Önceki) */}
+            <button 
+              onClick={() => handleNavigateLocal(-1)}
+              className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-white/70 hover:text-white bg-black/40 hover:bg-black/70 p-2 sm:p-3 rounded-full transition duration-200 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+            >
+              <ChevronLeftIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+
+            {/* Sağ Ok Butonu (Sonraki) */}
+            <button 
+              onClick={() => handleNavigateLocal(1)}
+              className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-white/70 hover:text-white bg-black/40 hover:bg-black/70 p-2 sm:p-3 rounded-full transition duration-200 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+            >
+              <ChevronRightIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+
             {/* Resim Container */}
             <img 
+              key={img.id} // Resim değiştiğinde animasyon/render yenilenmesi için
               src={img.fullUrl} 
               alt={description}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain animate-in fade-in duration-300"
               referrerPolicy="no-referrer"
             />
 
             {/* Sol Altta Dominant Color */}
-            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-2 rounded-full border border-white/20">
+            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-30 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-2 rounded-full border border-white/20">
               <div 
                 className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-lg"
                 style={{ backgroundColor: img.color }}
@@ -369,7 +428,7 @@
                 Hafızaya Al ve Kapat
               </button>
               <p className="text-xs text-center text-gray-400 mt-4 leading-relaxed">
-                Yaptığınız değişiklikler kapatıldığında <b>otomatik</b> hafızaya alınır. Kalıcı olması için ana ekrandaki <b>Excel'e Yayınla</b> butonunu kullanın.
+                Yaptığınız değişiklikler kapatıldığında veya oklarla geçiş yapıldığında <b>otomatik</b> hafızaya alınır. Kalıcı olması için ana ekrandaki <b>Excel'e Yayınla</b> butonunu kullanın.
               </p>
             </div>
           </div>
