@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDETRI — Visual Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #090807;
+    --cream: #e8e0d0;
+    --offwhite: #f4f0e8;
+    --silver: #b0a890;
+    --copper: #a86828;
+    --burgundy: #581020;
+    --gold: #b89850;
+    --dim: #2a2720;
+    --gap: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Archivo', sans-serif;
+    font-weight: 200;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(9,8,7,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(176,168,144,0.12);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--cream);
+    text-transform: uppercase;
+  }
+
+  .header-title span {
+    color: var(--copper);
+    font-style: italic;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn {
+    background: none;
+    border: 1px solid rgba(176,168,144,0.3);
+    color: var(--silver);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    border-color: var(--copper);
+    color: var(--copper);
+  }
+
+  .btn-primary {
+    background: var(--copper);
+    border-color: var(--copper);
+    color: var(--black);
+    font-weight: 400;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--black);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--silver);
+    display: inline-block;
+    margin-right: 6px;
+    transition: background 0.3s;
+  }
+
+  .status-dot.loading { background: var(--gold); animation: pulse 1s infinite; }
+  .status-dot.ready { background: #5a8a5a; }
+  .status-dot.error { background: var(--burgundy); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .status-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--silver);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── MASONRY GRID ─── */
+  .gallery-wrap {
+    padding: 24px var(--gap);
+  }
+
+  .masonry {
+    column-count: 5;
+    column-gap: var(--gap);
+  }
+
+  @media (max-width: 1400px) { .masonry { column-count: 4; } }
+  @media (max-width: 1100px) { .masonry { column-count: 3; } }
+  @media (max-width: 720px)  { .masonry { column-count: 2; } }
+  @media (max-width: 480px)  { .masonry { column-count: 1; } }
+
+  .card {
+    break-inside: avoid;
+    margin-bottom: var(--gap);
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--dim);
+  }
+
+  .card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.4s ease;
+  }
+
+  .card:hover img { transform: scale(1.03); }
+
+  .card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 10px 10px;
+    background: linear-gradient(to top, rgba(9,8,7,0.85) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .card:hover .card-overlay { opacity: 1; }
+
+  .card-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .card-type {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    text-transform: uppercase;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-placeholder {
+    width: 100%;
+    aspect-ratio: 3/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: rgba(176,168,144,0.3);
+    letter-spacing: 0.08em;
+  }
+
+  /* ─── LOADING STATE ─── */
+  .loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--silver);
+  }
+
+  .loading-state p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.5;
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(176,168,144,0.2);
+    border-top-color: var(--copper);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── FULLSCREEN MODAL ─── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,8,7,0.97);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(176,168,144,0.08);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--silver);
+    font-size: 20px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover { background: rgba(176,168,144,0.1); color: var(--cream); }
+
+  .modal-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal-counter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--silver);
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+  }
+
+  .modal-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  .modal-image-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .modal-image-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .modal-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(176,168,144,0.08);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+  }
+
+  .color-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+
+  .color-hex {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--silver);
+    letter-spacing: 0.06em;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--silver);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .field-input {
+    background: rgba(42,39,32,0.5);
+    border: 1px solid rgba(176,168,144,0.15);
+    color: var(--cream);
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    padding: 8px 10px;
+    width: 100%;
+    transition: border-color 0.2s;
+    resize: none;
+    outline: none;
+  }
+
+  .field-input:focus {
+    border-color: var(--copper);
+  }
+
+  .field-input::placeholder {
+    color: rgba(176,168,144,0.25);
+    font-style: italic;
+  }
+
+  textarea.field-input {
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(176,168,144,0.08);
+  }
+
+  .pinterest-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--silver);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  .pinterest-link:hover { opacity: 1; color: var(--copper); }
+
+  .nav-arrows {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid rgba(176,168,144,0.2);
+    color: var(--silver);
+    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--copper);
+    color: var(--copper);
+  }
+
+  /* Modal keyboard hint */
+  .keyboard-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--silver);
+    opacity: 0.3;
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── EDITOR PANEL ─── */
+  .editor-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(640px, 100vw);
+    background: #0e0c0a;
+    border-left: 1px solid rgba(176,168,144,0.12);
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: -24px 0 60px rgba(0,0,0,0.5);
+  }
+
+  .editor-panel.open { transform: translateX(0); }
+
+  .editor-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(176,168,144,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .editor-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--silver);
+    text-transform: uppercase;
+  }
+
+  .editor-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .editor-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .editor-body::-webkit-scrollbar { width: 4px; }
+  .editor-body::-webkit-scrollbar-track { background: transparent; }
+  .editor-body::-webkit-scrollbar-thumb { background: rgba(176,168,144,0.2); }
+
+  .editor-row {
+    display: grid;
+    grid-template-columns: 32px 48px 1fr 1fr;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(176,168,144,0.06);
+    align-items: start;
+    transition: background 0.15s;
+  }
+
+  .editor-row:hover { background: rgba(176,168,144,0.03); }
+
+  .editor-row-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: rgba(176,168,144,0.25);
+    padding-top: 4px;
+    text-align: right;
+  }
+
+  .editor-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 1px;
+    background: var(--dim);
+    flex-shrink: 0;
+  }
+
+  .editor-input {
+    background: rgba(42,39,32,0.4);
+    border: 1px solid rgba(176,168,144,0.1);
+    color: var(--cream);
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    padding: 5px 8px;
+    width: 100%;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s;
+  }
+
+  .editor-input:focus { border-color: var(--copper); }
+  .editor-input::placeholder { color: rgba(176,168,144,0.2); font-style: italic; }
+
+  textarea.editor-input { min-height: 40px; line-height: 1.4; }
+
+  .editor-col-headers {
+    display: grid;
+    grid-template-columns: 32px 48px 1fr 1fr;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(176,168,144,0.15);
+    background: rgba(42,39,32,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .editor-col-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--silver);
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--dim);
+    border: 1px solid rgba(176,168,144,0.2);
+    color: var(--cream);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 10px 20px;
+    z-index: 9998;
+    transition: transform 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── KEYBOARD SHORTCUT HINT ─── */
+  .shortcut-hint {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: rgba(176,168,144,0.2);
+    letter-spacing: 0.06em;
+    z-index: 50;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">EDETRI — <span>Visual Archive</span></div>
+  <div class="header-actions">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="status-dot loading" id="statusDot"></span>
+      <span class="status-text" id="statusText">Loading...</span>
+    </div>
+    <button class="btn" onclick="copyForSheets()" id="copyBtn" style="display:none">Copy F:G for Sheets</button>
+    <button class="btn" onclick="toggleEditor()">⊞ Editor <small style="opacity:0.5;margin-left:4px">Shift+E</small></button>
+  </div>
+</header>
+
+<main class="gallery-wrap">
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <p>Fetching visual archive...</p>
+  </div>
+  <div class="masonry" id="masonry" style="display:none"></div>
+</main>
+
+<!-- Fullscreen Modal -->
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button class="modal-close" onclick="closeModal()" title="Close (Esc)">✕</button>
+      <span class="modal-counter" id="modalCounter"></span>
+    </div>
+    <div class="nav-arrows">
+      <button class="nav-btn" onclick="navigateModal(-1)" title="Previous (←)">←</button>
+      <button class="nav-btn" onclick="navigateModal(1)" title="Next (→)">→</button>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="modal-image-wrap">
+      <img id="modalImg" src="" alt="" referrerpolicy="no-referrer">
+    </div>
+    <div class="modal-sidebar">
+      <div class="color-chip">
+        <div class="color-circle" id="modalColorCircle"></div>
+        <span class="color-hex" id="modalColorHex"></span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="modalType">Type</label>
+        <input class="field-input" id="modalType" type="text" placeholder="e.g. Texture, Minimal, Color…" oninput="autoSaveModal()">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="modalDesc">Description</label>
+        <textarea class="field-input" id="modalDesc" placeholder="Notes about this image…" oninput="autoSaveModal()"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <a class="pinterest-link" id="modalPinterestLink" href="#" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span>↗</span> View on Pinterest
+        </a>
+        <span class="keyboard-hint">← → navigate · Esc close</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor Panel -->
+<div class="editor-panel" id="editorPanel">
+  <div class="editor-header">
+    <span class="editor-title">Field Editor</span>
+    <div class="editor-actions">
+      <button class="btn btn-primary" onclick="copyForSheets()">Copy F:G for Sheets</button>
+      <button class="modal-close" onclick="toggleEditor()">✕</button>
+    </div>
+  </div>
+  <div class="editor-body">
+    <div class="editor-col-headers">
+      <span class="editor-col-header">#</span>
+      <span class="editor-col-header">Img</span>
+      <span class="editor-col-header">Type (F)</span>
+      <span class="editor-col-header">Description (G)</span>
+    </div>
+    <div id="editorRows"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Keyboard hint -->
+<div class="shortcut-hint">Shift+E → editor</div>
+
+<script>
+  const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
+  const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+  const LS_KEY = 'edetri-masonry-edits';
+
+  let rows = [];       // array of { rowNum, imgUrl, color, pinterestUrl, type, description }
+  let currentIdx = -1;
+
+  // ─── CSV PARSER ───────────────────────────────────────────────
+  function parseCSV(text) {
+    const records = [];
+    let i = 0;
+    const n = text.length;
+
+    while (i < n) {
+      const record = [];
+      while (i < n && text[i] !== '\n') {
+        if (text[i] === '"') {
+          // Quoted field
+          i++;
+          let field = '';
+          while (i < n) {
+            if (text[i] === '"') {
+              if (i + 1 < n && text[i + 1] === '"') {
+                field += '"';
+                i += 2;
+              } else {
+                i++;
+                break;
+              }
+            } else {
+              field += text[i++];
+            }
+          }
+          record.push(field);
+          if (i < n && text[i] === ',') i++;
+        } else {
+          let field = '';
+          while (i < n && text[i] !== ',' && text[i] !== '\n') {
+            field += text[i++];
+          }
+          record.push(field.trim());
+          if (i < n && text[i] === ',') i++;
+        }
+      }
+      if (i < n) i++; // skip \n
+      records.push(record);
+    }
+    return records;
+  }
+
+  // ─── LOCAL STORAGE ─────────────────────────────────────────────
+  function loadEdits() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); }
+    catch { return {}; }
+  }
+
+  function saveEdit(rowNum, type, description) {
+    const edits = loadEdits();
+    edits[String(rowNum)] = { type, description };
+    localStorage.setItem(LS_KEY, JSON.stringify(edits));
+  }
+
+  // ─── FETCH & RENDER ────────────────────────────────────────────
+  async function init() {
+    try {
+      const res = await fetch(CSV_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const records = parseCSV(text);
+      const edits = loadEdits();
+
+      // Row 9 (index 8) = headers, rows 10+ (index 9+) = data
+      rows = [];
+      for (let i = 9; i < records.length; i++) {
+        const r = records[i];
+        const rowNum = i + 1; // 1-indexed spreadsheet row
+        const imgUrl = (r[2] || '').trim();
+        if (!imgUrl) continue;
+
+        const saved = edits[String(rowNum)] || {};
+        rows.push({
+          rowNum,
+          imgUrl,
+          color:        (r[3] || '').trim(),
+          pinterestUrl: (r[4] || '').trim(),
+          type:         saved.type        !== undefined ? saved.type        : (r[5] || '').trim(),
+          description:  saved.description !== undefined ? saved.description : (r[6] || '').trim(),
+        });
+      }
+
+      renderMasonry();
+      renderEditor();
+      setStatus('ready', `${rows.length} images`);
+      document.getElementById('copyBtn').style.display = 'inline-block';
+    } catch (err) {
+      setStatus('error', 'Failed to load');
+      document.getElementById('loadingState').innerHTML =
+        `<p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em">
+          Error: ${err.message}<br><br>
+          <span style="opacity:.5">Check console or try via local server instead of file://</span>
+        </p>`;
+    }
+  }
+
+  function renderMasonry() {
+    const masonry = document.getElementById('masonry');
+    masonry.innerHTML = '';
+    rows.forEach((row, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.idx = idx;
+      card.onclick = () => openModal(idx);
+
+      const img = document.createElement('img');
+      img.src = row.imgUrl;
+      img.alt = row.type || '';
+      img.loading = 'lazy';
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => {
+        img.style.display = 'none';
+        const ph = card.querySelector('.card-placeholder') || document.createElement('div');
+        ph.className = 'card-placeholder';
+        ph.style.background = row.color || 'var(--dim)';
+        ph.textContent = row.color || '—';
+        if (!card.querySelector('.card-placeholder')) card.insertBefore(ph, card.firstChild);
+      };
+
+      const overlay = document.createElement('div');
+      overlay.className = 'card-overlay';
+
+      if (row.color) {
+        const dot = document.createElement('div');
+        dot.className = 'card-color';
+        dot.style.background = row.color;
+        overlay.appendChild(dot);
+      }
+
+      if (row.type) {
+        const typeEl = document.createElement('span');
+        typeEl.className = 'card-type';
+        typeEl.textContent = row.type;
+        overlay.appendChild(typeEl);
+      }
+
+      card.appendChild(img);
+      card.appendChild(overlay);
+      masonry.appendChild(card);
+    });
+
+    document.getElementById('loadingState').style.display = 'none';
+    masonry.style.display = '';
+  }
+
+  // ─── MODAL ─────────────────────────────────────────────────────
+  function openModal(idx) {
+    currentIdx = idx;
+    const row = rows[idx];
+
+    document.getElementById('modalImg').src = row.imgUrl;
+    document.getElementById('modalImg').referrerPolicy = 'no-referrer';
+
+    const circle = document.getElementById('modalColorCircle');
+    const hexEl = document.getElementById('modalColorHex');
+    if (row.color) {
+      circle.style.background = row.color;
+      circle.style.display = 'block';
+      hexEl.textContent = row.color.toUpperCase();
+    } else {
+      circle.style.display = 'none';
+      hexEl.textContent = '';
+    }
+
+    document.getElementById('modalType').value = row.type || '';
+    document.getElementById('modalDesc').value = row.description || '';
+
+    const link = document.getElementById('modalPinterestLink');
+    if (row.pinterestUrl) {
+      link.href = row.pinterestUrl;
+      link.style.display = 'flex';
+    } else {
+      link.style.display = 'none';
+    }
+
+    document.getElementById('modalCounter').textContent = `${idx + 1} / ${rows.length}`;
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+    currentIdx = -1;
+  }
+
+  function navigateModal(dir) {
+    if (currentIdx < 0) return;
+    const next = (currentIdx + dir + rows.length) % rows.length;
+    // Save current before navigating
+    autoSaveModal();
+    openModal(next);
+  }
+
+  function autoSaveModal() {
+    if (currentIdx < 0) return;
+    const type = document.getElementById('modalType').value;
+    const description = document.getElementById('modalDesc').value;
+    rows[currentIdx].type = type;
+    rows[currentIdx].description = description;
+    saveEdit(rows[currentIdx].rowNum, type, description);
+    // Update card overlay
+    updateCardOverlay(currentIdx);
+  }
+
+  function updateCardOverlay(idx) {
+    const card = document.querySelector(`.card[data-idx="${idx}"]`);
+    if (!card) return;
+    const overlay = card.querySelector('.card-overlay');
+    if (!overlay) return;
+    const typeEl = overlay.querySelector('.card-type');
+    const row = rows[idx];
+    if (row.type) {
+      if (typeEl) {
+        typeEl.textContent = row.type;
+      } else {
+        const el = document.createElement('span');
+        el.className = 'card-type';
+        el.textContent = row.type;
+        overlay.appendChild(el);
+      }
+    } else if (typeEl) {
+      typeEl.remove();
+    }
+    // Update editor row if visible
+    const editorTypeInput = document.querySelector(`#editorRows [data-row-idx="${idx}"] .editor-type`);
+    if (editorTypeInput && editorTypeInput.value !== row.type) editorTypeInput.value = row.type;
+    const editorDescInput = document.querySelector(`#editorRows [data-row-idx="${idx}"] .editor-desc`);
+    if (editorDescInput && editorDescInput.value !== row.description) editorDescInput.value = row.description;
+  }
+
+  // ─── EDITOR PANEL ──────────────────────────────────────────────
+  function renderEditor() {
+    const container = document.getElementById('editorRows');
+    container.innerHTML = '';
+    rows.forEach((row, idx) => {
+      const div = document.createElement('div');
+      div.className = 'editor-row';
+      div.dataset.rowIdx = idx;
+
+      const numEl = document.createElement('span');
+      numEl.className = 'editor-row-num';
+      numEl.textContent = row.rowNum;
+
+      const thumb = document.createElement('img');
+      thumb.className = 'editor-thumb';
+      thumb.src = row.imgUrl;
+      thumb.referrerPolicy = 'no-referrer';
+      thumb.alt = '';
+      thumb.loading = 'lazy';
+      thumb.onerror = () => { thumb.style.background = row.color || 'var(--dim)'; thumb.src = ''; };
+
+      const typeInput = document.createElement('input');
+      typeInput.className = 'editor-input editor-type';
+      typeInput.type = 'text';
+      typeInput.value = row.type || '';
+      typeInput.placeholder = 'Type…';
+      typeInput.oninput = () => {
+        rows[idx].type = typeInput.value;
+        saveEdit(row.rowNum, typeInput.value, rows[idx].description);
+        updateCardOverlay(idx);
+      };
+
+      const descInput = document.createElement('textarea');
+      descInput.className = 'editor-input editor-desc';
+      descInput.value = row.description || '';
+      descInput.placeholder = 'Description…';
+      descInput.rows = 2;
+      descInput.oninput = () => {
+        rows[idx].description = descInput.value;
+        saveEdit(row.rowNum, rows[idx].type, descInput.value);
+        updateCardOverlay(idx);
+      };
+
+      div.appendChild(numEl);
+      div.appendChild(thumb);
+      div.appendChild(typeInput);
+      div.appendChild(descInput);
+      container.appendChild(div);
+    });
+  }
+
+  function toggleEditor() {
+    const panel = document.getElementById('editorPanel');
+    panel.classList.toggle('open');
+  }
+
+  // ─── COPY FOR SHEETS ───────────────────────────────────────────
+  function copyForSheets() {
+    // TSV: one row per image row, columns: TYPE \t Description
+    // Ordered by rowNum, ready to paste into F10:G...
+    const sorted = [...rows].sort((a, b) => a.rowNum - b.rowNum);
+    const tsv = sorted.map(r => `${r.type || ''}\t${r.description || ''}`).join('\n');
+    navigator.clipboard.writeText(tsv).then(() => {
+      showToast(`✓ Copied ${sorted.length} rows — paste into column F:G starting at row 10`);
+    }).catch(() => {
+      // Fallback: show in a textarea
+      const ta = document.createElement('textarea');
+      ta.value = tsv;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast(`✓ Copied ${sorted.length} rows — paste into column F:G starting at row 10`);
+    });
+  }
+
+  // ─── HELPERS ───────────────────────────────────────────────────
+  function setStatus(state, text) {
+    const dot = document.getElementById('statusDot');
+    const el = document.getElementById('statusText');
+    dot.className = `status-dot ${state}`;
+    el.textContent = text;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ─── KEYBOARD SHORTCUTS ────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      // Allow Escape to blur
+      if (e.key === 'Escape') e.target.blur();
+      return;
+    }
+
+    if (e.shiftKey && e.key === 'E') {
+      e.preventDefault();
+      toggleEditor();
+      return;
+    }
+
+    const modal = document.getElementById('modal');
+    if (modal.classList.contains('open')) {
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowLeft')  navigateModal(-1);
+      if (e.key === 'ArrowRight') navigateModal(1);
+    }
+  });
+
+  // Close modal on backdrop click (outside sidebar/image area)
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal')) closeModal();
+  });
+
+  // ─── INIT ──────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>
