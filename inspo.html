@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>İlham Galerisi</title>
+  
+  <!-- Tailwind CSS (Arayüz stilleri için) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM (Uygulama mantığı için) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel (Tarayıcıda JSX okuyabilmek için) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* Masonry grid için ufak bir düzeltme */
+    .break-inside-avoid {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 antialiased">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- İKONLAR (Dış kütüphane yerine saf SVG kullanıyoruz) ---
+    const XIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
+    const ExternalLinkIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>);
+    const SaveIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>);
+    const LoaderIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>);
+    const CheckIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>);
+
+    // --- AYARLAR ---
+    const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
+    const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec'; 
+
+    function App() {
+      const [images, setImages] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [selectedImg, setSelectedImg] = useState(null);
+      const [columnCount, setColumnCount] = useState(8);
+
+      // Ekran boyutuna göre sütun sayısını belirle (Görselleri %60 küçültmek için sütun sayısı artırıldı)
+      useEffect(() => {
+        const updateColumns = () => {
+          if (window.innerWidth >= 1280) setColumnCount(10);
+          else if (window.innerWidth >= 1024) setColumnCount(8);
+          else if (window.innerWidth >= 768) setColumnCount(6);
+          else if (window.innerWidth >= 640) setColumnCount(4);
+          else setColumnCount(2);
+        };
+
+        updateColumns();
+        window.addEventListener('resize', updateColumns);
+        return () => window.removeEventListener('resize', updateColumns);
+      }, []);
+
+      // Verileri Google Sheets'ten çek
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            // &headers=0 eklendi: Bu sayede Google Sheets API ilk satırı başlık olarak ayırmak yerine veri satırı olarak algılar.
+            // Böylece index 9 tam olarak 10. satıra eşit olur ve kayma (offset) ortadan kalkar.
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0`;
+            const res = await fetch(url);
+            const text = await res.text();
+            
+            // Google'ın döndürdüğü özel formatı temizleyip saf JSON'a çeviriyoruz
+            const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+            const data = JSON.parse(jsonString);
+            
+            const rows = data.table.rows;
+            const parsedImages = [];
+
+            // Tüm satırları otomatik tara (Sabit 9 rakamı kaldırıldı)
+            for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              if (!row || !row.c || !row.c[2] || !row.c[2].v) continue; // C kolonu (resim linki) boşsa o satırı tamamen atla
+
+              const thumbUrl = row.c[2]?.v; // C Kolonu: Thumbnail (Ana ekran)
+              const fullUrl = row.c[1]?.v;  // B Kolonu: Tam Ekran resim
+              
+              // Sadece "http" ile başlayan geçerli bir link ise işleme al (Başlık yazılarını vb. otomatik eler)
+              if (!thumbUrl.toString().startsWith('http')) continue;
+
+              const excelRowNumber = i + 1; // Kodun 0'dan saymasını düzeltip gerçek Excel satır numarasını buluyoruz
+
+              parsedImages.push({
+                id: excelRowNumber, // Artık ID doğrudan Excel'in yanındaki gerçek satır numarası oldu
+                thumbUrl: thumbUrl,
+                fullUrl: fullUrl && fullUrl.toString().startsWith('http') ? fullUrl : thumbUrl, // Eğer B kolonu boşsa çökmeyip C'deki resmi kullansın
+                color: row.c[3]?.v || '#CCCCCC', // D Kolonu: Dominant Color
+                pinterestLink: row.c[4]?.v || '#', // E Kolonu: Pinterest Link
+                type: row.c[5]?.v || '', // F Kolonu: TYPE
+                description: row.c[6]?.v || '' // G Kolonu: Description
+              });
+            }
+
+            setImages(parsedImages);
+          } catch (error) {
+            console.error("Veri çekilirken hata oluştu:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        fetchData();
+      }, []);
+
+      const openModal = (img) => {
+        setSelectedImg({ ...img });
+      };
+
+      const closeModal = () => {
+        setSelectedImg(null);
+      };
+
+      if (loading) {
+        return (
+          <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <LoaderIcon className="w-10 h-10 animate-spin text-gray-400" />
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen p-4 sm:p-8">
+          <header className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-gray-800 tracking-tight">İlham Galerisi</h1>
+            <p className="text-gray-500 mt-2">Google Sheets destekli lokal Pinterest</p>
+          </header>
+
+          {/* Masonry Grid - Soldan sağa sıralama (Excel sırası) için React ile dağıtıldı */}
+          <div className="flex gap-3 sm:gap-4">
+            {Array.from({ length: columnCount }).map((_, colIndex) => (
+              <div key={colIndex} className="flex flex-col gap-3 sm:gap-4 flex-1">
+                {images
+                  .filter((_, index) => index % columnCount === colIndex)
+                  .map((img) => (
+                    <div 
+                      key={img.id} 
+                      className="relative group cursor-pointer rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+                      onClick={() => openModal(img)}
+                    >
+                      <img 
+                        src={img.thumbUrl} 
+                        alt={img.description || "Gallery image"} 
+                        className="w-full h-auto object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+                      
+                      <div 
+                        className="absolute bottom-2 left-2 w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-white/70 shadow-md"
+                        style={{ backgroundColor: img.color }}
+                        title={`Dominant Color: ${img.color}`}
+                      ></div>
+                    </div>
+                  ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Fullscreen Modal */}
+          {selectedImg && (
+            <Modal 
+              img={selectedImg} 
+              onClose={closeModal} 
+              setImages={setImages} 
+            />
+          )}
+        </div>
+      );
+    }
+
+    // Tam Ekran Modal Bileşeni
+    function Modal({ img, onClose, setImages }) {
+      const [type, setType] = useState(img.type);
+      const [description, setDescription] = useState(img.description);
+      const [isSaving, setIsSaving] = useState(false);
+      const [savedStatus, setSavedStatus] = useState(false);
+
+      const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) onClose();
+      };
+
+      const handleSave = async () => {
+        setIsSaving(true);
+        
+        try {
+          // Arayüzü anında güncelle
+          setImages(prevImages => prevImages.map(item => 
+            item.id === img.id ? { ...item, type, description } : item
+          ));
+
+          // Google Sheets'e kaydet
+          const payload = {
+            row: img.id, // Artık matematiksel işleme (+1'e) gerek yok, çünkü img.id direkt gerçek excel satır numarası (örneğin: 10)
+            type: type,
+            description: description
+          };
+
+          await fetch(APPS_SCRIPT_WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+
+          setIsSaving(false);
+          setSavedStatus(true);
+          setTimeout(() => setSavedStatus(false), 2000);
+
+        } catch (error) {
+          console.error("Kaydetme hatası:", error);
+          alert("Kaydedilirken bir hata oluştu. Bağlantınızı kontrol edin.");
+          setIsSaving(false);
+        }
+      };
+
+      return (
+        <div 
+          className="fixed inset-0 z-50 bg-black flex flex-col md:flex-row"
+          onClick={handleBackdropClick}
+        >
+          {/* Sol Taraf: Tam Ekran Resim Alanı */}
+          <div 
+            className="flex-1 h-[60vh] md:h-full relative flex items-center justify-center bg-black" 
+            onClick={handleBackdropClick}
+          >
+            {/* Kapatma Butonu (Resmin Sol Üstünde) */}
+            <button 
+              onClick={onClose}
+              className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 p-2.5 rounded-full transition duration-200"
+            >
+              <XIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+
+            {/* Resim Container */}
+            <img 
+              src={img.fullUrl} 
+              alt={description}
+              className="w-full h-full object-contain"
+              referrerPolicy="no-referrer"
+            />
+
+            {/* Sol Altta Dominant Color */}
+            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-2 rounded-full border border-white/20">
+              <div 
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-lg"
+                style={{ backgroundColor: img.color }}
+              ></div>
+              <span className="text-white text-xs sm:text-sm font-mono tracking-wider">{img.color}</span>
+            </div>
+          </div>
+
+          {/* Sağ Taraf: Düzenleme Paneli (Sidebar) */}
+          <div className="w-full md:w-96 bg-white h-full shadow-2xl flex flex-col p-6 sm:p-8 overflow-y-auto">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">Detaylar</h2>
+
+            <div className="space-y-6 flex-grow">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-2">TYPE (Tür)</label>
+                <input 
+                  type="text" 
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  placeholder="Örn: Poster, UI, Fotoğraf..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition bg-gray-50 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Description (Açıklama)</label>
+                <textarea 
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Bu görsel hakkında notlar ekleyin..."
+                  rows={5}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition resize-none bg-gray-50 focus:bg-white"
+                />
+              </div>
+
+              {img.pinterestLink && img.pinterestLink !== '#' && (
+                 <div className="pt-2">
+                  <a 
+                    href={img.pinterestLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+                  >
+                    <ExternalLinkIcon className="w-4 h-4" />
+                    Pinterest'te Görüntüle
+                  </a>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-100">
+              <button 
+                onClick={handleSave}
+                disabled={isSaving}
+                className={`w-full py-3.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm ${
+                  savedStatus 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-black text-white hover:bg-gray-800 active:scale-95 hover:shadow-md'
+                }`}
+              >
+                {isSaving ? (
+                  <LoaderIcon className="w-5 h-5 animate-spin" />
+                ) : savedStatus ? (
+                  <React.Fragment>
+                    <CheckIcon className="w-5 h-5" />
+                    Kaydedildi!
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    <SaveIcon className="w-5 h-5" />
+                    Excel'e Kaydet
+                  </React.Fragment>
+                )}
+              </button>
+              <p className="text-xs text-center text-gray-400 mt-4 leading-relaxed">
+                Girdiğiniz veriler kalıcı olarak Google Sheet dosyanıza işlenecektir.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Uygulamayı başlat
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
