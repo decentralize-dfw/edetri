@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDETRI — Creative Bible Summary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Archivo:wght@200;300;400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #090807;
+    --cream: #e8e0d0;
+    --offwhite: #f4f0e8;
+    --silver: #b0a890;
+    --copper: #a86828;
+    --burgundy: #581020;
+    --gold: #b89850;
+    --dim: #2a2720;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Archivo', sans-serif;
+    font-weight: 200;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  .hero-left {
+    background: linear-gradient(160deg, #1a1208 0%, #2d1f0a 40%, #090807 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 50px 70px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 60%, rgba(168,104,40,0.15) 0%, transparent 60%);
+  }
+
+  .hero-right {
+    background: linear-gradient(160deg, #111213 0%, #1a1c1e 40%, #090807 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 60px 70px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 60%, rgba(176,168,144,0.08) 0%, transparent 60%);
+  }
+
+  /* Vertical split line */
+  .hero-split::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--copper) 30%, var(--gold) 50%, var(--silver) 70%, transparent);
+    z-index: 10;
+    transform: translateX(-50%);
+  }
+
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 0.4em;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.3s;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2.8rem, 5vw, 5rem);
+    line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.6s;
+  }
+
+  .hero-right .hero-title {
+    color: var(--silver);
+  }
+
+  .hero-sub {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 200;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--silver);
+    line-height: 1.8;
+    max-width: 320px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.9s;
+  }
+
+  /* Center logo overlay */
+  .hero-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1.4s ease forwards 1.2s;
+  }
+
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    letter-spacing: 0.8em;
+    color: var(--cream);
+    text-transform: uppercase;
+    background: var(--black);
+    padding: 12px 28px 12px 36px;
+    border-top: 1px solid var(--copper);
+    border-bottom: 1px solid var(--copper);
+  }
+
+  .sinek-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.4rem;
+    letter-spacing: 0.5em;
+    color: var(--silver);
+    text-transform: uppercase;
+    margin-top: 12px;
+    opacity: 0.6;
+  }
+
+  /* ─── SECTIONS ─── */
+  .sections {
+    display: grid;
+    grid-template-rows: auto auto auto;
+  }
+
+  /* WHY */
+  .why-section {
+    background: var(--black);
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .why-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(88,16,32,0.3) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 20%, rgba(168,104,40,0.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+    position: relative;
+  }
+
+  .circle-label {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .circle-orb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--copper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .circle-orb::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,104,40,0.4), transparent);
+  }
+
+  .circle-orb span {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold);
+    position: relative;
+    z-index: 1;
+  }
+
+  .circle-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 0.6em;
+    color: var(--silver);
+    text-transform: uppercase;
+  }
+
+  .section-headline {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    color: var(--cream);
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .section-sub-headline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0;
+    margin-top: 56px;
+  }
+
+  .why-divider {
+    background: linear-gradient(to bottom, transparent, var(--copper) 20%, var(--copper) 80%, transparent);
+    opacity: 0.4;
+    margin: 0 40px;
+  }
+
+  .why-col {
+    padding: 0 10px;
+  }
+
+  .why-col-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.5em;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .why-col-label::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--copper);
+  }
+
+  .why-col p {
+    font-size: 0.8rem;
+    line-height: 2;
+    color: var(--silver);
+    letter-spacing: 0.04em;
+  }
+
+  .why-col p strong {
+    color: var(--cream);
+    font-weight: 300;
+  }
+
+  .manifesto-block {
+    margin-top: 60px;
+    border-left: 2px solid var(--copper);
+    padding: 20px 0 20px 36px;
+  }
+
+  .manifesto-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    color: var(--cream);
+    line-height: 1.5;
+  }
+
+  .manifesto-source {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.42rem;
+    letter-spacing: 0.4em;
+    color: var(--silver);
+    text-transform: uppercase;
+    margin-top: 14px;
+  }
+
+  /* HOW */
+  .how-section {
+    background: #0c0b09;
+    padding: 100px 0;
+    position: relative;
+    border-top: 1px solid rgba(168,104,40,0.2);
+  }
+
+  .how-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(176,168,144,0.06) 0%, transparent 60%);
+  }
+
+  .how-layers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 60px;
+    background: rgba(168,104,40,0.15);
+    border: 1px solid rgba(168,104,40,0.15);
+  }
+
+  .layer-card {
+    background: var(--black);
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s ease;
+  }
+
+  .layer-card:hover {
+    background: #110f0c;
+  }
+
+  .layer-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--copper);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+
+  .layer-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .layer-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.42rem;
+    letter-spacing: 0.5em;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .layer-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--cream);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .layer-eng {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.42rem;
+    letter-spacing: 0.35em;
+    color: var(--silver);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0.7;
+  }
+
+  .layer-desc {
+    font-size: 0.72rem;
+    line-height: 1.9;
+    color: var(--silver);
+    margin-bottom: 20px;
+  }
+
+  .layer-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: 0.4;
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    font-style: italic;
+  }
+
+  .layer-uses {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .layer-use-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.38rem;
+    letter-spacing: 0.3em;
+    color: var(--copper);
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid rgba(168,104,40,0.25);
+    display: inline-block;
+    width: fit-content;
+  }
+
+  /* Rules row */
+  .rules-row {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0;
+    margin-top: 60px;
+  }
+
+  .rules-col { padding: 0 10px; }
+
+  .rules-divider {
+    background: linear-gradient(to bottom, transparent, rgba(168,104,40,0.4) 30%, rgba(168,104,40,0.4) 70%, transparent);
+    margin: 0 30px;
+  }
+
+  .rules-col-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.55em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .rules-col-title.do { color: var(--gold); }
+  .rules-col-title.dont { color: var(--burgundy); }
+
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--silver);
+  }
+
+  .rule-item::before {
+    content: '—';
+    color: var(--copper);
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    margin-top: 4px;
+  }
+
+  .rule-item.dont-item::before {
+    content: '×';
+    color: var(--burgundy);
+  }
+
+  /* WHAT */
+  .what-section {
+    background: var(--black);
+    padding: 100px 0;
+    border-top: 1px solid rgba(176,168,144,0.1);
+    position: relative;
+  }
+
+  .what-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 85% 60%, rgba(184,152,80,0.08) 0%, transparent 50%);
+  }
+
+  .what-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1px 0.8fr;
+    gap: 0;
+    margin-top: 60px;
+    align-items: start;
+  }
+
+  .what-main { padding-right: 60px; }
+
+  .what-divider {
+    background: linear-gradient(to bottom, var(--copper) 0%, var(--gold) 50%, var(--silver) 100%);
+    opacity: 0.25;
+    margin: 0 40px;
+    align-self: stretch;
+    min-height: 200px;
+  }
+
+  .what-aside { padding-left: 20px; }
+
+  .product-line {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(168,104,40,0.12);
+  }
+
+  .product-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--cream);
+    min-width: 120px;
+  }
+
+  .product-desc {
+    font-size: 0.68rem;
+    color: var(--silver);
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+  }
+
+  .stockists-block {
+    margin-top: 0;
+  }
+
+  .aside-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.42rem;
+    letter-spacing: 0.55em;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .stockist-item {
+    font-size: 0.7rem;
+    color: var(--silver);
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(176,168,144,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.03em;
+  }
+
+  .stockist-city {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.38rem;
+    letter-spacing: 0.3em;
+    color: var(--copper);
+    text-transform: uppercase;
+  }
+
+  .press-row {
+    margin-top: 30px;
+  }
+
+  .press-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .press-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.4rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    border: 1px solid rgba(184,152,80,0.3);
+    padding: 6px 14px;
+  }
+
+  /* TENSION MAP */
+  .tension-section {
+    background: #0c0b09;
+    padding: 80px 0;
+    border-top: 1px solid rgba(168,104,40,0.15);
+  }
+
+  .tension-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(168,104,40,0.1);
+    margin-top: 50px;
+    border: 1px solid rgba(168,104,40,0.1);
+  }
+
+  .tension-pair {
+    background: var(--black);
+    padding: 28px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tension-a {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--gold);
+    opacity: 0.8;
+  }
+
+  .tension-sep {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.4rem;
+    color: var(--copper);
+    letter-spacing: 0.3em;
+    opacity: 0.6;
+  }
+
+  .tension-b {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--silver);
+    opacity: 0.8;
+    text-align: right;
+  }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid rgba(168,104,40,0.2);
+    padding: 50px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+  }
+
+  .footer-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.8em;
+    color: var(--cream);
+    text-transform: uppercase;
+  }
+
+  .footer-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.4rem;
+    letter-spacing: 0.35em;
+    color: var(--silver);
+    text-transform: uppercase;
+    opacity: 0.5;
+    text-align: right;
+    line-height: 2;
+  }
+
+  /* DIVIDER LINE */
+  .section-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--copper);
+    margin-bottom: 20px;
+  }
+
+  .section-body-text {
+    font-size: 0.78rem;
+    line-height: 2;
+    color: var(--silver);
+    max-width: 620px;
+    letter-spacing: 0.03em;
+  }
+
+  .section-body-text strong {
+    color: var(--cream);
+    font-weight: 300;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Section separator */
+  .sep-line {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--copper) 20%, var(--gold) 50%, var(--silver) 80%, transparent);
+    opacity: 0.2;
+  }
+
+  /* SINEK BAND */
+  .sinek-band {
+    background: #0a0907;
+    border-top: 1px solid rgba(168,104,40,0.2);
+    border-bottom: 1px solid rgba(168,104,40,0.2);
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .sinek-step {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .sinek-orb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--copper);
+    flex-shrink: 0;
+  }
+
+  .sinek-orb.how { background: var(--gold); }
+  .sinek-orb.what { background: var(--silver); }
+
+  .sinek-word {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.55em;
+    text-transform: uppercase;
+    color: var(--silver);
+    opacity: 0.6;
+  }
+
+  .sinek-arrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.5rem;
+    color: var(--copper);
+    opacity: 0.4;
+    margin: 0 30px;
+    letter-spacing: 0.1em;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- HERO: THE SPLIT -->
+<section class="hero">
+  <div class="hero-split">
+    <div class="hero-left">
+      <div class="hero-tag">Sıcak — Barok — Organik</div>
+      <h2 class="hero-title">Kadife<br>& Ateş</h2>
+      <p class="hero-sub">Istanbul atölyesi. Cam üfleme. El yapımı. Her parça biricik. Barok zarafet, sıcak ışık, organik form.</p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-tag" style="text-align:right">Soğuk — Endüstriyel — Krom</div>
+      <h2 class="hero-title" style="text-align:right">Çelik<br>& Gölge</h2>
+      <p class="hero-sub" style="text-align:right;margin-left:auto">Paris salonu. Krom metallizasyon. Wireframe geometri. Endüstriyel soğukluk, yaşanmış yüzey.</p>
+    </div>
+  </div>
+  <div class="hero-center">
+    <div class="logo">E D E T R I</div>
+    <div class="sinek-label">Istanbul · Paris · 2022</div>
+  </div>
+</section>
+
+<!-- SINEK BAND -->
+<div class="sinek-band">
+  <div class="sinek-step">
+    <div class="sinek-orb why"></div>
+    <span class="sinek-word">Why — İnanç</span>
+  </div>
+  <div class="sinek-arrow">→</div>
+  <div class="sinek-step">
+    <div class="sinek-orb how"></div>
+    <span class="sinek-word">How — Sistem</span>
+  </div>
+  <div class="sinek-arrow">→</div>
+  <div class="sinek-step">
+    <div class="sinek-orb what"></div>
+    <span class="sinek-word">What — Ürün</span>
+  </div>
+</div>
+
+<!-- WHY -->
+<section class="why-section">
+  <div class="section-inner">
+    <div class="circle-label reveal">
+      <div class="circle-orb"><span>W</span></div>
+      <div>
+        <div class="circle-title">Why — Neden Varız</div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h2 class="section-headline">Dönüşüm anı<br><em style="color:var(--copper)">güzeldir.</em></h2>
+      <div class="section-sub-headline">Simon Sinek — İçten dışa / The Golden Circle</div>
+    </div>
+
+    <div class="section-rule reveal"></div>
+
+    <p class="section-body-text reveal">
+      EDETRI'nin varoluş sebebi tek bir gözlemde yatıyor: <strong>güzellik sabit değil, iki hal arasında gidip gelir.</strong> Barok zarafet ve endüstriyel soğukluk, aynı objenin iki hali. Aylin İstanbul'da cam üflüyor, Gizem Paris'te sofra kuruyor — bu coğrafi gerilim tesadüf değil, tüm görsel dilin anatomisi.
+    </p>
+
+    <div class="why-grid reveal">
+      <div class="why-col">
+        <div class="why-col-label">İnanç</div>
+        <p>
+          <strong>Güzellik sınır tanımaz.</strong> "EDETRI does not refer to anything that exists and has thus no boundary." Markanın kuruluş manifestosu zaten bunu söylüyordu. Şimdi bu sınırsızlık görsel bir dile dönüşüyor.<br><br>
+          Biz ne saf romantik ne saf endüstriyel bir markayız. <strong>İkisinin birbirine dönüştüğü o eşik noktasında duruyoruz.</strong> Camı metallileştiren, kumaşı çeliğe saran, Caravaggio'nun ışığını dijital wireframe ile karşılaştıran bir dil.
+        </p>
+      </div>
+      <div class="why-divider"></div>
+      <div class="why-col">
+        <div class="why-col-label">Fırsatın Kökü</div>
+        <p>
+          Sofra kültürü + el yapımı + uluslararası sanat referansı — <strong>bu üçü aynı anda kimse yapmıyor.</strong> EDETRI bu boşluktadır.<br><br>
+          Mevcut kimlik güçlü ama tek katmanlıydı. Yeni yön <strong>ses seviyesini açıyor — tonu değil.</strong> Saf beyaz kimlik korunuyor, üzerine yeni bir katman geliyor: metal aksanlar, krom görsellik, yaşanmışlık izleri.
+        </p>
+      </div>
+    </div>
+
+    <div class="manifesto-block reveal">
+      <p class="manifesto-text">"Güzel ama sessiz" olan marka<br><em style="color:var(--copper)">"güzel, yaşanmış ve unutulmaz"</em> olacak.</p>
+      <div class="manifesto-source">Creative Bible v4-3 — 2026 Hedef</div>
+    </div>
+  </div>
+</section>
+
+<div class="sep-line"></div>
+
+<!-- HOW -->
+<section class="how-section">
+  <div class="section-inner">
+    <div class="circle-label reveal">
+      <div class="circle-orb" style="border-color:var(--gold)">
+        <div style="position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle,rgba(184,152,80,0.4),transparent)"></div>
+        <span style="color:var(--gold)">H</span>
+      </div>
+      <div>
+        <div class="circle-title" style="color:var(--gold)">How — Nasıl Yapıyoruz</div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h2 class="section-headline">The Split dili.<br>Üç katman sistemi.<br><em style="color:var(--gold)">Gesamtkunstwerk.</em></h2>
+      <div class="section-sub-headline" style="color:var(--gold)">Her dokunma noktası aynı dili konuşur</div>
+    </div>
+
+    <div class="how-layers reveal">
+      <div class="layer-card">
+        <div class="layer-num">Katman 01 — %15</div>
+        <div class="layer-name">Chrome Baroque</div>
+        <div class="layer-eng">Hero / Kampanya</div>
+        <div class="layer-desc">Klasik resim estetiği + krom metallizasyon. Dramatik, sessiz, ağırbaşlı. "Bu bir reklam değil, bir tablo." Yılda 2–4 hero set. Split kompozisyon veya full chrome.</div>
+        <div class="layer-uses">
+          <span class="layer-use-tag">Sergi Afişi</span>
+          <span class="layer-use-tag">Booklet Kapağı</span>
+          <span class="layer-use-tag">Web Hero</span>
+        </div>
+        <div class="layer-pct">15</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">Katman 02 — %35</div>
+        <div class="layer-name">Wireframe & Drip</div>
+        <div class="layer-eng">Product / Ürün</div>
+        <div class="layer-desc">3D teknik çizim + eriyen/damlayan render. Teknik ama duygusal. "Bu bir mühendislik çizimi — ama ağlıyor." Her ürün karanlık + açık fon olmak üzere iki modda.</div>
+        <div class="layer-uses">
+          <span class="layer-use-tag">Web Ürün Sayfası</span>
+          <span class="layer-use-tag">Katalog</span>
+          <span class="layer-use-tag">Sosyal Medya</span>
+        </div>
+        <div class="layer-pct" style="color:var(--silver)">35</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">Katman 03 — %50</div>
+        <div class="layer-name">Grain Documentary</div>
+        <div class="layer-eng">Life / Yaşam</div>
+        <div class="layer-desc">S/B dominant, yüksek grain, analog film. EDETRI objeleri yaşamın doğal parçası — vitrin değil, hayatın uzantısı. Umursamaz zarafet. En sık üretilen katman.</div>
+        <div class="layer-uses">
+          <span class="layer-use-tag">Instagram Stories</span>
+          <span class="layer-use-tag">Event BTS</span>
+          <span class="layer-use-tag">Lifestyle</span>
+        </div>
+        <div class="layer-pct" style="color:var(--cream)">50</div>
+      </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="rules-row reveal" style="margin-top:60px">
+      <div class="rules-col">
+        <div class="rules-col-title do">✓ &nbsp; Daima Yap</div>
+        <div class="rule-item">İki hali her görselde bir arada tut — sıcak+soğuk, kumaş+metal.</div>
+        <div class="rule-item">Metal fısıldatsın: az ama kesin — bir çizgi, bir yansıma.</div>
+        <div class="rule-item">Sahneyi "bırakılmış" hissettir: erimiş mum, buruşuk keten.</div>
+        <div class="rule-item">Asimetri kural olsun — vitrin değil, yaşanmışlık.</div>
+        <div class="rule-item">Grain ekle — Layer 3'te her zaman, diğerlerinde seçici.</div>
+      </div>
+      <div class="rules-divider"></div>
+      <div class="rules-col">
+        <div class="rules-col-title dont">× &nbsp; Asla Yapma</div>
+        <div class="rule-item dont-item">Tam simetrik kompozisyon — EDETRI ortada durmaz.</div>
+        <div class="rule-item dont-item">Stok fotoğraf estetiği, HDR renk, gülümseyen yaşam tarzı.</div>
+        <div class="rule-item dont-item">Parlak renkler — palet dışı hiçbir şey yok.</div>
+        <div class="rule-item dont-item">"%20 indirim! 🔥" dili — EDETRI satmaz, davet eder.</div>
+        <div class="rule-item dont-item">Tek katmanda takılı kalmak — üç katman her zaman döngüsel.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep-line"></div>
+
+<!-- WHAT -->
+<section class="what-section">
+  <div class="section-inner">
+    <div class="circle-label reveal">
+      <div class="circle-orb" style="border-color:var(--silver)">
+        <div style="position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle,rgba(176,168,144,0.3),transparent)"></div>
+        <span style="color:var(--silver)">W</span>
+      </div>
+      <div>
+        <div class="circle-title" style="color:var(--silver)">What — Ne Üretiyoruz</div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h2 class="section-headline">El yapımı<br>sofra objeleri.<br><em style="color:var(--silver)">Her parça biricik.</em></h2>
+      <div class="section-sub-headline" style="color:var(--silver)">WHY olmadan WHAT sadece bir bardaktır</div>
+    </div>
+
+    <div class="what-grid reveal">
+      <div class="what-main">
+        <p class="section-body-text" style="margin-bottom:36px">
+          EDETRI'nin ürünleri, WHY'ın fiziksel taşıyıcılarıdır. Cam ve seramik objeler, The Split'in elle tutulabilir hali. Her isim bir kültürel referans taşır — <strong>Cahun, Scarpa, Dis-Moi, Pablo, Koga</strong> — ama asla açıklanmaz. Merak uyandırır.
+        </p>
+
+        <div class="product-line">
+          <div class="product-name">Cam</div>
+          <div class="product-desc">Istanbul atölyesinde elde üfleme. IOR 1.5, hafif yeşilimsi tint. Her parça biricik — varyasyon hata değil, vitrindir.</div>
+        </div>
+        <div class="product-line">
+          <div class="product-name">Seramik</div>
+          <div class="product-desc">El yapımı sofra objeleri. Saf beyaz'dan krom aksanlı yüzeylere geçiş. Barok formlar, endüstriyel son katman.</div>
+        </div>
+        <div class="product-line">
+          <div class="product-name">Sergi Masası</div>
+          <div class="product-desc">Fırçalanmış çelik tabla + drapeli keten. Metal ve kumaş birbirini taşıyor — The Split'in fiziksel manifestosu. Bağımsız tasarım objesi.</div>
+        </div>
+        <div class="product-line">
+          <div class="product-name">Booklet</div>
+          <div class="product-desc">18×18cm. Gümüş folyo kabartma. Riso + offset hibrit baskı. Her sezon kalınlaşan koleksiyoner objesi. Ürün değil — deneyim.</div>
+        </div>
+        <div class="product-line">
+          <div class="product-name">WebXR Galeri</div>
+          <div class="product-desc">Tarayıcı içinde 3D mekânsal galeri. Baroque Room → Geçiş Koridoru → Chrome Room. Sofra kültüründe ilk. AR ile ürünü kendi masana yerleştir.</div>
+        </div>
+      </div>
+
+      <div class="what-divider"></div>
+
+      <div class="what-aside">
+        <div class="stockists-block">
+          <div class="aside-label">Satış Noktaları</div>
+          <div class="stockist-item">Bureau <span class="stockist-city">Istanbul</span></div>
+          <div class="stockist-item">Galataport <span class="stockist-city">Istanbul</span></div>
+          <div class="stockist-item">House of Cafune <span class="stockist-city">—</span></div>
+          <div class="stockist-item">Isola Space <span class="stockist-city">Dubai</span></div>
+          <div class="stockist-item">Mamaka <span class="stockist-city">Kopenhag</span></div>
+          <div class="stockist-item">Maison Flâneur <span class="stockist-city">UK</span></div>
+        </div>
+
+        <div class="press-row" style="margin-top:32px">
+          <div class="aside-label">Basın</div>
+          <div class="press-items">
+            <span class="press-tag">Elle France</span>
+            <span class="press-tag">Vogue Türkiye</span>
+          </div>
+        </div>
+
+        <div style="margin-top:36px;padding-top:28px;border-top:1px solid rgba(168,104,40,0.15)">
+          <div class="aside-label">Konumlandırma</div>
+          <p style="font-size:0.7rem;line-height:1.9;color:var(--silver);margin-top:4px">
+            Hay ve Normann'ın altında değil — <strong style="color:var(--cream);font-weight:300">farklı</strong>. Onlar seri, EDETRI biricik. Completedworks ile yan yana: ikisi de kültürel referans taşıyan sanatçı objeler. L'Objet gibi aşırı dekoratif lüks klişeye asla yaklaşılmaz.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TENSION MAP -->
+<section class="tension-section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="circle-title" style="color:var(--copper);font-family:'IBM Plex Mono';font-size:0.45rem;letter-spacing:0.6em;margin-bottom:12px">Gerilim Haritası — The Split</div>
+      <p style="font-size:0.72rem;color:var(--silver);max-width:500px;line-height:1.9">Her yaratıcı karar bu eksenlerde bir yerde durur. Nokta tam ortada değil — hafifçe metal tarafa kayık, ama romantikliği asla kaybetmemiş.</p>
+    </div>
+    <div class="tension-grid reveal">
+      <div class="tension-pair">
+        <span class="tension-a">Romantik</span>
+        <span class="tension-sep">⟷</span>
+        <span class="tension-b">Endüstriyel</span>
+      </div>
+      <div class="tension-pair">
+        <span class="tension-a">Saf</span>
+        <span class="tension-sep">⟷</span>
+        <span class="tension-b">Yaşanmış</span>
+      </div>
+      <div class="tension-pair">
+        <span class="tension-a">El yapımı</span>
+        <span class="tension-sep">⟷</span>
+        <span class="tension-b">Makine</span>
+      </div>
+      <div class="tension-pair">
+        <span class="tension-a">Sessiz</span>
+        <span class="tension-sep">⟷</span>
+        <span class="tension-b">Titreşim</span>
+      </div>
+      <div class="tension-pair">
+        <span class="tension-a">Organik</span>
+        <span class="tension-sep">⟷</span>
+        <span class="tension-b">Geometrik</span>
+      </div>
+      <div class="tension-pair">
+        <span class="tension-a">Kumaş</span>
+        <span class="tension-sep">⟷</span>
+        <span class="tension-b">Çelik</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">E D E T R I</div>
+  <div style="font-family:'Playfair Display';font-style:italic;font-size:0.9rem;color:var(--copper);opacity:0.7;text-align:center;flex:1">
+    "No preconceived meaning. No boundary."
+  </div>
+  <div class="footer-meta">
+    Creative Bible<br>
+    Definitive Edition · 2026<br>
+    Istanbul · Paris
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
