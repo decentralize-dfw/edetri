@@ -41,13 +41,29 @@
     const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
     const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec'; 
 
+    // --- GÜVENLİ DEPOLAMA (Önizleme ekranı çökmelerini önlemek için) ---
+    const safeStorage = {
+      get: (key) => {
+        try { return JSON.parse(window.localStorage.getItem(key)); } catch(e) { return null; }
+      },
+      set: (key, val) => {
+        try { window.localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.warn("Local storage bu ortamda kısıtlı."); }
+      },
+      remove: (key) => {
+        try { window.localStorage.removeItem(key); } catch(e) { }
+      }
+    };
+
     function App() {
       const [images, setImages] = useState([]);
       const [loading, setLoading] = useState(true);
       const [selectedImg, setSelectedImg] = useState(null);
       const [columnCount, setColumnCount] = useState(8);
+      
+      const [pendingChanges, setPendingChanges] = useState(() => safeStorage.get('pinterest_pending_changes') || {});
+      const [isPublishing, setIsPublishing] = useState(false);
 
-      // Ekran boyutuna göre sütun sayısını belirle (Görselleri %60 küçültmek için sütun sayısı artırıldı)
+      // Ekran boyutuna göre sütun sayısını belirle
       useEffect(() => {
         const updateColumns = () => {
           if (window.innerWidth >= 1280) setColumnCount(10);
@@ -66,44 +82,54 @@
       useEffect(() => {
         const fetchData = async () => {
           try {
-            // &headers=0 eklendi: Bu sayede Google Sheets API ilk satırı başlık olarak ayırmak yerine veri satırı olarak algılar.
-            // Böylece index 9 tam olarak 10. satıra eşit olur ve kayma (offset) ortadan kalkar.
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0`;
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=A10:Z`;
             const res = await fetch(url);
             const text = await res.text();
             
-            // Google'ın döndürdüğü özel formatı temizleyip saf JSON'a çeviriyoruz
             const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
             const data = JSON.parse(jsonString);
             
             const rows = data.table.rows;
             const parsedImages = [];
 
-            // Tüm satırları otomatik tara (Sabit 9 rakamı kaldırıldı)
+            // Tüm satırları otomatik tara
             for (let i = 0; i < rows.length; i++) {
               const row = rows[i];
-              if (!row || !row.c || !row.c[2] || !row.c[2].v) continue; // C kolonu (resim linki) boşsa o satırı tamamen atla
+              if (!row || !row.c || !row.c[2] || !row.c[2].v) continue;
 
-              const thumbUrl = row.c[2]?.v; // C Kolonu: Thumbnail (Ana ekran)
-              const fullUrl = row.c[1]?.v;  // B Kolonu: Tam Ekran resim
+              const thumbUrl = row.c[2]?.v; // C Kolonu
+              const fullUrl = row.c[1]?.v;  // B Kolonu
               
-              // Sadece "http" ile başlayan geçerli bir link ise işleme al (Başlık yazılarını vb. otomatik eler)
               if (!thumbUrl.toString().startsWith('http')) continue;
 
-              const excelRowNumber = i + 1; // Kodun 0'dan saymasını düzeltip gerçek Excel satır numarasını buluyoruz
+              const excelRowNumber = i + 10; 
 
               parsedImages.push({
-                id: excelRowNumber, // Artık ID doğrudan Excel'in yanındaki gerçek satır numarası oldu
+                id: excelRowNumber,
                 thumbUrl: thumbUrl,
-                fullUrl: fullUrl && fullUrl.toString().startsWith('http') ? fullUrl : thumbUrl, // Eğer B kolonu boşsa çökmeyip C'deki resmi kullansın
-                color: row.c[3]?.v || '#CCCCCC', // D Kolonu: Dominant Color
-                pinterestLink: row.c[4]?.v || '#', // E Kolonu: Pinterest Link
-                type: row.c[5]?.v || '', // F Kolonu: TYPE
-                description: row.c[6]?.v || '' // G Kolonu: Description
+                fullUrl: fullUrl && fullUrl.toString().startsWith('http') ? fullUrl : thumbUrl,
+                color: row.c[3]?.v || '#CCCCCC', // D Kolonu
+                pinterestLink: row.c[4]?.v || '#', // E Kolonu
+                type: row.c[5]?.v || '', // F Kolonu
+                description: row.c[6]?.v || '' // G Kolonu
               });
             }
 
-            setImages(parsedImages);
+            // Excel'den gelen veriler ile tarayıcı hafızasındaki (localStorage) yayınlanmamış değişiklikleri birleştir
+            const pendingObj = safeStorage.get('pinterest_pending_changes') || {};
+            
+            const mergedImages = parsedImages.map(img => {
+              if (pendingObj[img.id]) {
+                return {
+                  ...img,
+                  type: pendingObj[img.id].type,
+                  description: pendingObj[img.id].description
+                };
+              }
+              return img;
+            });
+
+            setImages(mergedImages);
           } catch (error) {
             console.error("Veri çekilirken hata oluştu:", error);
           } finally {
@@ -113,6 +139,46 @@
 
         fetchData();
       }, []);
+
+      // Değişiklikleri hafızaya al
+      const handleLocalSave = (id, type, description) => {
+        setImages(prevImages => prevImages.map(item => 
+          item.id === id ? { ...item, type, description } : item
+        ));
+        
+        setPendingChanges(prev => {
+          const updatedPending = {
+            ...prev,
+            [id]: { row: id, type, description }
+          };
+          safeStorage.set('pinterest_pending_changes', updatedPending);
+          return updatedPending;
+        });
+      };
+
+      // Bekleyen tüm değişiklikleri sırayla Excel'e yolla
+      const publishAllChanges = async () => {
+        const changes = Object.values(pendingChanges);
+        if (changes.length === 0) return;
+
+        setIsPublishing(true);
+        try {
+          for (const change of changes) {
+            await fetch(APPS_SCRIPT_WEB_APP_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify(change)
+            });
+          }
+          setPendingChanges({}); 
+          safeStorage.remove('pinterest_pending_changes');
+        } catch (error) {
+          console.error("Toplu kayıt hatası:", error);
+          alert("Kaydedilirken bir hata oluştu. Bağlantınızı kontrol edin.");
+        } finally {
+          setIsPublishing(false);
+        }
+      };
 
       const openModal = (img) => {
         setSelectedImg({ ...img });
@@ -130,14 +196,32 @@
         );
       }
 
+      const pendingCount = Object.keys(pendingChanges).length;
+
       return (
         <div className="min-h-screen p-4 sm:p-8">
-          <header className="mb-8 text-center">
+          <header className="mb-8 flex flex-col items-center text-center relative min-h-[80px]">
             <h1 className="text-3xl font-bold text-gray-800 tracking-tight">İlham Galerisi</h1>
-            <p className="text-gray-500 mt-2">Google Sheets destekli lokal Pinterest</p>
+            <p className="text-gray-500 mt-2 mb-4 sm:mb-0">Google Sheets destekli lokal Pinterest</p>
+            
+            {/* Toplu Yayınlama Butonu - ARTIK HER ZAMAN GÖRÜNÜR */}
+            <div className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 z-10">
+              <button 
+                onClick={publishAllChanges}
+                disabled={isPublishing || pendingCount === 0}
+                className={`px-6 py-2.5 rounded-full font-medium flex items-center gap-2 shadow-sm transition-all ${
+                  pendingCount > 0 
+                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:scale-105 active:scale-95' 
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {isPublishing ? <LoaderIcon className="w-5 h-5 animate-spin" /> : <SaveIcon className="w-5 h-5" />}
+                {isPublishing ? 'Kaydediliyor...' : `Excel'e Yayınla (${pendingCount})`}
+              </button>
+            </div>
           </header>
 
-          {/* Masonry Grid - Soldan sağa sıralama (Excel sırası) için React ile dağıtıldı */}
+          {/* Masonry Grid - Soldan sağa sıralama (Excel sırası) */}
           <div className="flex gap-3 sm:gap-4">
             {Array.from({ length: columnCount }).map((_, colIndex) => (
               <div key={colIndex} className="flex flex-col gap-3 sm:gap-4 flex-1">
@@ -173,7 +257,7 @@
             <Modal 
               img={selectedImg} 
               onClose={closeModal} 
-              setImages={setImages} 
+              onSaveLocally={handleLocalSave} 
             />
           )}
         </div>
@@ -181,62 +265,36 @@
     }
 
     // Tam Ekran Modal Bileşeni
-    function Modal({ img, onClose, setImages }) {
-      const [type, setType] = useState(img.type);
-      const [description, setDescription] = useState(img.description);
-      const [isSaving, setIsSaving] = useState(false);
-      const [savedStatus, setSavedStatus] = useState(false);
+    function Modal({ img, onClose, onSaveLocally }) {
+      const [type, setType] = useState(img.type || '');
+      const [description, setDescription] = useState(img.description || '');
 
-      const handleBackdropClick = (e) => {
-        if (e.target === e.currentTarget) onClose();
-      };
-
-      const handleSave = async () => {
-        setIsSaving(true);
-        
-        try {
-          // Arayüzü anında güncelle
-          setImages(prevImages => prevImages.map(item => 
-            item.id === img.id ? { ...item, type, description } : item
-          ));
-
-          // Google Sheets'e kaydet
-          const payload = {
-            row: img.id, // Artık matematiksel işleme (+1'e) gerek yok, çünkü img.id direkt gerçek excel satır numarası (örneğin: 10)
-            type: type,
-            description: description
-          };
-
-          await fetch(APPS_SCRIPT_WEB_APP_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-          });
-
-          setIsSaving(false);
-          setSavedStatus(true);
-          setTimeout(() => setSavedStatus(false), 2000);
-
-        } catch (error) {
-          console.error("Kaydetme hatası:", error);
-          alert("Kaydedilirken bir hata oluştu. Bağlantınızı kontrol edin.");
-          setIsSaving(false);
+      // Modaldan çıkıldığı an (X, ESC veya Buton) otomatik kaydetmeyi tetikler
+      const handleSafeClose = () => {
+        // Yalnızca gerçekten bir şey değiştirildiyse kaydet
+        if (type !== (img.type || '') || description !== (img.description || '')) {
+          onSaveLocally(img.id, type, description);
         }
+        onClose(); // Ana ekrana dön
       };
+
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.key === 'Escape') {
+            handleSafeClose();
+          }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [type, description, img]); // type ve desc değiştikçe referansı günceller
 
       return (
-        <div 
-          className="fixed inset-0 z-50 bg-black flex flex-col md:flex-row"
-          onClick={handleBackdropClick}
-        >
+        <div className="fixed inset-0 z-50 bg-black flex flex-col md:flex-row">
           {/* Sol Taraf: Tam Ekran Resim Alanı */}
-          <div 
-            className="flex-1 h-[60vh] md:h-full relative flex items-center justify-center bg-black" 
-            onClick={handleBackdropClick}
-          >
-            {/* Kapatma Butonu (Resmin Sol Üstünde) */}
+          <div className="flex-1 h-[60vh] md:h-full relative flex items-center justify-center bg-black">
+            {/* Kapatma Butonu (Aynı zamanda kaydeder) */}
             <button 
-              onClick={onClose}
+              onClick={handleSafeClose}
               className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 p-2.5 rounded-full transition duration-200"
             >
               <XIcon className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -304,30 +362,14 @@
 
             <div className="mt-8 pt-6 border-t border-gray-100">
               <button 
-                onClick={handleSave}
-                disabled={isSaving}
-                className={`w-full py-3.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm ${
-                  savedStatus 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-black text-white hover:bg-gray-800 active:scale-95 hover:shadow-md'
-                }`}
+                onClick={handleSafeClose}
+                className={`w-full py-3.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm bg-black text-white hover:bg-gray-800 active:scale-95 hover:shadow-md`}
               >
-                {isSaving ? (
-                  <LoaderIcon className="w-5 h-5 animate-spin" />
-                ) : savedStatus ? (
-                  <React.Fragment>
-                    <CheckIcon className="w-5 h-5" />
-                    Kaydedildi!
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <SaveIcon className="w-5 h-5" />
-                    Excel'e Kaydet
-                  </React.Fragment>
-                )}
+                <CheckIcon className="w-5 h-5" />
+                Hafızaya Al ve Kapat
               </button>
               <p className="text-xs text-center text-gray-400 mt-4 leading-relaxed">
-                Girdiğiniz veriler kalıcı olarak Google Sheet dosyanıza işlenecektir.
+                Yaptığınız değişiklikler kapatıldığında <b>otomatik</b> hafızaya alınır. Kalıcı olması için ana ekrandaki <b>Excel'e Yayınla</b> butonunu kullanın.
               </p>
             </div>
           </div>
