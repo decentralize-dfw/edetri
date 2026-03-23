@@ -704,6 +704,8 @@
 <div class="shortcut-hint">Shift+E → editor</div>
 
 <script>
+  const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
+  const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=C10%3AG&gid=0`;
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
   const LS_KEY = 'edetri-masonry-edits';
 
@@ -768,29 +770,34 @@
   // ─── FETCH & RENDER ────────────────────────────────────────────
   async function init() {
     try {
-      const res = await fetch(APPS_SCRIPT_URL);
+      const res = await fetch(GVIZ_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      if (json.status !== 'success') throw new Error(json.message || 'Apps Script error');
-      const records = json.data;
+      const text = await res.text();
+      // Strip JSONP wrapper: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+      const jsonStr = text.slice(text.indexOf('(') + 1, text.lastIndexOf(')'));
+      const json = JSON.parse(jsonStr);
+      if (json.status !== 'ok') throw new Error('Spreadsheet data unavailable');
+      const records = json.table.rows.map(row =>
+        (row.c || []).map(cell => cell && cell.v != null ? String(cell.v) : '')
+      );
       const edits = loadEdits();
 
-      // Row 9 (index 8) = headers, rows 10+ (index 9+) = data
+      // range=C10:G → records[0] = row 10, columns: 0=C(imgUrl) 1=D(color) 2=E(pinterest) 3=F(type) 4=G(desc)
       rows = [];
-      for (let i = 9; i < records.length; i++) {
+      for (let i = 0; i < records.length; i++) {
         const r = records[i];
-        const rowNum = i + 1; // 1-indexed spreadsheet row
-        const imgUrl = String(r[2] || '').trim();
+        const rowNum = i + 10;
+        const imgUrl = (r[0] || '').trim();
         if (!imgUrl) continue;
 
         const saved = edits[String(rowNum)] || {};
         rows.push({
           rowNum,
           imgUrl,
-          color:        String(r[3] || '').trim(),
-          pinterestUrl: String(r[4] || '').trim(),
-          type:         saved.type        !== undefined ? saved.type        : String(r[5] || '').trim(),
-          description:  saved.description !== undefined ? saved.description : String(r[6] || '').trim(),
+          color:        (r[1] || '').trim(),
+          pinterestUrl: (r[2] || '').trim(),
+          type:         saved.type        !== undefined ? saved.type        : (r[3] || '').trim(),
+          description:  saved.description !== undefined ? saved.description : (r[4] || '').trim(),
         });
       }
 
