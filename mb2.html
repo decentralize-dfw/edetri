@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDETRI — Moodboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<style>
+:root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif;font-weight:200;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
+
+/* HEADER */
+#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px}
+.header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
+.header-title span{color:var(--copper);font-style:italic}
+.header-right{display:flex;align-items:center;gap:14px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
+.status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
+.status-dot.ready{background:#5a8a5a}
+.status-dot.error{background:var(--burgundy)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-text{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.06em}
+.btn-map{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 13px;cursor:pointer;transition:all .2s;white-space:nowrap;text-transform:uppercase}
+.btn-map:hover{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.08)}
+
+/* ÖZET OVERLAY */
+#ozetOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto}
+#ozetOverlay.open{display:block}
+#ozetInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
+#ozetClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#ozetClose:hover{color:var(--copper)}
+#ozetContent{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.8}
+#ozetContent h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:2em 0 .5em;font-weight:400}
+#ozetContent h3{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.6em 0 .4em;font-weight:400}
+#ozetContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
+#ozetContent ul{padding-left:1.2em;margin:0 0 1em}
+#ozetContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
+
+/* RAPOR OVERLAY */
+#raporOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto}
+#raporOverlay.open{display:block}
+#raporInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
+#raporClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#raporClose:hover{color:var(--copper)}
+#raporContent{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.8}
+#raporContent h1,#raporContent h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:2em 0 .5em;font-weight:400}
+#raporContent h3,#raporContent h4{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.6em 0 .4em;font-weight:400}
+#raporContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
+#raporContent ul,#raporContent ol{padding-left:1.2em;margin:0 0 1em}
+#raporContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
+#raporContent strong{font-weight:400;color:var(--cream)}
+#raporLoading{color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:6px;padding:0 0 12px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-chip{background:none;border:1px solid rgba(176,168,144,.18);color:rgba(176,168,144,.6);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;cursor:pointer;transition:all .2s;white-space:nowrap;border-radius:1px;flex-shrink:0}
+.filter-chip:hover{border-color:rgba(176,168,144,.5);color:var(--cream)}
+.filter-chip.active{background:var(--copper);border-color:var(--copper);color:var(--black);font-weight:400}
+.filter-chip.all-chip.active{background:rgba(176,168,144,.15);border-color:var(--silver);color:var(--cream)}
+
+/* MASONRY */
+.gallery-wrap{padding:24px 8px}
+.masonry{column-count:5;column-gap:8px}
+.card{break-inside:avoid;margin-bottom:8px;position:relative;cursor:pointer;border-radius:2px;background:var(--dim)}
+.card.hidden{display:none}
+.card-img-wrap{overflow:hidden;border-radius:2px 2px 0 0;position:relative}
+.card-img-wrap img{display:block;width:100%;height:auto;transition:transform .4s ease}
+.card:hover .card-img-wrap img{transform:scale(1.03)}
+.card-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 8px 8px;background:linear-gradient(to top,rgba(9,8,7,.85),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;gap:5px}
+.card:hover .card-overlay{opacity:1}
+.card-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
+.card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,10px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
+body.show-comments .card-desc{display:block}
+
+/* SIZE SLIDER */
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:10px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 18px;border-radius:2px}
+#sizeSliderWrap span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase}
+#sizeSlider{width:160px;accent-color:var(--copper);cursor:pointer}
+
+/* COMMENT TOGGLE */
+#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px}
+#commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
+#commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
+
+/* SPINNER */
+.spinner{width:24px;height:24px;border:1px solid rgba(176,168,144,.2);border-top-color:var(--copper);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(9,8,7,.99);z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-backdrop.open{opacity:1;pointer-events:all}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;position:absolute;top:0;left:0;right:0;z-index:10;background:linear-gradient(to bottom,rgba(9,8,7,.9),transparent)}
+.modal-close{background:none;border:none;color:var(--silver);font-size:18px;cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s}
+.modal-close:hover{background:rgba(176,168,144,.1);color:var(--cream)}
+.modal-counter{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.08em;opacity:.5}
+.nav-arrows{display:flex;gap:8px}
+.nav-btn{background:rgba(9,8,7,.6);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:14px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;border-radius:2px}
+.nav-btn:hover{border-color:var(--copper);color:var(--copper)}
+.modal-image-full{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.modal-image-full img{width:100%;height:100%;object-fit:contain;display:block}
+.modal-info-strip{position:absolute;bottom:0;left:0;right:0;padding:80px 28px 24px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:10;pointer-events:none}
+.modal-info-left{display:flex;flex-direction:column;gap:8px;pointer-events:all}
+.modal-color-row{display:flex;align-items:center;gap:8px}
+.modal-color-dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
+.modal-color-hex{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.08em;opacity:.7}
+.modal-title{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,42px);font-weight:400;font-style:italic;color:var(--cream);line-height:1.15;max-width:60vw}
+.modal-desc-text{font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;color:var(--silver);opacity:.75;line-height:1.5;max-width:50vw}
+.modal-info-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:all}
+.pinterest-link{display:flex;align-items:center;gap:6px;color:var(--silver);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;opacity:.4;transition:opacity .2s}
+.pinterest-link:hover{opacity:.9;color:var(--copper)}
+.keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.25;letter-spacing:.06em}
+
+/* MAP VIEW */
+#mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none}
+#mapView:active{cursor:grabbing}
+#mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+.map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
+.map-ui-btn:hover{border-color:var(--copper);color:var(--copper)}
+#mapCloseBtn{right:18px}
+#mapShuffleBtn{right:128px}
+#mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
+.map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
+.map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
+#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
+#mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
+
+/* CLUSTER LABELS — always on top */
+.map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:500}
+.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:30px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
+.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:5px}
+
+/* ISLANDS */
+.map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.map-island:hover{z-index:999!important}
+.map-island-inner{position:relative;border-radius:2px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.55);transition:box-shadow .2s,outline .2s;width:100%;height:100%}
+.map-island:hover .map-island-inner{outline:1px solid rgba(168,104,40,.55);box-shadow:0 0 28px rgba(168,104,40,.12),0 14px 44px rgba(0,0,0,.75)}
+.map-island img{display:block;width:100%;height:100%;object-fit:cover}
+.map-island-hlabel{position:absolute;bottom:0;left:0;right:0;padding:18px 6px 5px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;opacity:0;transition:opacity .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-island:hover .map-island-hlabel{opacity:1}
+
+/* HOVER TOOLTIP */
+#mapTooltip{position:fixed;bottom:40px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
+#mapTooltip.visible{opacity:1}
+.tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2}
+.tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5}
+
+/* RAPOR TABS */
+#raporTabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:28px;border-bottom:1px solid rgba(176,168,144,.12);padding-bottom:12px}
+.rapor-tab{background:none;border:none;color:rgba(176,168,144,.45);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.rapor-tab:hover{color:var(--silver)}
+.rapor-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
+
+/* BÖLÜM AÇIKLAMA */
+#bolumAciklamaWrap{padding:0 0 10px}
+#bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
+
+/* MAP AÇIKLAMA BUTTON */
+#mapAciklamaBtn{position:fixed;top:48px;left:24px;font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(176,168,144,.35);letter-spacing:.1em;z-index:300;cursor:pointer;transition:color .2s;user-select:none}
+#mapAciklamaBtn:hover{color:rgba(176,168,144,.7)}
+
+/* FINDER PANEL */
+#finderPanel{position:fixed;z-index:350;background:rgba(9,8,7,.96);backdrop-filter:blur(16px);border:1px solid rgba(176,168,144,.18);width:480px;height:420px;min-width:260px;min-height:180px;display:flex;flex-direction:column;top:80px;left:24px;overflow:hidden;resize:both}
+#finderTitleBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(176,168,144,.12);cursor:move;user-select:none;flex-shrink:0}
+#finderTitleText{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--silver);text-transform:uppercase}
+#finderCloseBtn{background:none;border:none;color:rgba(176,168,144,.4);cursor:pointer;font-size:14px;line-height:1;padding:0;transition:color .2s}
+#finderCloseBtn:hover{color:var(--silver)}
+#finderTabs{display:flex;gap:2px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid rgba(176,168,144,.08);flex-shrink:0}
+.finder-tab{background:none;border:none;color:rgba(176,168,144,.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent}
+.finder-tab:hover{color:var(--silver)}
+.finder-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
+#finderContent{flex:1;overflow-y:auto;padding:20px 24px;color:var(--cream);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.7}
+#finderContent h1,#finderContent h2{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:1.8em 0 .4em;font-weight:400}
+#finderContent h3,#finderContent h4{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.4em 0 .3em;font-weight:400}
+#finderContent p{text-align:justify;text-align-last:left;margin:0 0 .8em}
+#finderContent ul,#finderContent ol{padding-left:1.2em;margin:0 0 .8em}
+#finderContent li{margin-bottom:.3em}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- MAP — shown immediately, full screen loader -->
+<div id="mapView">
+  <div class="map-title-label">EDETRI — Constellation</div>
+  <div id="mapAciklamaBtn" onclick="toggleFinderPanel()">+ açıklama</div>
+  <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
+  <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
+  <div id="mapStage"></div>
+  <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
+  <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
+  <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
+  <!-- FINDER PANEL -->
+  <div id="finderPanel" style="display:none">
+    <div id="finderTitleBar">
+      <span id="finderTitleText">Bölüm Açıklamaları</span>
+      <button id="finderCloseBtn" onclick="closeFinderPanel()">✕</button>
+    </div>
+    <div id="finderTabs"></div>
+    <div id="finderContent"></div>
+  </div>
+</div>
+
+<!-- HEADER — hidden until map closed -->
+<header id="siteHeader" style="display:none">
+  <div class="header-top">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="header-title">EDETRI — <span>Moodboard</span></div>
+      <button class="btn-map" onclick="openOzet()">Özet</button>
+      <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
+    </div>
+    <div class="header-right">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="status-dot loading" id="statusDot"></span>
+        <span class="status-text" id="statusText">Loading...</span>
+      </div>
+      <button class="btn-map" onclick="openMap()">⊕ Map</button>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:12px"></div>
+    <div id="bolumAciklamaWrap" style="display:none;padding-bottom:12px;flex-shrink:0">
+      <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
+    </div>
+  </div>
+</header>
+
+<!-- GALLERY — hidden until map closed -->
+<main id="galleryWrap" style="display:none">
+  <div class="gallery-wrap">
+    <div class="masonry" id="masonry"></div>
+  </div>
+</main>
+
+<!-- SIZE SLIDER (masonry mode) -->
+<div id="sizeSliderWrap">
+  <span>Size</span>
+  <input type="range" id="sizeSlider" min="1" max="9" value="5" step="1" oninput="applySize(this.value)">
+</div>
+
+<!-- COMMENT TOGGLE (masonry mode) -->
+<div id="commentToggleWrap">
+  <input type="checkbox" id="commentToggle">
+  <label for="commentToggle">Yorum</label>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal-image-full"><img id="modalImg" src="" alt="" referrerpolicy="no-referrer"></div>
+  <div class="modal-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <span class="modal-counter" id="modalCounter"></span>
+    </div>
+    <div class="nav-arrows">
+      <button class="nav-btn" onclick="navModal(-1)">←</button>
+      <button class="nav-btn" onclick="navModal(1)">→</button>
+    </div>
+  </div>
+  <div class="modal-info-strip">
+    <div class="modal-info-left">
+      <div class="modal-color-row">
+        <div class="modal-color-dot" id="mColorDot" style="display:none"></div>
+        <span class="modal-color-hex" id="mColorHex"></span>
+      </div>
+      <div class="modal-title" id="mTitle"></div>
+      <div class="modal-desc-text" id="mDesc"></div>
+    </div>
+    <div class="modal-info-right">
+      <a class="pinterest-link" id="mLink" href="#" target="_blank" rel="noopener">↗ Pinterest</a>
+      <span class="keyboard-hint">← → nav · Esc close</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AG&gid=0`;
+
+const SECTION_DOCS = [
+  { key: 'booklet',          label: 'Booklet' },
+  { key: 'editoryel',        label: 'Editöryel' },
+  { key: 'mekan',            label: 'Mekan' },
+  { key: 'yasanmislik',      label: 'Yaşanmışlık' },
+  { key: 'sergi-platform',   label: 'Sergi Platform' },
+  { key: 'drape-ip-kaplama', label: 'Drape / İp Kaplama' },
+  { key: 'metal-kumas',      label: 'Metal Kumaş' }
+];
+const RAPOR_BASE = 'https://xrweb.studio/edetri/rapor/';
+
+function toSlug(s) {
+  return s.toLowerCase()
+    .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+    .replace(/ö/g,'o').replace(/ç/g,'c').replace(/ı/g,'i')
+    .replace(/\s+/g,'-');
+}
+
+let rows = [], visibleIdx = [], currentIdx = -1;
+let mapBuilt = false, isShuffled = false;
+let mapAllItems = [];
+let panX = 0, panY = 0, scale = 1;
+let isPanning = false, panSX, panSY, panOX, panOY;
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(GVIZ);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const json = JSON.parse(text.slice(text.indexOf('(')+1, text.lastIndexOf(')')));
+    if (json.status !== 'ok') throw new Error('Sheet unavailable — make sure it is public');
+
+    rows = [];
+    for (const row of (json.table.rows||[])) {
+      const c = (row.c||[]).map(x => x&&x.v!=null ? String(x.v) : '');
+      const imgUrl = (c[0]||'').trim();
+      if (!imgUrl) continue;
+      rows.push({
+        imgUrl,
+        color:        (c[2]||'').trim(),
+        pinterestUrl: (c[3]||'').trim(),
+        type:         (c[4]||'').trim(),
+        description:  (c[5]||'').trim()
+      });
+    }
+
+    visibleIdx = rows.map((_,i)=>i);
+    renderFilters();
+    renderMasonry();
+    setStatus('ready', `${rows.length} images`);
+    buildMap();
+  } catch(e) {
+    setStatus('error','Failed to load');
+    document.getElementById('mapLoader').innerHTML =
+      `<div style="text-align:center;padding:40px 20px">
+        <p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;margin-bottom:12px">Error: ${e.message}</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(176,168,144,.4);letter-spacing:.06em">Make sure the Google Sheet is set to<br>"Anyone with the link can view"</p>
+      </div>`;
+  }
+}
+
+// ── FILTERS ───────────────────────────────────────────────────
+function renderFilters() {
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = '';
+  const types = [...new Set(rows.map(r=>r.type).filter(Boolean))].sort();
+  if (!types.length) return;
+
+  const all = mkChip('All','all',true); all.classList.add('all-chip');
+  all.onclick = () => applyFilter('all');
+  bar.appendChild(all);
+  types.forEach(t => { const c=mkChip(t,t,false); c.onclick=()=>applyFilter(t); bar.appendChild(c); });
+}
+
+function mkChip(label,f,active) {
+  const c=document.createElement('button');
+  c.className='filter-chip'+(active?' active':'');
+  c.textContent=label; c.dataset.f=f; return c;
+}
+
+function applyFilter(f) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
+  document.querySelectorAll('.card').forEach(card=>{
+    card.classList.toggle('hidden', f!=='all' && rows[+card.dataset.idx].type!==f);
+  });
+  visibleIdx = rows.map((_,i)=>i).filter(i=>f==='all'||rows[i].type===f);
+  // show/hide bölüm açıklama button
+  const wrap = document.getElementById('bolumAciklamaWrap');
+  if (f !== 'all') {
+    const slug = toSlug(f);
+    const hasDoc = SECTION_DOCS.some(s => s.key === slug);
+    wrap.style.display = hasDoc ? '' : 'none';
+    wrap.dataset.key = slug;
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+// ── MASONRY ───────────────────────────────────────────────────
+function renderMasonry() {
+  const m = document.getElementById('masonry');
+  m.innerHTML = '';
+  rows.forEach((row,idx) => {
+    const card = document.createElement('div');
+    card.className='card'; card.dataset.idx=idx;
+    card.onclick = ()=>openModal(idx);
+    const wrap = document.createElement('div'); wrap.className='card-img-wrap';
+    const img = document.createElement('img');
+    img.src=row.imgUrl; img.alt=row.type||''; img.loading='lazy'; img.referrerPolicy='no-referrer';
+    const ov = document.createElement('div'); ov.className='card-overlay';
+    if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; ov.appendChild(d); }
+    if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; ov.appendChild(s); }
+    wrap.appendChild(img); wrap.appendChild(ov); card.appendChild(wrap);
+    if (row.description) { const desc=document.createElement('div'); desc.className='card-desc'; desc.textContent=row.description; card.appendChild(desc); }
+    m.appendChild(card);
+  });
+}
+
+function applySize(v) {
+  const cols = 10 - parseInt(v);
+  document.getElementById('masonry').style.columnCount = cols;
+  document.documentElement.style.setProperty('--desc-font-size', Math.max(10, Math.round(80/cols)) + 'px');
+}
+
+// ── MAP BUILD ─────────────────────────────────────────────────
+function applyTransform() {
+  document.getElementById('mapStage').style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+}
+
+function buildMap() {
+  const stage = document.getElementById('mapStage');
+  stage.innerHTML = '';
+  mapAllItems = [];
+  isShuffled = false;
+  document.getElementById('mapShuffleBtn').classList.remove('active');
+
+  const VW=window.innerWidth, VH=window.innerHeight;
+  let seed=137;
+  const rng=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/0xffffffff; };
+
+  const types=[...new Set(rows.map(r=>r.type).filter(Boolean))];
+  const ungrouped=rows.filter(r=>!r.type);
+  const WORLD_W=3400, WORLD_H=2600;
+  const cols=Math.ceil(Math.sqrt(types.length||1));
+  const rcount=Math.ceil((types.length||1)/cols);
+  const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
+
+  const centers=types.map((_,i)=>({
+    x: cellW*(i%cols+0.5)+(rng()-.5)*cellW*.3,
+    y: cellH*(Math.floor(i/cols)+0.5)+(rng()-.5)*cellH*.3
+  }));
+
+  const allItems=[];
+
+  function placeCluster(group, cx, cy) {
+    const n=group.length;
+    group.forEach((row,j)=>{
+      const gi=rows.indexOf(row);
+      const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.8;
+      const ring=Math.floor(j/8);
+      const dist=60+ring*90+rng()*70;
+      const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
+      const sr=rng();
+      const w=sr<.12?120:sr<.38?85:58;
+      const h=sr<.12?160:sr<.38?112:77;
+      const ix=px-w/2, iy=py-h/2;
+      const rot=(rng()-.5)*6;
+
+      const island=document.createElement('div');
+      island.className='map-island';
+      island.style.cssText=`left:${ix}px;top:${iy}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg)`;
+      island.dataset.baseRot=rot; island.dataset.currentRot=rot;
+
+      const inner=document.createElement('div'); inner.className='map-island-inner';
+      const img=document.createElement('img');
+      img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy';
+      img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
+      const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
+      inner.appendChild(img); inner.appendChild(hl); island.appendChild(inner);
+
+      // drag vs click logic (pointer capture for clean stop on release anywhere)
+      let dragging=false, hasMoved=false, dsx, dsy, dsl, dst;
+      island.addEventListener('pointerdown', e=>{
+        e.stopPropagation();
+        dragging=true; hasMoved=false;
+        dsx=e.clientX; dsy=e.clientY;
+        dsl=parseFloat(island.style.left); dst=parseFloat(island.style.top);
+        island.style.transition='none'; island.style.zIndex='1000';
+        island.setPointerCapture(e.pointerId);
+      });
+      island.addEventListener('pointermove', e=>{
+        if (!dragging) return;
+        const dx=(e.clientX-dsx)/scale, dy=(e.clientY-dsy)/scale;
+        if (Math.abs(dx)>3||Math.abs(dy)>3) hasMoved=true;
+        if (!hasMoved) return;
+        island.style.left=(dsl+dx)+'px'; island.style.top=(dst+dy)+'px';
+      });
+      island.addEventListener('pointerup', ()=>{
+        if (!dragging) return;
+        dragging=false; island.style.zIndex=''; island.style.transition='';
+        if (!hasMoved) {
+          openModal(gi);
+        } else {
+          const item=mapAllItems.find(x=>x.el===island);
+          if (item){ item.baseX=parseFloat(island.style.left); item.baseY=parseFloat(island.style.top); }
+        }
+      });
+      island.addEventListener('pointercancel', ()=>{
+        dragging=false; island.style.zIndex=''; island.style.transition='';
+      });
+
+      // hover: +10deg rotation + tooltip
+      island.addEventListener('mouseenter', ()=>{
+        const r=parseFloat(island.dataset.currentRot);
+        island.style.transform=`rotate(${r+10}deg)`;
+        document.getElementById('ttType').textContent=row.type||'';
+        document.getElementById('ttDesc').textContent=row.description||'';
+        if (row.type||row.description) document.getElementById('mapTooltip').classList.add('visible');
+      });
+      island.addEventListener('mouseleave', ()=>{
+        const r=parseFloat(island.dataset.currentRot);
+        island.style.transform=`rotate(${r}deg)`;
+        document.getElementById('mapTooltip').classList.remove('visible');
+      });
+
+      stage.appendChild(island);
+      allItems.push({el:island, baseX:ix, baseY:iy, baseRot:rot});
+    });
+  }
+
+  types.forEach((t,i)=>placeCluster(rows.filter(r=>r.type===t), centers[i].x, centers[i].y));
+  if (ungrouped.length) placeCluster(ungrouped, WORLD_W/2, WORLD_H*.88);
+
+  mapAllItems=allItems;
+
+  // cluster labels (z-index 500)
+  types.forEach((t,i)=>{
+    const lbl=document.createElement('div'); lbl.className='map-cluster-label';
+    lbl.style.left=centers[i].x+'px'; lbl.style.top=(centers[i].y-75)+'px';
+    const nm=document.createElement('div'); nm.className='map-cluster-name'; nm.textContent=t;
+    const cnt=document.createElement('div'); cnt.className='map-cluster-count';
+    cnt.textContent=`${rows.filter(r=>r.type===t).length} items`;
+    lbl.appendChild(nm); lbl.appendChild(cnt); stage.appendChild(lbl);
+  });
+
+  // fit to screen — use approximate sizes since DOM not yet painted
+  const W_EST=80, H_EST=100, PAD=80;
+  const minX=Math.min(...allItems.map(x=>x.baseX))-PAD;
+  const minY=Math.min(...allItems.map(x=>x.baseY))-PAD;
+  const maxX=Math.max(...allItems.map(x=>x.baseX+W_EST))+PAD;
+  const maxY=Math.max(...allItems.map(x=>x.baseY+H_EST))+PAD;
+  scale=Math.min(VW/(maxX-minX), VH/(maxY-minY), 1);
+  panX=(VW-(maxX-minX)*scale)/2 - minX*scale;
+  panY=(VH-(maxY-minY)*scale)/2 - minY*scale;
+  applyTransform();
+
+  document.getElementById('mapLoader').style.display='none';
+  mapBuilt=true;
+
+  // pan (pointer capture for clean stop on release anywhere)
+  const view=document.getElementById('mapView');
+  view.addEventListener('pointerdown', e=>{
+    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')||e.target.closest('#finderPanel')||e.target.closest('#mapAciklamaBtn')) return;
+    isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
+    view.setPointerCapture(e.pointerId);
+    view.style.cursor='grabbing';
+  });
+  view.addEventListener('pointermove', e=>{
+    if (!isPanning) return;
+    panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+  });
+  view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; });
+  view.addEventListener('pointercancel', ()=>{ isPanning=false; view.style.cursor=''; });
+
+  // scroll zoom
+  view.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const f=e.deltaY>0?.92:1.08;
+    const ns=Math.min(Math.max(scale*f,.1),5);
+    const rect=view.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    panX=mx-(mx-panX)*(ns/scale); panY=my-(my-panY)*(ns/scale);
+    scale=ns; applyTransform();
+  },{passive:false});
+
+  // touch handled by pointer events above
+}
+
+function openMap() {
+  document.getElementById('siteHeader').style.display='none';
+  document.getElementById('galleryWrap').style.display='none';
+  document.getElementById('sizeSliderWrap').style.display='none';
+  document.getElementById('commentToggleWrap').style.display='none';
+  document.getElementById('mapView').style.display='block';
+  document.body.style.overflow='hidden';
+  if (!mapBuilt && rows.length) buildMap();
+}
+
+function closeMap() {
+  document.getElementById('mapView').style.display='none';
+  document.getElementById('siteHeader').style.display='';
+  document.getElementById('galleryWrap').style.display='';
+  document.getElementById('sizeSliderWrap').style.display='flex';
+  document.getElementById('commentToggleWrap').style.display='flex';
+  document.body.style.overflow='';
+}
+
+// ── SHUFFLE ───────────────────────────────────────────────────
+function toggleShuffle() {
+  isShuffled=!isShuffled;
+  document.getElementById('mapShuffleBtn').classList.toggle('active',isShuffled);
+  isShuffled ? doShuffle() : returnCluster();
+}
+
+function doShuffle() {
+  let s=Date.now();
+  const rr=()=>{ s=(s*1664525+1013904223)>>>0; return s/0xffffffff; };
+  const VW=window.innerWidth/scale, VH=window.innerHeight/scale;
+  const offX=-panX/scale, offY=-panY/scale;
+  mapAllItems.forEach(item=>{
+    const PAD=20;
+    const w=parseInt(item.el.style.width)||80, h=parseInt(item.el.style.height)||100;
+    const tx=offX+PAD+rr()*(VW-w-PAD*2);
+    const ty=offY+PAD+rr()*(VH-h-PAD*2);
+    const rot=(rr()-.5)*22;
+    item.el.style.transition='left .7s cubic-bezier(.34,1.56,.64,1),top .7s cubic-bezier(.34,1.56,.64,1),transform .7s ease';
+    item.el.style.left=tx+'px'; item.el.style.top=ty+'px';
+    item.el.style.transform=`rotate(${rot}deg)`;
+    item.el.dataset.currentRot=rot;
+    item.shuffleX=tx; item.shuffleY=ty;
+  });
+  document.querySelectorAll('.map-cluster-label').forEach(l=>{l.style.transition='opacity .3s';l.style.opacity='0';});
+}
+
+function returnCluster() {
+  mapAllItems.forEach(item=>{
+    item.el.style.transition='left .6s cubic-bezier(.25,.46,.45,.94),top .6s cubic-bezier(.25,.46,.45,.94),transform .6s ease';
+    item.el.style.left=item.baseX+'px'; item.el.style.top=item.baseY+'px';
+    item.el.style.transform=`rotate(${item.baseRot}deg)`;
+    item.el.dataset.currentRot=item.baseRot;
+  });
+  document.querySelectorAll('.map-cluster-label').forEach(l=>{l.style.transition='opacity .4s .3s';l.style.opacity='1';});
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(idx) {
+  currentIdx=idx;
+  const row=rows[idx];
+  document.getElementById('modalImg').src=row.imgUrl;
+  const dot=document.getElementById('mColorDot'), hex=document.getElementById('mColorHex');
+  if (row.color){ dot.style.background=row.color; dot.style.display='block'; hex.textContent=row.color.toUpperCase(); }
+  else { dot.style.display='none'; hex.textContent=''; }
+  document.getElementById('mTitle').textContent=row.type||'';
+  document.getElementById('mDesc').textContent=row.description||'';
+  const lnk=document.getElementById('mLink');
+  if (row.pinterestUrl){ lnk.href=row.pinterestUrl; lnk.style.display='flex'; }
+  else lnk.style.display='none';
+  const pos=visibleIdx.indexOf(idx);
+  document.getElementById('modalCounter').textContent=`${pos>=0?pos+1:idx+1} / ${visibleIdx.length}`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function navModal(dir) {
+  if (currentIdx<0) return;
+  const pos=visibleIdx.indexOf(currentIdx);
+  if (pos<0) return;
+  openModal(visibleIdx[(pos+dir+visibleIdx.length)%visibleIdx.length]);
+}
+
+// ── STATUS ────────────────────────────────────────────────────
+function setStatus(s,t) {
+  document.getElementById('statusDot').className=`status-dot ${s}`;
+  document.getElementById('statusText').textContent=t;
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────
+document.addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  const m=document.getElementById('modal');
+  if (m.classList.contains('open')){
+    if (e.key==='Escape') closeModal();
+    if (e.key==='ArrowLeft') navModal(-1);
+    if (e.key==='ArrowRight') navModal(1);
+  } else if (document.getElementById('mapView').style.display!=='none'){
+    if (e.key==='Escape') closeMap();
+  }
+});
+
+document.getElementById('modal').addEventListener('click', e=>{
+  if (e.target===document.getElementById('modal')) closeModal();
+});
+
+document.getElementById('commentToggle').addEventListener('change', function(){
+  document.body.classList.toggle('show-comments', this.checked);
+});
+
+init();
+
+function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
+
+// ── RAPOR (tabbed) ─────────────────────────────────────────────
+let raporLoadedTabs = {};
+function openRapor(initialKey) {
+  document.getElementById('raporOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  buildRaporTabs();
+  switchRaporTab(initialKey || SECTION_DOCS[0].key);
+}
+function buildRaporTabs() {
+  const bar = document.getElementById('raporTabs');
+  if (bar.children.length) return;
+  SECTION_DOCS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'rapor-tab';
+    btn.textContent = s.label;
+    btn.dataset.key = s.key;
+    btn.onclick = () => switchRaporTab(s.key);
+    bar.appendChild(btn);
+  });
+}
+function switchRaporTab(key) {
+  document.querySelectorAll('.rapor-tab').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  const content = document.getElementById('raporContent');
+  if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
+  content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
+  fetch(RAPOR_BASE + key + '.docx')
+    .then(r => r.arrayBuffer())
+    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+}
+function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
+
+// ── BÖLÜM AÇIKLAMA ─────────────────────────────────────────────
+function openBolumAciklama() {
+  const key = document.getElementById('bolumAciklamaWrap').dataset.key;
+  if (key) openRapor(key);
+}
+
+// ── FINDER PANEL (map mode) ────────────────────────────────────
+let finderTabsBuilt = false;
+function toggleFinderPanel() {
+  const p = document.getElementById('finderPanel');
+  if (p.style.display === 'none') openFinderPanel();
+  else closeFinderPanel();
+}
+function openFinderPanel(key) {
+  const p = document.getElementById('finderPanel');
+  p.style.display = 'flex';
+  if (!finderTabsBuilt) { buildFinderTabs(); finderTabsBuilt = true; }
+  switchFinderTab(key || SECTION_DOCS[0].key);
+}
+function closeFinderPanel() {
+  document.getElementById('finderPanel').style.display = 'none';
+}
+function buildFinderTabs() {
+  const bar = document.getElementById('finderTabs');
+  SECTION_DOCS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'finder-tab';
+    btn.textContent = s.label;
+    btn.dataset.key = s.key;
+    btn.onclick = () => switchFinderTab(s.key);
+    bar.appendChild(btn);
+  });
+  // drag-by-titlebar using pointer capture
+  const titleBar = document.getElementById('finderTitleBar');
+  let dragDx, dragDy;
+  titleBar.addEventListener('pointerdown', e => {
+    if (e.target.id === 'finderCloseBtn') return;
+    const p = document.getElementById('finderPanel');
+    const r = p.getBoundingClientRect();
+    dragDx = e.clientX - r.left; dragDy = e.clientY - r.top;
+    titleBar.setPointerCapture(e.pointerId);
+  });
+  titleBar.addEventListener('pointermove', e => {
+    if (!titleBar.hasPointerCapture(e.pointerId)) return;
+    const p = document.getElementById('finderPanel');
+    p.style.left = (e.clientX - dragDx) + 'px';
+    p.style.top  = (e.clientY - dragDy) + 'px';
+  });
+}
+function switchFinderTab(key) {
+  document.querySelectorAll('.finder-tab').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  const content = document.getElementById('finderContent');
+  // reuse raporLoadedTabs cache
+  if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
+  content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em">Yükleniyor...</div>';
+  fetch(RAPOR_BASE + key + '.docx')
+    .then(r => r.arrayBuffer())
+    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRapor();closeFinderPanel()}});
+</script>
+
+<!-- ÖZET OVERLAY -->
+<div id="ozetOverlay" onclick="if(event.target===this)closeOzet()">
+  <button id="ozetClose" onclick="closeOzet()">✕</button>
+  <div id="ozetInner">
+    <div id="ozetContent">
+      <h2>Kürasyon Bilançosu</h2>
+      <h3>Genel Tanım</h3>
+      <p>Bu kürasyon bir estetik manifesto değil, bir malzeme düşüncesi. Her kategori aslında aynı soruyu farklı ölçeklerde soruyor: bir şey kendi doğasından koptuğunda ne olur? Kumaş taşıdığında, metal aktığında, masa giyindiğinde, bardak kirlendiğinde — o kopuş anı nedir?</p>
+      <h3>İskelet</h3>
+      <h3>Birinci eksen: Dönüşüm</h3>
+      <p>Kürasyon boyunca en çok tekrarlayan hareket şu — bir malzeme başka bir malzemenin dilini konuşuyor. Kumaş metal gibi duruyor, metal kumaş gibi akıyor, taş cam gibi davranıyor. Bu sadece estetik bir gözlem değil, bir üretim mantığı. "Bakteri × endüstri", "zanaat ve arsızlık" gibi notlar bu eksenin en net ifadesi. Dönüşüm burada bir süsleme değil, varoluş biçimi.</p>
+      <h3>İkinci eksen: Kontrol ve bırakma arasındaki gerilim</h3>
+      <p>Kürasyon iki uç arasında sürekli gidip geliyor. Bir yanda "kontrollü kaos", "ana referans" denen görseller — düzenli ama asla tam düzenli değil. Öte yanda "çok layerlı, o kadar layerlı ki kendinden çıkmış" diye reddedilen görseller. İstenen şey bu ikisi arasındaki eşik — ne tam kontrol ne tam bırakış. "Kontrollü bir dünyada kumaşların flörtözlük ve yaşanmışlık eklemesi" notu bu eksenin tam ortasını tarif ediyor.</p>
+      <h3>Üçüncü eksen: Ölçek kayması</h3>
+      <p>Kürasyon büyük mimari jestlerden (tepeden sarkıtılan kumaşlar, koolhaas bölünmeleri) çok küçük anlamlara (tabi arasındaki bardak, bulaşıktaki kirli kadeh) gidiyor. Ve en güçlü notlar çoğunlukla küçük ölçekte. "Küçük ölçekte de çalışabilecek bir fikir", "tek noktadan vurulmalı ve o nokta her şeyi tanımlıyor" — bu kürasyon büyük jesti reddederken küçük jesti yüceltiyor.</p>
+      <h3>Kategorilerin Birbiriyle İlişkisi</h3>
+      <p>Drape sahneyi kuruyor — dış kabuk, mekânın dili.<br>Metal kumaş ilişkisi malzemenin kendisini kuruyor — iç dönüşüm, maddenin dili.<br>Sergi platform bu ikisinin taşıyıcısını kuruyor — strüktür, iskelet.<br>Yaşanmışlık hepsinin sonrasına bakıyor — kullanım izi, zamanın dili.<br>Mekan bunların hepsinin içinde yaşadığı atmosferi kuruyor.<br>Editöryel bu sistemi nasıl göstereceğini soruyor — temsil, görsel dil.<br>Booklet ise bu sistemi nasıl taşıyacağını soruyor — kalıcılık, nesne olarak belge.</p>
+      <p>Bu yedi kategori aslında tek bir sorunun yedi farklı katmanı: EDETRI bir sahne kurarken neye bakıyor, neyle bakıyor, ne bırakıyor?</p>
+      <h3>Reddiyeler Sistemi</h3>
+      <p>Kürasyon neyi istediği kadar neyi istemediği konusunda da çok net. "Hayır", "bizlik değil", "fazla vintage", "fazla flörtöz", "alakasız", "fazla hightech" — bu reddiyeler rastgele değil, bir sınır çiziyor.</p>
+      <p>Red edilen şeyler üç grupta toplanıyor:</p>
+      <ul>
+        <li>Çok temiz olanlar — steril, simetrik, tam düzenli. Yaşanmamış.</li>
+        <li>Çok kaotik olanlar — "kendinden çıkmış", efekt objeyi yutmuş, mesaj kaybolmuş.</li>
+        <li>Yanlış referans taşıyanlar — fazla vintage, fazla hightech, fazla moda, yanlış çağrışım alanı.</li>
+      </ul>
+      <h3>Bu Kürasyonun Report-v4-3'e Kattığı</h3>
+      <p>Report'ta "The Split" bir konsept olarak vardı — iki dünyanın aynı karede buluşması. Kürasyon bunu somutlaştırıyor ve genişletiyor.</p>
+      <p>Report'ta olmayan ama kürasyonda güçlü çıkan birkaç şey var:</p>
+      <p>Kullanım izinin estetik değeri. Yaşanmışlık kategorisi bunu doğrudan söylüyor. Bitmiş masa, kirli bardak, dökülen şey — bunlar hata değil, içerik. Report "bırakılmış his" diyor ama kürasyon bunu çok daha somut bir yere taşıyor: "sırf masaları çekmek için yemek düzenlemek."</p>
+      <p>Ölçek kararı. Report büyük bir vizyon çiziyor — WebXR, hero kampanya, sergi. Kürasyon sürekli küçük ölçeğe çekiyor. "Tek noktadan vurulmalı", "küçük ölçekte de çalışır." Bu bir gerilim — üçüncü aşama raporda çözüme kavuşturulmalı.</p>
+      <p>Malzemenin kendi sesi. Kürasyon boyunca en güçlü notlar malzemenin "yanlış" davrandığı anlara yazılmış. Metal aktığında, kumaş taşıdığında, taş cam gibi konuştuğunda. Bu, EDETRI'nin ürün dilini de tarif ediyor aslında — cam ve seramik zaten "doğasından kopan" malzemeler. Ateşte şekillenen, sonra donup kalan.</p>
+      <h3>Üçüncü Aşama İçin Çerçeve</h3>
+      <p>Bu kürasyondan çıkan sistem şu soruyu sormak zorunda:</p>
+      <p>EDETRI bir sahne kurarken — sergi, sofra, görsel, fiziksel nesne — hangi anda duruyor? Tam düzenmeden önce mi, tam bırakmadan önce mi? O eşik neresi?</p>
+      <p>Bu sorunun cevabı hem sergi masasının tasarım kararını, hem fotoğraf dilini, hem booklet'in fiziksel yapısını, hem sosyal medya tonunu belirliyor. Kürasyon bu eşiği gösterdi — üçüncü aşama onu tanımlamalı.</p>
+    </div>
+  </div>
+</div>
+
+<!-- RAPOR OVERLAY -->
+<div id="raporOverlay" onclick="if(event.target===this)closeRapor()">
+  <button id="raporClose" onclick="closeRapor()">✕</button>
+  <div id="raporInner">
+    <div id="raporTabs"></div>
+    <div id="raporContent"></div>
+  </div>
+</div>
+</body>
+</html>
