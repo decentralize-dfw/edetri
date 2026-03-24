@@ -28,32 +28,40 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-map{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 13px;cursor:pointer;transition:all .2s;white-space:nowrap;text-transform:uppercase}
 .btn-map:hover{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.08)}
 
+/* DOCUMENT TYPOGRAPHY (shared by all docx content areas) */
+.doc-content{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.85}
+.doc-content h1{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:20px;color:var(--cream);letter-spacing:.02em;margin:2.2em 0 .7em;line-height:1.25;border-bottom:1px solid rgba(176,168,144,.1);padding-bottom:.4em}
+.doc-content h2{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:10px;color:var(--copper);text-transform:uppercase;letter-spacing:.22em;margin:2em 0 .5em}
+.doc-content h3{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:9px;color:var(--silver);text-transform:uppercase;letter-spacing:.18em;margin:1.6em 0 .4em}
+.doc-content h4{font-family:'IBM Plex Mono',monospace;font-weight:300;font-size:8px;color:rgba(176,168,144,.45);text-transform:uppercase;letter-spacing:.16em;margin:1.3em 0 .3em}
+.doc-content p{margin:0 0 .9em;text-align:justify;text-align-last:left}
+.doc-content strong{font-weight:500;color:var(--cream)}
+.doc-content em{font-style:italic;color:var(--gold);font-weight:300}
+.doc-content ul,.doc-content ol{padding-left:1.4em;margin:0 0 .9em}
+.doc-content li{margin-bottom:.35em;text-align:justify;text-align-last:left}
+.doc-content ul li::marker{color:rgba(168,104,40,.6)}
+.doc-content ol li::marker{color:rgba(168,104,40,.6);font-family:'IBM Plex Mono',monospace;font-size:10px}
+.doc-content blockquote{border-left:2px solid rgba(168,104,40,.35);padding:.2em 0 .2em 1em;margin:1em 0;font-style:italic;color:rgba(176,168,144,.65)}
+.doc-content a{color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,104,40,.3)}
+.doc-content a:hover{border-bottom-color:var(--copper)}
+
 /* ÖZET OVERLAY */
-#ozetOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto}
+#ozetOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
 #ozetOverlay.open{display:block}
+#ozetOverlay::-webkit-scrollbar{width:4px}
+#ozetOverlay::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
 #ozetInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
 #ozetClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
 #ozetClose:hover{color:var(--copper)}
-#ozetContent{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.8}
-#ozetContent h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:2em 0 .5em;font-weight:400}
-#ozetContent h3{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.6em 0 .4em;font-weight:400}
-#ozetContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
-#ozetContent ul{padding-left:1.2em;margin:0 0 1em}
-#ozetContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
 
 /* RAPOR OVERLAY */
-#raporOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto}
+#raporOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
 #raporOverlay.open{display:block}
+#raporOverlay::-webkit-scrollbar{width:4px}
+#raporOverlay::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
 #raporInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
 #raporClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
 #raporClose:hover{color:var(--copper)}
-#raporContent{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.8}
-#raporContent h1,#raporContent h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:2em 0 .5em;font-weight:400}
-#raporContent h3,#raporContent h4{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.6em 0 .4em;font-weight:400}
-#raporContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
-#raporContent ul,#raporContent ol{padding-left:1.2em;margin:0 0 1em}
-#raporContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
-#raporContent strong{font-weight:400;color:var(--cream)}
 #raporLoading{color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0}
 
 /* FILTER BAR */
@@ -161,26 +169,32 @@ body.show-comments .card-desc{display:block}
 #bolumAciklamaWrap{padding:0 0 10px}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
-/* MAP AÇIKLAMA BUTTON */
-#mapAciklamaBtn{position:fixed;top:48px;left:24px;font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(176,168,144,.6);letter-spacing:.1em;z-index:1002;cursor:pointer;transition:color .2s;user-select:none}
-#mapAciklamaBtn:hover{color:rgba(176,168,144,.9)}
+/* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
+.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:9px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.28);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
+.map-cluster-aciklama-btn:hover{color:var(--copper)}
 
-/* FINDER PANEL */
-#finderPanel{position:fixed;z-index:350;background:rgba(9,8,7,.96);backdrop-filter:blur(16px);border:1px solid rgba(176,168,144,.18);width:480px;height:420px;min-width:260px;min-height:180px;display:flex;flex-direction:column;top:80px;left:24px;overflow:hidden;resize:both}
-#finderTitleBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(176,168,144,.12);cursor:move;user-select:none;flex-shrink:0}
-#finderTitleText{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--silver);text-transform:uppercase}
-#finderCloseBtn{background:none;border:none;color:rgba(176,168,144,.4);cursor:pointer;font-size:14px;line-height:1;padding:0;transition:color .2s}
-#finderCloseBtn:hover{color:var(--silver)}
-#finderTabs{display:flex;gap:2px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid rgba(176,168,144,.08);flex-shrink:0}
-.finder-tab{background:none;border:none;color:rgba(176,168,144,.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent}
-.finder-tab:hover{color:var(--silver)}
-.finder-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
-#finderContent{flex:1;overflow-y:auto;padding:20px 24px;color:var(--cream);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.7}
-#finderContent h1,#finderContent h2{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:1.8em 0 .4em;font-weight:400}
-#finderContent h3,#finderContent h4{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.4em 0 .3em;font-weight:400}
-#finderContent p{text-align:justify;text-align-last:left;margin:0 0 .8em}
-#finderContent ul,#finderContent ol{padding-left:1.2em;margin:0 0 .8em}
-#finderContent li{margin-bottom:.3em}
+/* CLUSTER PANEL (floating docx windows, multiple can be open) */
+.cluster-panel{position:fixed;z-index:1100;background:rgba(8,7,6,.97);backdrop-filter:blur(20px);border:1px solid rgba(176,168,144,.13);width:400px;height:480px;min-width:240px;min-height:160px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.75);overflow:visible}
+.cp-titlebar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(176,168,144,.09);cursor:grab;user-select:none;flex-shrink:0}
+.cp-titlebar:active{cursor:grabbing}
+.cp-title{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;font-weight:400;color:rgba(176,168,144,.65);letter-spacing:.06em}
+.cp-close{background:none;border:none;color:rgba(176,168,144,.3);font-size:13px;cursor:pointer;padding:0;line-height:1;transition:color .15s}
+.cp-close:hover{color:var(--copper)}
+.cp-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 20px 16px;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.25) transparent}
+.cp-content::-webkit-scrollbar{width:3px}
+.cp-content::-webkit-scrollbar-track{background:transparent}
+.cp-content::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
+.cp-content::-webkit-scrollbar-thumb:hover{background:rgba(168,104,40,.6)}
+/* 8-way resize handles */
+.cp-resize{position:absolute;z-index:10;user-select:none}
+.cp-resize-n{top:-4px;left:10px;right:10px;height:8px;cursor:n-resize}
+.cp-resize-s{bottom:-4px;left:10px;right:10px;height:8px;cursor:s-resize}
+.cp-resize-e{right:-4px;top:10px;bottom:10px;width:8px;cursor:e-resize}
+.cp-resize-w{left:-4px;top:10px;bottom:10px;width:8px;cursor:w-resize}
+.cp-resize-ne{top:-4px;right:-4px;width:12px;height:12px;cursor:ne-resize}
+.cp-resize-nw{top:-4px;left:-4px;width:12px;height:12px;cursor:nw-resize}
+.cp-resize-se{bottom:-4px;right:-4px;width:12px;height:12px;cursor:se-resize}
+.cp-resize-sw{bottom:-4px;left:-4px;width:12px;height:12px;cursor:sw-resize}
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
@@ -192,22 +206,12 @@ body.show-comments .card-desc{display:block}
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
   <div class="map-title-label">EDETRI — Constellation</div>
-  <div id="mapAciklamaBtn" onclick="toggleFinderPanel()">+ açıklama</div>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
   <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
   <div id="mapStage"></div>
   <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
   <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
   <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
-  <!-- FINDER PANEL -->
-  <div id="finderPanel" style="display:none">
-    <div id="finderTitleBar">
-      <span id="finderTitleText">Bölüm Açıklamaları</span>
-      <button id="finderCloseBtn" onclick="closeFinderPanel()">✕</button>
-    </div>
-    <div id="finderTabs"></div>
-    <div id="finderContent"></div>
-  </div>
 </div>
 
 <!-- HEADER — hidden until map closed -->
@@ -304,9 +308,13 @@ function toSlug(s) {
   return s.toLowerCase()
     .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
     .replace(/ö/g,'o').replace(/ç/g,'c').replace(/ı/g,'i')
-    .replace(/[^a-z0-9\s]/g,'')
-    .replace(/\s+/g,'-')
-    .replace(/-+/g,'-');
+    .replace(/[^a-z0-9\s]/g,' ')
+    .trim()
+    .replace(/\s+/g,'-');
+}
+function findDocForType(t) {
+  const slug = toSlug(t);
+  return SECTION_DOCS.find(s => slug === s.key || slug.startsWith(s.key + '-'));
 }
 
 let rows = [], visibleIdx = [], currentIdx = -1;
@@ -381,10 +389,9 @@ function applyFilter(f) {
   // show/hide bölüm açıklama button
   const wrap = document.getElementById('bolumAciklamaWrap');
   if (f !== 'all') {
-    const slug = toSlug(f);
-    const hasDoc = SECTION_DOCS.some(s => s.key === slug);
-    wrap.style.display = hasDoc ? '' : 'none';
-    wrap.dataset.key = slug;
+    const section = findDocForType(f);
+    wrap.style.display = section ? '' : 'none';
+    if (section) wrap.dataset.key = section.key;
   } else {
     wrap.style.display = 'none';
   }
@@ -450,9 +457,9 @@ function buildMap() {
     const n=group.length;
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
-      const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.8;
-      const ring=Math.floor(j/8);
-      const dist=60+ring*90+rng()*70;
+      const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
+      const ring=Math.floor(j/6);
+      const dist=90+ring*130+rng()*35;
       const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
       const sr=rng();
       const w=sr<.12?120:sr<.38?85:58;
@@ -534,7 +541,14 @@ function buildMap() {
     const nm=document.createElement('div'); nm.className='map-cluster-name'; nm.textContent=t;
     const cnt=document.createElement('div'); cnt.className='map-cluster-count';
     cnt.textContent=`${rows.filter(r=>r.type===t).length} items`;
-    lbl.appendChild(nm); lbl.appendChild(cnt); stage.appendChild(lbl);
+    lbl.appendChild(nm); lbl.appendChild(cnt);
+    const sec=findDocForType(t);
+    if (sec) {
+      const ab=document.createElement('div'); ab.className='map-cluster-aciklama-btn'; ab.textContent='açıklama';
+      ab.addEventListener('click',e=>{e.stopPropagation();openClusterPanel(sec.key,ab);});
+      lbl.appendChild(ab);
+    }
+    stage.appendChild(lbl);
   });
 
   // fit to screen — use approximate sizes since DOM not yet painted
@@ -554,7 +568,7 @@ function buildMap() {
   // pan (pointer capture for clean stop on release anywhere)
   const view=document.getElementById('mapView');
   view.addEventListener('pointerdown', e=>{
-    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')||e.target.closest('#finderPanel')||e.target.closest('#mapAciklamaBtn')) return;
+    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
     isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
     view.setPointerCapture(e.pointerId);
     view.style.cursor='grabbing';
@@ -736,70 +750,111 @@ function openBolumAciklama() {
   if (key) openRapor(key);
 }
 
-// ── FINDER PANEL (map mode) ────────────────────────────────────
-let finderTabsBuilt = false;
-function toggleFinderPanel() {
-  const p = document.getElementById('finderPanel');
-  if (p.style.display === 'none') openFinderPanel();
-  else closeFinderPanel();
+// ── CLUSTER PANELS (per-cluster floating docx windows) ─────────
+const clusterPanelCache = {};
+let _panelZ = 1100;
+function nextPanelZ(){ return ++_panelZ; }
+
+function openClusterPanel(key, anchorEl) {
+  if (!clusterPanelCache[key]) {
+    clusterPanelCache[key] = createClusterPanel(key);
+    document.getElementById('mapView').appendChild(clusterPanelCache[key]);
+  }
+  const panel = clusterPanelCache[key];
+  if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
+  const r = anchorEl.getBoundingClientRect();
+  panel.style.left = Math.max(0, Math.min(r.left + 20, window.innerWidth - 420)) + 'px';
+  panel.style.top  = Math.max(0, Math.min(r.bottom + 10, window.innerHeight - 500)) + 'px';
+  panel.style.display = 'flex';
+  panel.style.zIndex = nextPanelZ();
+  loadClusterPanel(key, panel);
 }
-function openFinderPanel(key) {
-  const p = document.getElementById('finderPanel');
-  p.style.display = 'flex';
-  if (!finderTabsBuilt) { buildFinderTabs(); finderTabsBuilt = true; }
-  switchFinderTab(key || SECTION_DOCS[0].key);
+
+function createClusterPanel(key) {
+  const sec = SECTION_DOCS.find(s => s.key === key);
+  const panel = document.createElement('div');
+  panel.className = 'cluster-panel';
+  panel.dataset.key = key;
+  panel.style.display = 'none';
+  panel.innerHTML =
+    '<div class="cp-titlebar">' +
+      '<span class="cp-title">' + (sec ? sec.label : key) + '</span>' +
+      '<button class="cp-close">✕</button>' +
+    '</div>' +
+    '<div class="cp-content doc-content"></div>' +
+    '<div class="cp-resize cp-resize-n"></div>' +
+    '<div class="cp-resize cp-resize-ne"></div>' +
+    '<div class="cp-resize cp-resize-e"></div>' +
+    '<div class="cp-resize cp-resize-se"></div>' +
+    '<div class="cp-resize cp-resize-s"></div>' +
+    '<div class="cp-resize cp-resize-sw"></div>' +
+    '<div class="cp-resize cp-resize-w"></div>' +
+    '<div class="cp-resize cp-resize-nw"></div>';
+  panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
+  panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
+  setupPanelDrag(panel);
+  setupPanelResize(panel);
+  return panel;
 }
-function closeFinderPanel() {
-  document.getElementById('finderPanel').style.display = 'none';
-}
-function buildFinderTabs() {
-  const bar = document.getElementById('finderTabs');
-  SECTION_DOCS.forEach(s => {
-    const btn = document.createElement('button');
-    btn.className = 'finder-tab';
-    btn.textContent = s.label;
-    btn.dataset.key = s.key;
-    btn.onclick = () => switchFinderTab(s.key);
-    bar.appendChild(btn);
-  });
-  // drag-by-titlebar using pointer capture
-  const titleBar = document.getElementById('finderTitleBar');
-  let dragDx, dragDy;
-  titleBar.addEventListener('pointerdown', e => {
-    if (e.target.id === 'finderCloseBtn') return;
-    const p = document.getElementById('finderPanel');
-    const r = p.getBoundingClientRect();
-    dragDx = e.clientX - r.left; dragDy = e.clientY - r.top;
-    titleBar.setPointerCapture(e.pointerId);
-  });
-  titleBar.addEventListener('pointermove', e => {
-    if (!titleBar.hasPointerCapture(e.pointerId)) return;
-    const p = document.getElementById('finderPanel');
-    p.style.left = (e.clientX - dragDx) + 'px';
-    p.style.top  = (e.clientY - dragDy) + 'px';
-  });
-}
-function switchFinderTab(key) {
-  document.querySelectorAll('.finder-tab').forEach(b => b.classList.toggle('active', b.dataset.key === key));
-  const content = document.getElementById('finderContent');
-  // reuse raporLoadedTabs cache
-  if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
-  content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em">Yükleniyor...</div>';
+
+function loadClusterPanel(key, panel) {
+  const content = panel.querySelector('.cp-content');
+  if (content.dataset.loaded) return;
+  if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; content.dataset.loaded = '1'; return; }
+  content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:20px 0">Yükleniyor...</div>';
   fetch(RAPOR_BASE + key + '.docx')
     .then(r => r.arrayBuffer())
     .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
-    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRapor();closeFinderPanel()}});
+function setupPanelDrag(panel) {
+  const tb = panel.querySelector('.cp-titlebar');
+  let dx, dy;
+  tb.addEventListener('pointerdown', e => {
+    if (e.target.classList.contains('cp-close')) return;
+    e.stopPropagation();
+    const r = panel.getBoundingClientRect();
+    dx = e.clientX - r.left; dy = e.clientY - r.top;
+    tb.setPointerCapture(e.pointerId);
+  });
+  tb.addEventListener('pointermove', e => {
+    if (!tb.hasPointerCapture(e.pointerId)) return;
+    panel.style.left = (e.clientX - dx) + 'px';
+    panel.style.top  = (e.clientY - dy) + 'px';
+  });
+}
+
+function setupPanelResize(panel) {
+  panel.querySelectorAll('.cp-resize').forEach(handle => {
+    const dir = handle.className.replace(/.*cp-resize-/,'');
+    let sw, sh, sx, sy, sl, st;
+    handle.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      handle.setPointerCapture(e.pointerId);
+      const r = panel.getBoundingClientRect();
+      sw=r.width; sh=r.height; sx=e.clientX; sy=e.clientY; sl=r.left; st=r.top;
+    });
+    handle.addEventListener('pointermove', e => {
+      if (!handle.hasPointerCapture(e.pointerId)) return;
+      const dx=e.clientX-sx, dy=e.clientY-sy, MW=240, MH=160;
+      if (dir.includes('e')) panel.style.width  = Math.max(MW, sw+dx) + 'px';
+      if (dir.includes('s')) panel.style.height = Math.max(MH, sh+dy) + 'px';
+      if (dir.includes('w')) { const nw=Math.max(MW,sw-dx); panel.style.width=nw+'px'; panel.style.left=(sl+sw-nw)+'px'; }
+      if (dir.includes('n')) { const nh=Math.max(MH,sh-dy); panel.style.height=nh+'px'; panel.style.top=(st+sh-nh)+'px'; }
+    });
+  });
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeRapor();} });
 </script>
 
 <!-- ÖZET OVERLAY -->
 <div id="ozetOverlay" onclick="if(event.target===this)closeOzet()">
   <button id="ozetClose" onclick="closeOzet()">✕</button>
   <div id="ozetInner">
-    <div id="ozetContent">
+    <div id="ozetContent" class="doc-content">
       <h2>Kürasyon Bilançosu</h2>
       <h3>Genel Tanım</h3>
       <p>Bu kürasyon bir estetik manifesto değil, bir malzeme düşüncesi. Her kategori aslında aynı soruyu farklı ölçeklerde soruyor: bir şey kendi doğasından koptuğunda ne olur? Kumaş taşıdığında, metal aktığında, masa giyindiğinde, bardak kirlendiğinde — o kopuş anı nedir?</p>
@@ -840,7 +895,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRa
   <button id="raporClose" onclick="closeRapor()">✕</button>
   <div id="raporInner">
     <div id="raporTabs"></div>
-    <div id="raporContent"></div>
+    <div id="raporContent" class="doc-content"></div>
   </div>
 </div>
 </body>
