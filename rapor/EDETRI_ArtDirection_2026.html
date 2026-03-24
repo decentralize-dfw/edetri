@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDETRI — Art Direction & Uygulama Simülasyonları 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Unbounded:wght@200;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0d;
+    --paper: #f5f2ed;
+    --warm: #c8b89a;
+    --accent: #2a1f14;
+    --dust: #d4ccc0;
+    --rust: #8b4513;
+    --pale: #ede8e0;
+    --gold: #b8960c;
+    --gap: 80px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    height: 100vh;
+    min-height: 700px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover-left {
+    background: var(--accent);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px;
+    position: relative;
+  }
+
+  .cover-left::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(255,255,255,0.03) 39px,
+      rgba(255,255,255,0.03) 40px
+    );
+  }
+
+  .cover-brand {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 200;
+    font-size: 52px;
+    letter-spacing: 24px;
+    color: var(--paper);
+    line-height: 1;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-brand span {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: var(--warm);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    margin-top: 16px;
+  }
+
+  .cover-meta {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .cover-meta-item label {
+    display: block;
+    color: var(--warm);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cover-meta-item value {
+    display: block;
+    color: var(--paper);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .cover-right {
+    background: var(--pale);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    position: relative;
+  }
+
+  .cover-diagram {
+    width: 300px;
+    height: 300px;
+    position: relative;
+  }
+
+  .cover-diagram svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .cover-sub {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .cover-sub p {
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 1px;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .nav-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--paper);
+    padding: 14px 28px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
+  }
+
+  .nav-links {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-link {
+    padding: 14px 20px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--warm);
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 0.2s;
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .nav-link:hover { color: var(--paper); }
+
+  /* ── SECTION ── */
+  .section {
+    padding: var(--gap) 0;
+    border-bottom: 1px solid var(--dust);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 0;
+    align-items: start;
+    margin-bottom: 60px;
+  }
+
+  .section-number {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    color: var(--dust);
+    line-height: 1;
+    padding-top: 4px;
+  }
+
+  .section-title-block h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 36px;
+    color: var(--accent);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .section-title-block .tag {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--warm);
+  }
+
+  /* ── DNA UYUM ── */
+  .dna-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+  }
+
+  .dna-card {
+    background: var(--pale);
+    padding: 28px 20px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .dna-card:hover { transform: translateY(-4px); }
+
+  .dna-card-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 16px;
+  }
+
+  .dna-score-bar {
+    height: 3px;
+    background: var(--dust);
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .dna-score-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--accent);
+    transition: width 1s ease;
+  }
+
+  .dna-score-label {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .dna-vs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .dna-vs-item {
+    font-size: 9px;
+    line-height: 1.5;
+    padding: 8px;
+    background: white;
+  }
+
+  .dna-vs-item.current {
+    border-left: 2px solid var(--warm);
+    color: #888;
+  }
+
+  .dna-vs-item.target {
+    border-left: 2px solid var(--accent);
+    color: var(--accent);
+  }
+
+  .dna-vs-item .item-tag {
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.6;
+  }
+
+  /* ── UCURUM ── */
+  .gap-analysis {
+    background: var(--accent);
+    padding: 60px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gap-analysis::before {
+    content: 'UÇURUM';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 80px;
+    color: rgba(255,255,255,0.04);
+    letter-spacing: 10px;
+    white-space: nowrap;
+  }
+
+  .gap-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: var(--warm);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .gap-table {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 0;
+    align-items: start;
+  }
+
+  .gap-col-header {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .gap-row {
+    display: contents;
+  }
+
+  .gap-cell {
+    padding: 12px 0;
+    font-size: 10px;
+    color: rgba(245,242,237,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    line-height: 1.5;
+  }
+
+  .gap-cell.highlight {
+    color: var(--paper);
+    font-style: italic;
+  }
+
+  .gap-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+    color: var(--warm);
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* ── SIMULATION ── */
+  .sim-section {
+    margin-bottom: 60px;
+  }
+
+  .sim-area-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .sim-area-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sim-area-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--paper);
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .sim-area-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .sim-area-sub {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #aaa;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sim-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .sim-card {
+    padding: 28px 24px;
+    position: relative;
+  }
+
+  .sim-card.a { background: #eef2ee; border-top: 3px solid #4a7c59; }
+  .sim-card.b { background: #f5f0e8; border-top: 3px solid #c4902a; }
+  .sim-card.c { background: #f5ecec; border-top: 3px solid #8b3a3a; }
+
+  .sim-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .sim-card-tag {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--accent);
+  }
+
+  .sim-risk {
+    font-size: 8px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .sim-risk.low { background: #4a7c59; color: white; }
+  .sim-risk.mid { background: #c4902a; color: white; }
+  .sim-risk.high { background: #8b3a3a; color: white; }
+  .sim-risk.midhigh { background: #a05020; color: white; }
+
+  .sim-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+
+  .sim-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .sim-flow-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 9px;
+    line-height: 1.5;
+    color: #555;
+  }
+
+  .sim-flow-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .sim-card.a .sim-flow-dot { background: #4a7c59; }
+  .sim-card.b .sim-flow-dot { background: #c4902a; }
+  .sim-card.c .sim-flow-dot { background: #8b3a3a; }
+
+  .sim-outcome {
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(255,255,255,0.6);
+    font-size: 9px;
+    line-height: 1.5;
+    color: var(--accent);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+  }
+
+  .sim-rec {
+    margin-top: 10px;
+    padding: 8px;
+    border-left: 2px solid;
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  .sim-card.a .sim-rec { border-color: #4a7c59; color: #4a7c59; }
+  .sim-card.b .sim-rec { border-color: #c4902a; color: #8b5a10; }
+  .sim-card.c .sim-rec { border-color: #8b3a3a; color: #8b3a3a; }
+
+  /* ── PRIORITY ── */
+  .priority-visual {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 120px;
+    gap: 2px;
+    align-items: stretch;
+  }
+
+  .priority-header {
+    background: var(--accent);
+    color: var(--warm);
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .priority-row {
+    display: contents;
+  }
+
+  .priority-num {
+    background: var(--pale);
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: var(--dust);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    border-bottom: 2px solid white;
+  }
+
+  .priority-num.active { color: var(--accent); }
+
+  .priority-area {
+    background: var(--pale);
+    padding: 24px;
+    border-bottom: 2px solid white;
+  }
+
+  .priority-area-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .priority-area-why {
+    font-size: 9px;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  .priority-impact {
+    background: var(--pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    border-bottom: 2px solid white;
+    position: relative;
+  }
+
+  .priority-speed {
+    background: var(--pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    border-bottom: 2px solid white;
+  }
+
+  .impact-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .impact-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .impact-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+  }
+
+  .impact-dot.filled { background: var(--accent); }
+
+  .impact-label {
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .speed-pills {
+    display: flex;
+    gap: 3px;
+  }
+
+  .speed-pill {
+    width: 16px;
+    height: 6px;
+    border-radius: 3px;
+    border: 1.5px solid #aaa;
+  }
+
+  .speed-pill.filled { background: var(--rust); border-color: var(--rust); }
+
+  /* ── RULE ── */
+  .rule-box {
+    background: var(--accent);
+    padding: 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin: 40px 0;
+  }
+
+  .rule-box::before {
+    content: '';
+    position: absolute;
+    inset: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    pointer-events: none;
+  }
+
+  .rule-question {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 28px;
+    color: var(--paper);
+    line-height: 1.4;
+    max-width: 600px;
+    margin: 0 auto 24px;
+  }
+
+  .rule-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--warm);
+  }
+
+  /* ── BRAND DNA WHEEL ── */
+  .wheel-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    padding: 40px 0;
+  }
+
+  .wheel-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .wheel-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .wheel-legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .wheel-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .wheel-legend-text strong {
+    display: block;
+    font-size: 10px;
+    color: var(--accent);
+    margin-bottom: 2px;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .wheel-legend-text span {
+    font-size: 9px;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* ── CATEGORY GRID (Bölüm 1) ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .cat-card {
+    background: var(--pale);
+    padding: 20px 16px;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.2s;
+    cursor: default;
+  }
+
+  .cat-card:hover { background: var(--accent); }
+  .cat-card:hover .cat-title { color: var(--paper); }
+  .cat-card:hover .cat-keyword { color: var(--warm); }
+  .cat-card:hover .cat-tag { color: var(--dust); }
+  .cat-card:hover .cat-icon path,
+  .cat-card:hover .cat-icon circle,
+  .cat-card:hover .cat-icon line,
+  .cat-card:hover .cat-icon rect { stroke: var(--warm); }
+
+  .cat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--dust);
+    line-height: 1;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .cat-card:hover .cat-num { color: rgba(255,255,255,0.2); }
+
+  .cat-icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 12px;
+  }
+
+  .cat-icon path, .cat-icon circle, .cat-icon line, .cat-icon rect {
+    stroke: var(--accent);
+    transition: stroke 0.2s;
+  }
+
+  .cat-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 8px;
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+
+  .cat-keyword {
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .cat-tags {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  .cat-tag {
+    font-size: 7px;
+    padding: 2px 6px;
+    border: 1px solid var(--dust);
+    color: #999;
+    letter-spacing: 0.5px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .cat-card:hover .cat-tag { border-color: rgba(255,255,255,0.2); }
+
+  /* ── EŞIK DIAGRAM ── */
+  .esik-diagram {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+  }
+
+  /* ── QUOTE ── */
+  .pull-quote {
+    border-left: 3px solid var(--accent);
+    padding: 20px 32px;
+    margin: 40px 0;
+    background: var(--pale);
+  }
+
+  .pull-quote p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--accent);
+    padding: 40px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-brand {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 200;
+    font-size: 18px;
+    letter-spacing: 10px;
+    color: var(--paper);
+  }
+
+  .footer-meta {
+    text-align: right;
+  }
+
+  .footer-meta p {
+    font-size: 9px;
+    color: var(--warm);
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0;
+  }
+
+  .divider-line { flex: 1; height: 1px; background: var(--dust); }
+  .divider-text {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--warm);
+    white-space: nowrap;
+  }
+
+  /* ── MATRIX ── */
+  .matrix {
+    display: grid;
+    grid-template-columns: 120px repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .matrix-cell {
+    padding: 16px;
+    background: var(--pale);
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  .matrix-header {
+    background: var(--accent);
+    color: var(--warm);
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .matrix-label {
+    background: #e8e3db;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #888;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+  }
+
+  .matrix-cell.a-cell { border-top: 2px solid #4a7c59; }
+  .matrix-cell.b-cell { border-top: 2px solid #c4902a; }
+  .matrix-cell.c-cell { border-top: 2px solid #8b3a3a; }
+
+  /* ── STATUS BADGE ── */
+  .status { display: inline-flex; align-items: center; gap: 6px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .status-dot.guclu { background: #4a7c59; }
+  .status-dot.orta { background: #c4902a; }
+  .status-dot.eksik { background: #8b3a3a; }
+
+  /* animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate { animation: fadeUp 0.7s ease forwards; }
+
+  .section-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--warm);
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════
+     COVER
+════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-left">
+    <div class="cover-brand">
+      EDETRI
+      <span>ART DIRECTION & UYGULAMA SİMÜLASYONLARI</span>
+    </div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <label>Tarih</label>
+        <value>Mart 2026</value>
+      </div>
+      <div class="cover-meta-item">
+        <label>Kapsam</label>
+        <value>Görsel · Ürün · Event · Basılı Yayın</value>
+      </div>
+      <div class="cover-meta-item">
+        <label>Metodoloji</label>
+        <value>DNA Analizi + 4 Alan × 3 Simülasyon</value>
+      </div>
+      <div class="cover-meta-item">
+        <label>Hedef</label>
+        <value>Kurucu · Ajans · Yatırımcı</value>
+      </div>
+    </div>
+  </div>
+  <div class="cover-right">
+    <div class="cover-diagram">
+      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer ring -->
+        <circle cx="150" cy="150" r="130" fill="none" stroke="#d4ccc0" stroke-width="1"/>
+        <!-- Mid ring -->
+        <circle cx="150" cy="150" r="90" fill="none" stroke="#d4ccc0" stroke-width="1"/>
+        <!-- Inner ring -->
+        <circle cx="150" cy="150" r="50" fill="#2a1f14" stroke="none"/>
+        <!-- Center text -->
+        <text x="150" y="146" font-family="'Unbounded', sans-serif" font-size="8" fill="#f5f2ed" text-anchor="middle" letter-spacing="3">EŞIK</text>
+        <text x="150" y="160" font-family="'Cormorant Garamond', serif" font-size="9" fill="#c8b89a" text-anchor="middle" font-style="italic">threshold</text>
+
+        <!-- 5 axes — DNA dimensions -->
+        <!-- Kimlik -->
+        <line x1="150" y1="150" x2="150" y2="22" stroke="#2a1f14" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="150" cy="38" r="22" fill="#2a1f14"/>
+        <text x="150" y="34" font-family="'DM Mono', monospace" font-size="7" fill="#f5f2ed" text-anchor="middle">KİMLİK</text>
+        <text x="150" y="46" font-family="'DM Mono', monospace" font-size="9" fill="#c8b89a" text-anchor="middle">●●●●●</text>
+
+        <!-- Ürün dili (72deg) -->
+        <line x1="150" y1="150" x2="273" y2="91" stroke="#2a1f14" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="265" cy="87" r="22" fill="#2a1f14"/>
+        <text x="265" y="83" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">ÜRÜN</text>
+        <text x="265" y="91" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">DİLİ</text>
+        <text x="265" y="103" font-family="'DM Mono', monospace" font-size="9" fill="#c8b89a" text-anchor="middle">●●●●●</text>
+
+        <!-- İletişim (144deg) -->
+        <line x1="150" y1="150" x2="232" y2="261" stroke="#2a1f14" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="235" cy="265" r="22" fill="#8b4513"/>
+        <text x="235" y="261" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">İLETİŞİM</text>
+        <text x="235" y="270" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">DİLİ</text>
+        <text x="235" y="281" font-family="'DM Mono', monospace" font-size="8" fill="#f0c080" text-anchor="middle">● ● ○</text>
+
+        <!-- Etkinlik (216deg) -->
+        <line x1="150" y1="150" x2="68" y2="261" stroke="#2a1f14" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="65" cy="265" r="22" fill="#5a6b4a"/>
+        <text x="65" y="261" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">ETKİNLİK</text>
+        <text x="65" y="272" font-family="'DM Mono', monospace" font-size="8" fill="#c8b89a" text-anchor="middle">● ● ○</text>
+
+        <!-- Coğrafya (288deg) -->
+        <line x1="150" y1="150" x2="27" y2="91" stroke="#2a1f14" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="34" cy="87" r="22" fill="#5a6b4a"/>
+        <text x="34" y="82" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">COĞ-</text>
+        <text x="34" y="91" font-family="'DM Mono', monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">RAFYA</text>
+        <text x="34" y="103" font-family="'DM Mono', monospace" font-size="8" fill="#c8b89a" text-anchor="middle">● ● ○</text>
+
+        <!-- Score polygon (approximate positions) -->
+        <!-- Full score: Kimlik 5/5, Ürün 5/5, İletişim 2/5, Etkinlik 3/5, Coğrafya 3/5 -->
+        <polygon points="150,60 230,115 205,220 95,220 70,115" fill="#2a1f14" opacity="0.08" stroke="#2a1f14" stroke-width="1" stroke-dasharray="4,3"/>
+      </svg>
+    </div>
+    <div class="cover-sub">
+      <p>DNA uyum haritası · 5 eksen</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-logo">EDETRI</div>
+  <div class="nav-links">
+    <a href="#dna" class="nav-link">01 · DNA Analizi</a>
+    <a href="#ucurum" class="nav-link">02 · Kritik Uçurum</a>
+    <a href="#kategoriler" class="nav-link">03 · 7 Kategori</a>
+    <a href="#cerceve" class="nav-link">04 · Ana Çerçeve</a>
+    <a href="#simulations" class="nav-link">05 · Simülasyonlar</a>
+    <a href="#oncelik" class="nav-link">06 · Öncelik</a>
+    <a href="#kural" class="nav-link">07 · Temel Kural</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════
+     01 · DNA UYUM ANALİZİ
+════════════════════════════════════════════════════ -->
+<section class="section" id="dna">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <div class="section-title-block">
+        <h2>DNA Uyum Analizi</h2>
+        <div class="tag">Mevcut durum ↔ Art direction hedefi · 5 eksen</div>
+      </div>
+    </div>
+
+    <div class="dna-grid">
+
+      <!-- KİMLİK -->
+      <div class="dna-card">
+        <div class="dna-card-label">01 · Kimlik</div>
+        <div class="dna-score-bar"><div class="dna-score-fill" style="width:95%"></div></div>
+        <div class="dna-score-label"><span class="status"><span class="status-dot guclu"></span></span> Güçlü</div>
+        <div class="dna-vs">
+          <div class="dna-vs-item current">
+            <div class="item-tag">Mevcut</div>
+            İsim boş bırakılmış — sınırsız
+          </div>
+          <div class="dna-vs-item target">
+            <div class="item-tag">Hedef</div>
+            Düşünce pratiği olarak marka
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:8px; color:#888; line-height:1.5;">
+          Anlamsız isim → sınır tanımayan kimlik için mükemmel zemin. Risk: dışa vurulmaması.
+        </div>
+      </div>
+
+      <!-- ÜRÜN DİLİ -->
+      <div class="dna-card">
+        <div class="dna-card-label">02 · Ürün Dili</div>
+        <div class="dna-score-bar"><div class="dna-score-fill" style="width:98%"></div></div>
+        <div class="dna-score-label"><span class="status"><span class="status-dot guclu"></span></span> Çok Güçlü</div>
+        <div class="dna-vs">
+          <div class="dna-vs-item current">
+            <div class="item-tag">Mevcut</div>
+            Lovers: gerilim · Scarpa: beklenti kırma
+          </div>
+          <div class="dna-vs-item target">
+            <div class="item-tag">Hedef</div>
+            Nesne eşiği taşır
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:8px; color:#888; line-height:1.5;">
+          Nesneler çerçeveyi zaten konuşuyor. Yapılacak iş: görünür kılmak.
+        </div>
+      </div>
+
+      <!-- İLETİŞİM -->
+      <div class="dna-card" style="border-top: 3px solid #8b4513;">
+        <div class="dna-card-label">03 · İletişim Dili</div>
+        <div class="dna-score-bar"><div class="dna-score-fill" style="width:30%; background:#8b4513;"></div></div>
+        <div class="dna-score-label" style="color:#8b4513;"><span class="status"><span class="status-dot eksik"></span></span> Kritik Uçurum</div>
+        <div class="dna-vs">
+          <div class="dna-vs-item current">
+            <div class="item-tag">Mevcut söylem</div>
+            "Harmonious union" — yumuşak
+          </div>
+          <div class="dna-vs-item target">
+            <div class="item-tag">Nesnenin söylediği</div>
+            Gerilim · kırılma · iz
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:8px; color:#8b4513; line-height:1.5;">
+          ⚠ En acil uygulama alanı
+        </div>
+      </div>
+
+      <!-- ETKİNLİK -->
+      <div class="dna-card">
+        <div class="dna-card-label">04 · Etkinlik</div>
+        <div class="dna-score-bar"><div class="dna-score-fill" style="width:55%; background:#c4902a;"></div></div>
+        <div class="dna-score-label"><span class="status"><span class="status-dot orta"></span></span> Orta</div>
+        <div class="dna-vs">
+          <div class="dna-vs-item current">
+            <div class="item-tag">Mevcut</div>
+            Servis odaklı
+          </div>
+          <div class="dna-vs-item target">
+            <div class="item-tag">Hedef</div>
+            Etkinlik bir sahne — iz bırakır
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:8px; color:#888; line-height:1.5;">
+          Bakış açısı değişikliği yeterli: "ne sunuyor" → "ne bırakıyor"
+        </div>
+      </div>
+
+      <!-- COĞRAFYA -->
+      <div class="dna-card">
+        <div class="dna-card-label">05 · Coğrafya</div>
+        <div class="dna-score-bar"><div class="dna-score-fill" style="width:50%; background:#c4902a;"></div></div>
+        <div class="dna-score-label"><span class="status"><span class="status-dot orta"></span></span> Ham Malzeme</div>
+        <div class="dna-vs">
+          <div class="dna-vs-item current">
+            <div class="item-tag">Mevcut</div>
+            İstanbul + Paris — lojistik bilgi
+          </div>
+          <div class="dna-vs-item target">
+            <div class="item-tag">Hedef</div>
+            İki şehir = iki dil = gerilim
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:8px; color:#888; line-height:1.5;">
+          En güçlü işlenmemiş ham malzeme
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     02 · KRİTİK UÇURUM
+════════════════════════════════════════════════════ -->
+<section class="section" id="ucurum">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <div class="section-title-block">
+        <h2>Kritik Uçurum</h2>
+        <div class="tag">İletişim dili · Nesnenin söylediği ↔ Markanın söylediği</div>
+      </div>
+    </div>
+
+    <div class="gap-analysis">
+      <div class="gap-title">⚠ İletişim Dili Çelişkisi</div>
+      <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0; margin-bottom: 12px;">
+        <div class="gap-col-header">Markanın şu an söylediği</div>
+        <div></div>
+        <div class="gap-col-header">Nesnenin söylediği</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0;">
+        <div class="gap-cell">"Harmonious union between the food and the moment"</div>
+        <div class="gap-arrow">→</div>
+        <div class="gap-cell highlight">Lovers: gerilim. İki şeyin aynı anda hem bağlı hem ayrı olması.</div>
+
+        <div class="gap-cell">"Exploring the beauty of everyday objects"</div>
+        <div class="gap-arrow">→</div>
+        <div class="gap-cell highlight">Scarpa: beklenti kırılması. Ham yüzey, keskin form.</div>
+
+        <div class="gap-cell">"Blending the energy of Istanbul and Paris"</div>
+        <div class="gap-arrow">→</div>
+        <div class="gap-cell highlight">İki şehrin gerilimi — harmonisi değil.</div>
+      </div>
+
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#8b4513; flex-shrink:0;"></div>
+          <div style="font-size:10px; color:rgba(245,242,237,0.8); font-style:italic; font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5;">
+            İzleyici tutarsızlığı bilinçsizce hisseder — "Güzel ama tam inanmıyorum" hissi buradan kaynaklanır.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     03 · 7 KATEGORİ (Bölüm I özeti)
+════════════════════════════════════════════════════ -->
+<section class="section" id="kategoriler">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <div class="section-title-block">
+        <h2>Görsel Kürasyon · 7 Kategori</h2>
+        <div class="tag">Her kategori tek bir soruyu farklı malzemeyle soruyor</div>
+      </div>
+    </div>
+
+    <div class="cat-grid">
+
+      <!-- I -->
+      <div class="cat-card">
+        <div class="cat-num">I</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 8 C8 6 12 14 16 10 C20 6 24 12 24 12" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 20 C10 16 14 18 18 16" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12 4 L12 24" stroke-width="1" stroke-dasharray="2,2"/>
+        </svg>
+        <div class="cat-title">Drape / İp / Kaplama</div>
+        <div class="cat-keyword">Örtmenin Dili</div>
+        <div class="cat-tags">
+          <span class="cat-tag">bağlama</span>
+          <span class="cat-tag">kırılganlık</span>
+          <span class="cat-tag">yarı-gizleme</span>
+        </div>
+      </div>
+
+      <!-- II -->
+      <div class="cat-card">
+        <div class="cat-num">II</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="12" width="8" height="12" stroke-width="1.5" rx="1"/>
+          <path d="M12 18 C16 18 20 14 22 10" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M19 6 C21 8 23 10 22 10" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="cat-title">Metal Kumaş İlişkisi</div>
+        <div class="cat-keyword">Dönüşümün Eşiği</div>
+        <div class="cat-tags">
+          <span class="cat-tag">metalin akması</span>
+          <span class="cat-tag">gerilim</span>
+          <span class="cat-tag">çift okuma</span>
+        </div>
+      </div>
+
+      <!-- III -->
+      <div class="cat-card">
+        <div class="cat-num">III</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="18" width="20" height="6" stroke-width="1.5" rx="1"/>
+          <rect x="8" y="12" width="12" height="6" stroke-width="1.5" rx="1"/>
+          <circle cx="14" cy="8" r="3" stroke-width="1.5"/>
+        </svg>
+        <div class="cat-title">Sergi Platform</div>
+        <div class="cat-keyword">Sunum Zemini Konuşur</div>
+        <div class="cat-tags">
+          <span class="cat-tag">ham malzeme</span>
+          <span class="cat-tag">birikim</span>
+          <span class="cat-tag">dengesizlik</span>
+        </div>
+      </div>
+
+      <!-- IV -->
+      <div class="cat-card">
+        <div class="cat-num">IV</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="14" r="9" stroke-width="1.5"/>
+          <path d="M10 14 C10 11 12 9 14 9" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="14" y1="14" x2="20" y2="16" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="8" y1="19" x2="12" y2="22" stroke-width="1" stroke-dasharray="1,2"/>
+        </svg>
+        <div class="cat-title">Yaşanmışlık</div>
+        <div class="cat-keyword">Bitiş Anının Söylemi</div>
+        <div class="cat-tags">
+          <span class="cat-tag">iz</span>
+          <span class="cat-tag">bırakılmışlık</span>
+          <span class="cat-tag">kontrollü kaos</span>
+        </div>
+      </div>
+
+      <!-- V -->
+      <div class="cat-card">
+        <div class="cat-num">V</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 24 L4 8 L24 8 L24 24" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M4 8 L14 4 L24 8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="10" y1="24" x2="10" y2="16" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="18" y1="24" x2="18" y2="16" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M10 12 C10 10 12 9 14 10 C16 11 18 10 18 12" stroke-width="1" stroke-dasharray="2,1"/>
+        </svg>
+        <div class="cat-title">Mekân</div>
+        <div class="cat-keyword">İşlevi İhlal Eden Unsur</div>
+        <div class="cat-tags">
+          <span class="cat-tag">mimari ihlal</span>
+          <span class="cat-tag">geçici yapı</span>
+          <span class="cat-tag">kumaş sınır</span>
+        </div>
+      </div>
+
+      <!-- VI -->
+      <div class="cat-card">
+        <div class="cat-num">VI</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="20" height="16" stroke-width="1.5" rx="1"/>
+          <line x1="4" y1="12" x2="24" y2="12" stroke-width="1" stroke-dasharray="2,2"/>
+          <circle cx="10" cy="8" r="2" stroke-width="1.5"/>
+          <line x1="16" y1="7" x2="21" y2="7" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="16" y1="10" x2="19" y2="10" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <div class="cat-title">Editöryel</div>
+        <div class="cat-keyword">Kadrajın Tutumu</div>
+        <div class="cat-tags">
+          <span class="cat-tag">sprezzatura</span>
+          <span class="cat-tag">tek unsur</span>
+          <span class="cat-tag">IST↔PAR</span>
+        </div>
+      </div>
+
+      <!-- VII -->
+      <div class="cat-card">
+        <div class="cat-num">VII</div>
+        <svg class="cat-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="3" width="18" height="22" stroke-width="1.5" rx="1"/>
+          <line x1="9" y1="9" x2="19" y2="9" stroke-width="1" stroke-linecap="round"/>
+          <line x1="9" y1="13" x2="19" y2="13" stroke-width="1" stroke-linecap="round"/>
+          <line x1="9" y1="17" x2="15" y2="17" stroke-width="1" stroke-linecap="round"/>
+          <path d="M5 3 C5 3 7 5 5 7" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <div class="cat-title">Booklet</div>
+        <div class="cat-keyword">Nesne Olarak Kitap</div>
+        <div class="cat-tags">
+          <span class="cat-tag">kağıt doku</span>
+          <span class="cat-tag">binding</span>
+          <span class="cat-tag">editöryel sürpriz</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pull-quote" style="margin-top:40px;">
+      <p>Yedi kategorinin ortak ekseni: malzeme ya da anın kendi doğasına ihanet ettiği o kırılma noktası — her seferinde en güçlü olan şey.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     04 · ANA ÇERÇEVE (Bölüm II özeti)
+════════════════════════════════════════════════════ -->
+<section class="section" id="cerceve">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <div class="section-title-block">
+        <h2>Ana Çerçeve · 10 Prensip</h2>
+        <div class="tag">Bölüm II — Tek Ses · Tek Tutum · Tek Duruş</div>
+      </div>
+    </div>
+
+    <div class="wheel-section">
+      <div class="wheel-container">
+        <svg width="380" height="380" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+          <!-- bg rings -->
+          <circle cx="190" cy="190" r="170" fill="none" stroke="#e8e3db" stroke-width="1"/>
+          <circle cx="190" cy="190" r="120" fill="none" stroke="#e8e3db" stroke-width="1"/>
+          <circle cx="190" cy="190" r="70" fill="none" stroke="#e8e3db" stroke-width="1"/>
+
+          <!-- center -->
+          <circle cx="190" cy="190" r="38" fill="#2a1f14"/>
+          <text x="190" y="185" font-family="'Unbounded',sans-serif" font-size="7" fill="#f5f2ed" text-anchor="middle" letter-spacing="2">EDETRI</text>
+          <text x="190" y="200" font-family="'Cormorant Garamond',serif" font-size="9" fill="#c8b89a" text-anchor="middle" font-style="italic">duruş</text>
+
+          <!-- 10 principles around the circle -->
+          <!-- I Eşik — top -->
+          <circle cx="190" cy="24" r="18" fill="#2a1f14"/>
+          <text x="190" y="20" font-family="'DM Mono',monospace" font-size="6.5" fill="#f5f2ed" text-anchor="middle">EŞIK</text>
+          <text x="190" y="32" font-family="'DM Mono',monospace" font-size="6" fill="#c8b89a" text-anchor="middle">I</text>
+          <line x1="190" y1="42" x2="190" y2="152" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- II Malzeme — 36deg -->
+          <circle cx="300" cy="56" r="18" fill="#2a1f14"/>
+          <text x="300" y="52" font-family="'DM Mono',monospace" font-size="5.5" fill="#f5f2ed" text-anchor="middle">MALZEME</text>
+          <text x="300" y="63" font-family="'DM Mono',monospace" font-size="5.5" fill="#c8b89a" text-anchor="middle">TUTUMU II</text>
+          <line x1="284" y1="70" x2="218" y2="144" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- III Örtme — 72deg -->
+          <circle cx="364" cy="154" r="18" fill="#2a1f14"/>
+          <text x="364" y="150" font-family="'DM Mono',monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">ÖRTME</text>
+          <text x="364" y="162" font-family="'DM Mono',monospace" font-size="6" fill="#c8b89a" text-anchor="middle">III</text>
+          <line x1="346" y1="158" x2="238" y2="174" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- IV Nesne & İz — 108deg -->
+          <circle cx="348" cy="274" r="18" fill="#2a1f14"/>
+          <text x="348" y="270" font-family="'DM Mono',monospace" font-size="5.5" fill="#f5f2ed" text-anchor="middle">NESNE</text>
+          <text x="348" y="281" font-family="'DM Mono',monospace" font-size="5.5" fill="#c8b89a" text-anchor="middle">& İZ IV</text>
+          <line x1="332" y1="264" x2="228" y2="208" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- V Mekân — 144deg -->
+          <circle cx="252" cy="352" r="18" fill="#2a1f14"/>
+          <text x="252" y="348" font-family="'DM Mono',monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">MEKÂN</text>
+          <text x="252" y="360" font-family="'DM Mono',monospace" font-size="6" fill="#c8b89a" text-anchor="middle">V</text>
+          <line x1="240" y1="336" x2="204" y2="228" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- VI Olay — 180deg -->
+          <circle cx="130" cy="356" r="18" fill="#2a1f14"/>
+          <text x="130" y="352" font-family="'DM Mono',monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">OLAY &</text>
+          <text x="130" y="363" font-family="'DM Mono',monospace" font-size="5.5" fill="#c8b89a" text-anchor="middle">BELLEK VI</text>
+          <line x1="140" y1="340" x2="180" y2="228" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- VII Belge — 216deg -->
+          <circle cx="36" cy="274" r="18" fill="#2a1f14"/>
+          <text x="36" y="270" font-family="'DM Mono',monospace" font-size="6" fill="#f5f2ed" text-anchor="middle">BELGE</text>
+          <text x="36" y="281" font-family="'DM Mono',monospace" font-size="5.5" fill="#c8b89a" text-anchor="middle">& İZ VII</text>
+          <line x1="52" y1="262" x2="160" y2="204" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- VIII Modernite — 252deg -->
+          <circle cx="20" cy="154" r="18" fill="#2a1f14"/>
+          <text x="20" y="150" font-family="'DM Mono',monospace" font-size="5.5" fill="#f5f2ed" text-anchor="middle">MOD.</text>
+          <text x="20" y="161" font-family="'DM Mono',monospace" font-size="5.5" fill="#c8b89a" text-anchor="middle">& GEL VIII</text>
+          <line x1="36" y1="154" x2="152" y2="175" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- IX Tutum Bütünlüğü — 288deg -->
+          <circle cx="84" cy="56" r="18" fill="#2a1f14"/>
+          <text x="84" y="52" font-family="'DM Mono',monospace" font-size="5.5" fill="#f5f2ed" text-anchor="middle">TUTUM</text>
+          <text x="84" y="63" font-family="'DM Mono',monospace" font-size="5.5" fill="#c8b89a" text-anchor="middle">BÜTÜNL. IX</text>
+          <line x1="96" y1="70" x2="166" y2="144" stroke="#2a1f14" stroke-width="1" opacity="0.3"/>
+
+          <!-- X Duruş — 324deg (between top and IX) -->
+          <!-- Represented as inner label near center -->
+          <circle cx="190" cy="110" r="14" fill="none" stroke="#2a1f14" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="190" y="107" font-family="'DM Mono',monospace" font-size="5.5" fill="#2a1f14" text-anchor="middle">DURUŞ</text>
+          <text x="190" y="117" font-family="'DM Mono',monospace" font-size="5" fill="#888" text-anchor="middle">X TANIM</text>
+        </svg>
+      </div>
+
+      <div class="wheel-legend">
+        <div style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--warm); margin-bottom:12px; border-bottom:1px solid var(--dust); padding-bottom:8px;">10 Prensip</div>
+
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>I · Eşik</strong>
+            <span>İki şeyin aynı anda olduğu yer — sınır değil, birliktelik</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>II · Malzeme Tutumu</strong>
+            <span>Beklentisi kırılan malzeme konuşur — ham yüzey dürüstlüktür</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>III · Örtme & Gösterme</strong>
+            <span>Yarı örtülü şey, tam açıktan daha fazla soru taşır</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>IV · Nesne & İz</strong>
+            <span>İz, nesnenin kendi tarihini taşıma biçimidir</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>V · Mekân Olarak Tutum</strong>
+            <span>Mekân bir kap değil, bir dünya görüşüdür</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>VI · Olay & Bellek</strong>
+            <span>Olay bitişten itibaren başlar — iz, özetten uzun yaşar</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>VII · Belge & İz</strong>
+            <span>Fiziksel yayın nesne olduğunda, bilgi taşıyandan ayrışır</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>VIII · Modernite & Gelenek</strong>
+            <span>Referansın görünmez olması — beslenmek ama teşhir etmemek</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14;"></div>
+          <div class="wheel-legend-text">
+            <strong>IX · Tutum Bütünlüğü</strong>
+            <span>Her şeyin aynı dilde konuşması — aynı düzeyde mükemmel olması değil</span>
+          </div>
+        </div>
+        <div class="wheel-legend-item">
+          <div class="wheel-legend-dot" style="background:#2a1f14; opacity:0.4;"></div>
+          <div class="wheel-legend-text">
+            <strong>X · Duruşun Tanımı</strong>
+            <span>Gerilim olarak kimlik — iki kutup arasındaki o eşik bölge</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     05 · SİMÜLASYONLAR
+════════════════════════════════════════════════════ -->
+<section class="section" id="simulations">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <div class="section-title-block">
+        <h2>Uygulama Simülasyonları</h2>
+        <div class="tag">4 alan × 3 senaryo — A: Sağlıklı evrim · B: Tutarsız · C: Vitrinleşme</div>
+      </div>
+    </div>
+
+    <!-- Matrix header -->
+    <div class="matrix" style="margin-bottom: 40px;">
+      <div class="matrix-header"></div>
+      <div class="matrix-header" style="border-left: 3px solid #4a7c59;">A — Tutarlı Benimseme</div>
+      <div class="matrix-header" style="border-left: 3px solid #c4902a;">B — Tutarsız Uygulama</div>
+      <div class="matrix-header" style="border-left: 3px solid #8b3a3a;">C — Hızlı / Vitrinleşme</div>
+
+      <div class="matrix-label">Risk Seviyesi</div>
+      <div class="matrix-cell a-cell"><span class="sim-risk low">Düşük</span></div>
+      <div class="matrix-cell b-cell"><span class="sim-risk mid">Orta–Yüksek</span></div>
+      <div class="matrix-cell c-cell"><span class="sim-risk midhigh">Orta–Yüksek</span></div>
+
+      <div class="matrix-label">Sonuç</div>
+      <div class="matrix-cell a-cell">6 ayda görsel dil yerleşir. İzleyici logoyu görmeden tanır.</div>
+      <div class="matrix-cell b-cell">"Güzel ama emin değilim" hissi. En iyi ürün bile kaybolur.</div>
+      <div class="matrix-cell c-cell">Dil estetik pozisyon olarak etiketlenir → "eşik estetiği yapan marka" vitrine döner.</div>
+
+      <div class="matrix-label">Temel Uyarı</div>
+      <div class="matrix-cell a-cell">Yavaşlık pasif değil — her kararı tek soruyla süzmek demek.</div>
+      <div class="matrix-cell b-cell">Ses tutarsızlığı, stil tutarsızlığından tehlikelidir.</div>
+      <div class="matrix-cell c-cell">Bu dil estetik tercih değil, düşünme biçimi olarak sızmalı. Hız bunu engeller.</div>
+    </div>
+
+    <!-- 2.1 GÖRSEL İLETİŞİM -->
+    <div class="sim-section">
+      <div class="sim-area-title">
+        <div class="sim-area-icon">
+          <svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="1"/><circle cx="7" cy="9" r="2"/><path d="M12 13 L8 10 L5 13"/></svg>
+        </div>
+        <div>
+          <div class="sim-area-name">2.1 · Görsel İletişim & Sosyal Medya</div>
+          <div class="sim-area-sub">Mevcut: temiz, minimal, masum — gerilim yok</div>
+        </div>
+      </div>
+      <div class="sim-cards">
+        <div class="sim-card a">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">A</div>
+            <span class="sim-risk low">Risk: Düşük</span>
+          </div>
+          <div class="sim-card-title">Tutarlı Benimseme</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Her gönderi çerçeveyi taşımak zorunda değil</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Haftada bir: bitmemiş sofra, bırakılmış kadeh</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Kısa açıklama değil — sessizlik</div>
+          </div>
+          <div class="sim-outcome">6 ay içinde görsel dil tanınır. İzleyici "bu EDETRI" der, logoya bakmadan.</div>
+          <div class="sim-rec">İç karar: "Bu nesnenin söylediğini mi söylüyor, harmonious union mu söylüyor?" sorusu yeterli süzgeç.</div>
+        </div>
+        <div class="sim-card b">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">B</div>
+            <span class="sim-risk high">Risk: Yüksek</span>
+          </div>
+          <div class="sim-card-title">Tutarsız Uygulama</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Bazı gönderiler yeni dil deniyor</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Aynı akışta "beautiful tableware for your home" devam ediyor</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Stil tutarsızlığı değil — ses tutarsızlığı</div>
+          </div>
+          <div class="sim-outcome">İzleyici iki farklı ses duyuyor. Hangisinin gerçek olduğuna karar veremiyor.</div>
+          <div class="sim-rec">Önce iletişim dilini temizlemek. Eski açıklamaları kaldırmak bile yeterli başlangıç.</div>
+        </div>
+        <div class="sim-card c">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">C</div>
+            <span class="sim-risk midhigh">Risk: Orta–Yüksek</span>
+          </div>
+          <div class="sim-card-title">Hızlı Tam Benimseme</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Tüm iletişim aynı anda bu dile geçiyor</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Her gönderi eşik anı, her açıklama manifesto tonu</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Instagram + web + açıklamalar aynı anda dönüşüyor</div>
+          </div>
+          <div class="sim-outcome">Kısa vadede ilgi çekici. Sonra: "eşik estetiği yapan marka" etiketiyle vitrine döner.</div>
+          <div class="sim-rec">Yavaşlık burada güç. Dil estetik tercih değil, düşünme biçimi olarak sızmalı.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.2 ÜRÜN FOTOĞRAFI -->
+    <div class="sim-section">
+      <div class="sim-area-title">
+        <div class="sim-area-icon">
+          <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4"/><path d="M2 10 C2 5 5 2 10 2 C15 2 18 5 18 10"/><path d="M6 18 L6 16 M10 18 L10 17 M14 18 L14 16"/></svg>
+        </div>
+        <div>
+          <div class="sim-area-name">2.2 · Ürün Sunumu & Fotoğraf Dili</div>
+          <div class="sim-area-sub">Mevcut: beyaz fon, temiz ışık — profesyonel ama steril</div>
+        </div>
+      </div>
+      <div class="sim-cards">
+        <div class="sim-card a">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">A</div>
+            <span class="sim-risk low">Risk: Düşük</span>
+          </div>
+          <div class="sim-card-title">İki Dil Aynı Anda</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Birinci: mevcut format — form + işçilik</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>İkinci: bağlam fotoğrafı — ham yüzey, kullanılmış</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>İkisi aynı anda web sitesinde duruyor</div>
+          </div>
+          <div class="sim-outcome">"Bu nasıl yapılmış" + "Bu nasıl yaşanır" sorusu aynı anda yanıtlanıyor.</div>
+          <div class="sim-rec">Mevcut stüdyoya ikinci çekim protokolü eklemek yeterli — yeni ekipman değil, bakış açısı.</div>
+        </div>
+        <div class="sim-card b">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">B</div>
+            <span class="sim-risk mid">Risk: Orta</span>
+          </div>
+          <div class="sim-card-title">Karışık Portföy</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Bazı ürünler yeni dil, bazıları eski</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Web sitesinde ikisi yan yana</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Tutarsız portföy görünümü</div>
+          </div>
+          <div class="sim-outcome">"Hâlâ oturmamış" hissi — oysa nesnenin kendisi çok olgun.</div>
+          <div class="sim-rec">Önce bir ürün ailesiyle pilot: Lovers veya Scarpa. Tüm portföy aynı anda şart değil.</div>
+        </div>
+        <div class="sim-card c">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">C</div>
+            <span class="sim-risk mid">Risk: Orta</span>
+          </div>
+          <div class="sim-card-title">Steril Fon Tamamen Kalkıyor</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Tüm ürün fotoğrafları yeni protokole geçiyor</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Her çekim ham mekan</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Beyaz fon tamamen kaldırılıyor</div>
+          </div>
+          <div class="sim-outcome">Dubai + Kopenhag distribütörleri için standart ürün fotoğrafı hâlâ gerekli — satış uyumsuzluğu.</div>
+          <div class="sim-rec">İki dil yaşayabilir: satış kanalları için (form, netlik) + marka iletişimi için (bağlam, iz).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.3 EVENT -->
+    <div class="sim-section">
+      <div class="sim-area-title">
+        <div class="sim-area-icon">
+          <svg viewBox="0 0 20 20"><rect x="2" y="6" width="16" height="12" rx="1"/><path d="M6 6 L6 4 M14 6 L14 4"/><line x1="6" y1="11" x2="14" y2="11"/><line x1="6" y1="14" x2="10" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="sim-area-name">2.3 · Event Tasarımı & Belgeleme</div>
+          <div class="sim-area-sub">Mevcut: servis olarak çalışıyor — ne bıraktığı değil ne sunduğu önemli</div>
+        </div>
+      </div>
+      <div class="sim-cards">
+        <div class="sim-card a">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">A</div>
+            <span class="sim-risk low">Risk: Düşük</span>
+          </div>
+          <div class="sim-card-title">"Sonra Ne Kalır?" Sorusu</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Brief'e tek soru ekleniyor: "Bu etkinlik bitince geriye ne kalacak?"</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Belgeleme: kirli bardaklar, bırakılmış peçete, yarı aydınlık boş masa</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Bu görseller etkinlik öncesi değil sonrası paylaşılıyor</div>
+          </div>
+          <div class="sim-outcome">EDETRI etkinliklerinin ayırt edici imzası oluşur. Müşteri "etkinlik yaşandı" hisseder.</div>
+          <div class="sim-rec">Fotoğrafçıya: "Öncesi değil, sonrasını çek." Ek maliyet yok.</div>
+        </div>
+        <div class="sim-card b">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">B</div>
+            <span class="sim-risk mid">Risk: Orta</span>
+          </div>
+          <div class="sim-card-title">Değişken Uygulama</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Kimisinde yeni yaklaşım, kimisinde standart</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Belgeleme tutarsız</div>
+          </div>
+          <div class="sim-outcome">Portföy "farklı işler yapan bir prodüksiyon şirketi" görünümü alıyor.</div>
+          <div class="sim-rec">Kendi etkinliklerinden başlamak. Müşteri etkinlikleri bu dili anlamayı gerektirir — zaman ister.</div>
+        </div>
+        <div class="sim-card c">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">C</div>
+            <span class="sim-risk high">Risk: Yüksek</span>
+          </div>
+          <div class="sim-card-title">Her Müşteride Tam Uygulama</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Her müşteri etkinliğinde yeni yaklaşım zorunlu</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Bazı müşteriler "sonrası" belgesini bilmiyor</div>
+          </div>
+          <div class="sim-outcome">"Çok sanatsal, pratik değil" geri bildirimi. Yanlış konumlanma riski.</div>
+          <div class="sim-rec">Bu yaklaşımı "dili zaten anlayan" markalara önermek. Herkese değil, doğru müşteriye.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.4 BOOKLET -->
+    <div class="sim-section">
+      <div class="sim-area-title">
+        <div class="sim-area-icon">
+          <svg viewBox="0 0 20 20"><rect x="3" y="2" width="14" height="17" rx="1"/><line x1="7" y1="7" x2="13" y2="7"/><line x1="7" y1="10" x2="13" y2="10"/><line x1="7" y1="13" x2="10" y2="13"/></svg>
+        </div>
+        <div>
+          <div class="sim-area-name">2.4 · Booklet & Basılı Yayın</div>
+          <div class="sim-area-sub">Mevcut: sistematik basılı yayın yok — fırsat tam burada</div>
+        </div>
+      </div>
+      <div class="sim-cards">
+        <div class="sim-card a">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">A</div>
+            <span class="sim-risk low">Risk: Düşük</span>
+          </div>
+          <div class="sim-card-title">Booklet Bir Nesne Olur</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Kağıt dokusu seçimi — ham, baskıyı etkileyen</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Binding görünür: açık dikiş ya da piercing</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Bir siyah sayfa, ters çevrilmiş tipografi</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Objeyle aynı pakette</div>
+          </div>
+          <div class="sim-outcome">Katalog bırakılır, bu kitap masada kalır. Nesne ve booklet birbirini anlatır.</div>
+          <div class="sim-rec">İlk baskı: 50–100 adet. Yalnızca etkinlikte veya ürünle. Kitlesel basım şart değil.</div>
+        </div>
+        <div class="sim-card b">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">B</div>
+            <span class="sim-risk high">Risk: Yüksek</span>
+          </div>
+          <div class="sim-card-title">Güçlü Kap, Zayıf İçerik</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Booklet bu dille tasarlanıyor</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>İçerik standart ürün açıklamalarından oluşuyor</div>
+          </div>
+          <div class="sim-outcome">İlk etkileşimde merak, açtığında hayal kırıklığı. En kötü senaryo.</div>
+          <div class="sim-rec">İçerik ve form aynı anda bu dilde olmalı. Biri eksikse ikisi de zarar görür.</div>
+        </div>
+        <div class="sim-card c">
+          <div class="sim-card-header">
+            <div class="sim-card-tag">C</div>
+            <span class="sim-risk mid">Risk: Orta</span>
+          </div>
+          <div class="sim-card-title">Çok İddialı İlk Baskı</div>
+          <div class="sim-flow">
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Özel kağıt + özel cilt + çok sayıda baskı tekniği</div>
+            <div class="sim-flow-item"><div class="sim-flow-dot"></div>Maliyet yüksek, üretim uzuyor</div>
+          </div>
+          <div class="sim-outcome">Piyasaya çıkması gecikiyor. Beklenti yönetilemez hale gelir.</div>
+          <div class="sim-rec">İlk booklet az ve hızlı. Ham ve aceleci olmayan. Mükemmel değil, doğru.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     06 · ÖNCELİK SIRASI
+════════════════════════════════════════════════════ -->
+<section class="section" id="oncelik">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">06</div>
+      <div class="section-title-block">
+        <h2>Öncelik Sırası</h2>
+        <div class="tag">Risk / etki dengesi · Hangi alan önce?</div>
+      </div>
+    </div>
+
+    <div class="priority-visual">
+      <div class="priority-header">#</div>
+      <div class="priority-header">Alan</div>
+      <div class="priority-header">Etki</div>
+      <div class="priority-header">Hız</div>
+
+      <!-- 1 -->
+      <div class="priority-num active">1</div>
+      <div class="priority-area">
+        <div class="priority-area-name">İletişim Dili</div>
+        <div class="priority-area-why">Web + sosyal medya metinleri · Uçurum en büyük burada · Mevcut metinleri güncellemek yeterli</div>
+      </div>
+      <div class="priority-impact">
+        <div class="impact-bar">
+          <div class="impact-dots">
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot filled"></div>
+          </div>
+          <div class="impact-label">Yüksek</div>
+        </div>
+      </div>
+      <div class="priority-speed">
+        <div class="impact-bar">
+          <div class="speed-pills">
+            <div class="speed-pill filled"></div>
+            <div class="speed-pill filled"></div>
+            <div class="speed-pill filled"></div>
+          </div>
+          <div class="impact-label">Hızlı</div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="priority-num active">2</div>
+      <div class="priority-area">
+        <div class="priority-area-name">Ürün Fotoğrafı</div>
+        <div class="priority-area-why">İkinci çekim protokolü · Nesne zaten bu dili konuşuyor · Lovers veya Scarpa ile pilot başlatılır</div>
+      </div>
+      <div class="priority-impact">
+        <div class="impact-bar">
+          <div class="impact-dots">
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot filled"></div>
+          </div>
+          <div class="impact-label">Yüksek</div>
+        </div>
+      </div>
+      <div class="priority-speed">
+        <div class="impact-bar">
+          <div class="speed-pills">
+            <div class="speed-pill filled"></div>
+            <div class="speed-pill filled"></div>
+            <div class="speed-pill"></div>
+          </div>
+          <div class="impact-label">Orta</div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="priority-num">3</div>
+      <div class="priority-area">
+        <div class="priority-area-name">Booklet</div>
+        <div class="priority-area-why">Fiziksel kolektif kimliği kurar · İçerik ve form birlikte hazırlanmalı · 50–100 adet ilk baskı</div>
+      </div>
+      <div class="priority-impact">
+        <div class="impact-bar">
+          <div class="impact-dots">
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot"></div>
+          </div>
+          <div class="impact-label">Orta–Yüksek</div>
+        </div>
+      </div>
+      <div class="priority-speed">
+        <div class="impact-bar">
+          <div class="speed-pills">
+            <div class="speed-pill filled"></div>
+            <div class="speed-pill"></div>
+            <div class="speed-pill"></div>
+          </div>
+          <div class="impact-label">Yavaş</div>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="priority-num">4</div>
+      <div class="priority-area">
+        <div class="priority-area-name">Event Paradigma Değişimi</div>
+        <div class="priority-area-why">Kendi etkinliklerinden başlamak · Müşteri eğitimi gerektirir · "Sonra ne kalır?" sorusunun brief'e girmesi</div>
+      </div>
+      <div class="priority-impact">
+        <div class="impact-bar">
+          <div class="impact-dots">
+            <div class="impact-dot filled"></div>
+            <div class="impact-dot"></div>
+            <div class="impact-dot"></div>
+          </div>
+          <div class="impact-label">Orta</div>
+        </div>
+      </div>
+      <div class="priority-speed">
+        <div class="impact-bar">
+          <div class="speed-pills">
+            <div class="speed-pill filled"></div>
+            <div class="speed-pill"></div>
+            <div class="speed-pill"></div>
+          </div>
+          <div class="impact-label">Yavaş</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote" style="margin-top:40px;">
+      <p>İletişim dili dönüşmeden diğer alanlardaki değişiklikler tutarsız görünür. Bu yüzden öncelik sırası keyfi değil: iletişim dili tüm diğer alanların zeminini oluşturuyor.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     07 · TEMEL KURAL
+════════════════════════════════════════════════════ -->
+<section class="section" id="kural" style="border-bottom:none;">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-number">07</div>
+      <div class="section-title-block">
+        <h2>Ortak Kural</h2>
+        <div class="tag">Tüm simülasyonların A versiyonlarında ortak olan tek şey</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-label">Temel Süzgeç</div>
+    <div style="height:24px;"></div>
+    <div class="rule-question">
+      "Bu, nesnenin söylediğiyle aynı şeyi mi söylüyor?"
+    </div>
+    <div style="height:16px;"></div>
+    <div class="rule-label">Bu soruyu içselleştiren bir ekip, kurallar listesine ihtiyaç duymaz.</div>
+  </div>
+
+  <div class="container">
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 40px;">
+      <div style="background: var(--pale); padding: 28px 24px; text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:var(--accent); margin-bottom:8px;">↓</div>
+        <div style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--warm); margin-bottom:8px;">Kırılma Anı</div>
+        <div style="font-size:10px; color:#888; line-height:1.5;">Metal aktığında · Sofra sona erdiğinde · Kumaş taşıdığında</div>
+      </div>
+      <div style="background: var(--pale); padding: 28px 24px; text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:var(--accent); margin-bottom:8px;">→</div>
+        <div style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--warm); margin-bottom:8px;">Duraksama</div>
+        <div style="font-size:10px; color:#888; line-height:1.5;">İzleyici duruyor — dikkatten önce</div>
+      </div>
+      <div style="background: var(--pale); padding: 28px 24px; text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:var(--accent); margin-bottom:8px;">→</div>
+        <div style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--warm); margin-bottom:8px;">Anlam</div>
+        <div style="font-size:10px; color:#888; line-height:1.5;">Dikkat, anlamdan önce gelir</div>
+      </div>
+      <div style="background: var(--accent); padding: 28px 24px; text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:var(--paper); margin-bottom:8px;">⊙</div>
+        <div style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--warm); margin-bottom:8px;">Bağlılık</div>
+        <div style="font-size:10px; color:rgba(245,242,237,0.7); line-height:1.5;">Anlam, bağlılığa dönüşür</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:60px; padding: 40px; background: var(--pale);">
+      <div style="font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--warm); margin-bottom:16px;">Son Not</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:var(--accent); line-height:1.7; max-width:560px; margin:0 auto;">
+        Burada önerilen yeni bir kimlik inşası değil — var olanın tutarlı biçimde görünür kılınması.
+        <br><br>
+        Eşiği bulmak zor değil. Bulunduğunda onu korumak zor.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-brand">EDETRI</div>
+  <div class="footer-meta">
+    <p>Art Direction & Uygulama Simülasyonları · 2026</p>
+    <p>Gizli · Yalnızca iç kullanım ve yetkilendirilmiş iş ortakları</p>
+    <p>Istanbul ↔ Paris</p>
+  </div>
+</footer>
+
+<script>
+  // Animate score bars on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.width = e.target.dataset.width;
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.dna-score-fill').forEach(el => {
+    const w = el.style.width;
+    el.dataset.width = w;
+    el.style.width = '0%';
+    observer.observe(el);
+  });
+
+  // Fade in sections
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.sim-card, .dna-card, .cat-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    sectionObserver.observe(el);
+  });
+</script>
+
+</body>
+</html>
