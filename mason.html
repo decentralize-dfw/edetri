@@ -38,19 +38,27 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* MASONRY */
 .gallery-wrap{padding:24px 8px}
 .masonry{column-count:5;column-gap:8px}
-.card{break-inside:avoid;margin-bottom:8px;position:relative;cursor:pointer;overflow:hidden;border-radius:2px;background:var(--dim)}
+.card{break-inside:avoid;margin-bottom:8px;position:relative;cursor:pointer;border-radius:2px;background:var(--dim)}
 .card.hidden{display:none}
-.card img{display:block;width:100%;height:auto;transition:transform .4s ease}
-.card:hover img{transform:scale(1.03)}
+.card-img-wrap{overflow:hidden;border-radius:2px 2px 0 0;position:relative}
+.card-img-wrap img{display:block;width:100%;height:auto;transition:transform .4s ease}
+.card:hover .card-img-wrap img{transform:scale(1.03)}
 .card-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 8px 8px;background:linear-gradient(to top,rgba(9,8,7,.85),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;gap:5px}
 .card:hover .card-overlay{opacity:1}
 .card-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
 .card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,8px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
+body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
 #sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:10px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 18px;border-radius:2px}
 #sizeSliderWrap span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase}
 #sizeSlider{width:160px;accent-color:var(--copper);cursor:pointer}
+
+/* COMMENT TOGGLE */
+#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px}
+#commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
+#commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
 
 /* SPINNER */
 .spinner{width:24px;height:24px;border:1px solid rgba(176,168,144,.2);border-top-color:var(--copper);border-radius:50%;animation:spin .8s linear infinite}
@@ -158,6 +166,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="sizeSliderWrap">
   <span>Size</span>
   <input type="range" id="sizeSlider" min="1" max="9" value="5" step="1" oninput="applySize(this.value)">
+</div>
+
+<!-- COMMENT TOGGLE (masonry mode) -->
+<div id="commentToggleWrap">
+  <input type="checkbox" id="commentToggle">
+  <label for="commentToggle">Yorum</label>
 </div>
 
 <!-- MODAL -->
@@ -274,16 +288,23 @@ function renderMasonry() {
     const card = document.createElement('div');
     card.className='card'; card.dataset.idx=idx;
     card.onclick = ()=>openModal(idx);
+    const wrap = document.createElement('div'); wrap.className='card-img-wrap';
     const img = document.createElement('img');
     img.src=row.imgUrl; img.alt=row.type||''; img.loading='lazy'; img.referrerPolicy='no-referrer';
     const ov = document.createElement('div'); ov.className='card-overlay';
     if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; ov.appendChild(d); }
     if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; ov.appendChild(s); }
-    card.appendChild(img); card.appendChild(ov); m.appendChild(card);
+    wrap.appendChild(img); wrap.appendChild(ov); card.appendChild(wrap);
+    if (row.description) { const desc=document.createElement('div'); desc.className='card-desc'; desc.textContent=row.description; card.appendChild(desc); }
+    m.appendChild(card);
   });
 }
 
-function applySize(v) { document.getElementById('masonry').style.columnCount = 10-parseInt(v); }
+function applySize(v) {
+  const cols = 10 - parseInt(v);
+  document.getElementById('masonry').style.columnCount = cols;
+  document.documentElement.style.setProperty('--desc-font-size', Math.max(5, Math.round(40/cols)) + 'px');
+}
 
 // ── MAP BUILD ─────────────────────────────────────────────────
 function applyTransform() {
@@ -456,6 +477,7 @@ function openMap() {
   document.getElementById('siteHeader').style.display='none';
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('sizeSliderWrap').style.display='none';
+  document.getElementById('commentToggleWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
   document.body.style.overflow='hidden';
   if (!mapBuilt && rows.length) buildMap();
@@ -466,6 +488,7 @@ function closeMap() {
   document.getElementById('siteHeader').style.display='';
   document.getElementById('galleryWrap').style.display='';
   document.getElementById('sizeSliderWrap').style.display='flex';
+  document.getElementById('commentToggleWrap').style.display='flex';
   document.body.style.overflow='';
 }
 
@@ -556,6 +579,10 @@ document.addEventListener('keydown', e=>{
 
 document.getElementById('modal').addEventListener('click', e=>{
   if (e.target===document.getElementById('modal')) closeModal();
+});
+
+document.getElementById('commentToggle').addEventListener('change', function(){
+  document.body.classList.toggle('show-comments', this.checked);
 });
 
 init();
