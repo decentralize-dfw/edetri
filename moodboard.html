@@ -174,8 +174,8 @@ body.show-comments .card-desc{display:block!important}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
-.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:36px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.82);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
-.map-cluster-aciklama-btn:hover{color:var(--cream)}
+.map-cluster-aciklama-btn{display:inline-block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:36px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.9);background:rgba(8,7,6,.55);padding:6px 14px;cursor:pointer;transition:color .2s,background .2s;pointer-events:auto;user-select:none}
+.map-cluster-aciklama-btn:hover{color:var(--cream);background:rgba(8,7,6,.75)}
 
 /* CLUSTER PANEL (floating docx windows, multiple can be open) */
 .cluster-panel{position:fixed;z-index:1100;background:rgba(8,7,6,.97);backdrop-filter:blur(20px);border:1px solid rgba(176,168,144,.13);width:400px;height:480px;min-width:240px;min-height:160px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.75);overflow:visible}
@@ -199,6 +199,13 @@ body.show-comments .card-desc{display:block!important}
 .cp-resize-nw{top:-4px;left:-4px;width:12px;height:12px;cursor:nw-resize}
 .cp-resize-se{bottom:-4px;right:-4px;width:12px;height:12px;cursor:se-resize}
 .cp-resize-sw{bottom:-4px;left:-4px;width:12px;height:12px;cursor:sw-resize}
+
+/* MAP IMAGE PANEL (floating image+text popup) */
+.map-image-panel{width:480px!important;height:576px!important}
+.map-image-panel .mip-img-wrap{flex:1;overflow:hidden;min-height:0;background:rgba(0,0,0,.4)}
+.map-image-panel .mip-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
+.map-image-panel .mip-info{padding:10px 16px 14px;flex-shrink:0;border-top:1px solid rgba(176,168,144,.09)}
+.map-image-panel .mip-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);line-height:1.4;margin-top:4px}
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
@@ -243,6 +250,7 @@ body.show-comments .card-desc{display:block!important}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
   /* Cluster panels: full width on mobile */
   .cluster-panel{width:calc(100vw - 20px)!important;left:10px!important;height:55vh;min-height:180px}
+  .map-image-panel{height:70vh!important}
   /* Cluster labels: smaller on mobile */
   .map-cluster-name{font-size:36px}
   .map-cluster-count{font-size:11px}
@@ -261,7 +269,7 @@ body.show-comments .card-desc{display:block!important}
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
   <div class="map-title-label">EDETRI — Constellation</div>
-  <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasim()">Yaklaşım</button>
+  <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
   <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
   <div id="mapStage"></div>
@@ -506,8 +514,8 @@ function buildMap() {
   const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
 
   const centers=types.map((_,i)=>({
-    x: cellW*(i%cols+0.5)+(rng()-.5)*cellW*.3,
-    y: cellH*(Math.floor(i/cols)+0.5)+(rng()-.5)*cellH*.3
+    x: cellW*(i%cols+0.5)+(rng()-.5)*cellW*.06,
+    y: cellH*(Math.floor(i/cols)+0.5)+(rng()-.5)*cellH*.06
   }));
 
   const allItems=[];
@@ -518,7 +526,7 @@ function buildMap() {
       const gi=rows.indexOf(row);
       const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
       const ring=Math.floor(j/(isMobile?4:6));
-      const dist=isMobile?(55+ring*80+rng()*20):(90+ring*130+rng()*35);
+      const dist=isMobile?(44+ring*64+rng()*16):(72+ring*104+rng()*28);
       const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
       const sr=rng();
       const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
@@ -560,7 +568,7 @@ function buildMap() {
           if (!dragging) return;
           dragging=false; island.style.zIndex=''; island.style.transition='';
           if (!hasMoved) {
-            openModal(gi);
+            openMapImagePanel(gi);
           } else {
             const item=mapAllItems.find(x=>x.el===island);
             if (item){ item.baseX=parseFloat(island.style.left); item.baseY=parseFloat(island.style.top); }
@@ -584,7 +592,7 @@ function buildMap() {
         });
       } else {
         // Mobile: tap to open modal, canvas pan/pinch handles movement
-        island.addEventListener('click', ()=>openModal(gi));
+        island.addEventListener('click', ()=>openMapImagePanel(gi));
       }
 
       stage.appendChild(island);
@@ -712,6 +720,8 @@ function openMap() {
   document.getElementById('siteHeader').style.display='none';
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
+  document.getElementById('commentToggleWrap').style.display='none';
+  document.getElementById('sizeSliderWrap').style.display='none';
   document.body.classList.remove('gallery-mode');
   document.body.style.overflow='hidden';
   if (!mapBuilt && rows.length) buildMap();
@@ -721,6 +731,8 @@ function closeMap() {
   document.getElementById('mapView').style.display='none';
   document.getElementById('siteHeader').style.display='';
   document.getElementById('galleryWrap').style.display='';
+  document.getElementById('commentToggleWrap').style.display='flex';
+  document.getElementById('sizeSliderWrap').style.display='flex';
   document.body.classList.add('gallery-mode');
   document.body.style.overflow='';
 }
@@ -805,8 +817,8 @@ document.addEventListener('keydown', e=>{
     if (e.key==='Escape') closeModal();
     if (e.key==='ArrowLeft') navModal(-1);
     if (e.key==='ArrowRight') navModal(1);
-  } else if (document.getElementById('mapView').style.display!=='none'){
-    if (e.key==='Escape') closeMap();
+  } else {
+    if (e.key==='Escape') { closeOzet(); closeRapor(); closeYaklasim(); }
   }
 });
 
@@ -880,6 +892,82 @@ function closeRapor(){document.getElementById('raporOverlay').classList.remove('
 function openBolumAciklama() {
   const key = document.getElementById('bolumAciklamaWrap').dataset.key;
   if (key) openRapor(key);
+}
+
+// ── YAKLAŞIM PANEL (floating docx in map) ──────────────────────
+function openYaklasimPanel(anchorEl) {
+  const KEY = '__yaklasim__';
+  if (!clusterPanelCache[KEY]) {
+    const panel = document.createElement('div');
+    panel.className = 'cluster-panel';
+    panel.style.display = 'none';
+    panel.innerHTML =
+      '<div class="cp-titlebar"><span class="cp-title">Yaklaşım</span><button class="cp-close">✕</button></div>' +
+      '<div class="cp-content doc-content">Yükleniyor…</div>' +
+      '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
+      '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
+      '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
+      '<div class="cp-resize cp-resize-w"></div><div class="cp-resize cp-resize-nw"></div>';
+    panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
+    panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
+    setupPanelDrag(panel);
+    setupPanelResize(panel);
+    clusterPanelCache[KEY] = panel;
+    document.getElementById('mapView').appendChild(panel);
+    const content = panel.querySelector('.cp-content');
+    fetch(RAPOR_BASE + 'ozet.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { content.innerHTML = result.value; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  }
+  const panel = clusterPanelCache[KEY];
+  if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
+  const r = anchorEl ? anchorEl.getBoundingClientRect() : null;
+  panel.style.left = (r ? Math.min(r.right + 10, window.innerWidth - 420) : 80) + 'px';
+  panel.style.top  = (r ? Math.max(10, r.top) : 100) + 'px';
+  panel.style.display = 'flex';
+  panel.style.zIndex = nextPanelZ();
+}
+
+// ── MAP IMAGE PANEL (floating island detail popup) ──────────────
+let mapImagePanelEl = null;
+function openMapImagePanel(gi) {
+  if (!mapImagePanelEl) {
+    const panel = document.createElement('div');
+    panel.className = 'cluster-panel map-image-panel';
+    panel.style.display = 'none';
+    panel.innerHTML =
+      '<div class="cp-titlebar"><span class="cp-title mip-title"></span><button class="cp-close">✕</button></div>' +
+      '<div class="mip-img-wrap"><img class="mip-img" src="" alt="" referrerpolicy="no-referrer"></div>' +
+      '<div class="mip-info"><div class="mip-desc"></div></div>' +
+      '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
+      '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
+      '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
+      '<div class="cp-resize cp-resize-w"></div><div class="cp-resize cp-resize-nw"></div>';
+    panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
+    panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
+    setupPanelDrag(panel);
+    setupPanelResize(panel);
+    mapImagePanelEl = panel;
+    document.getElementById('mapView').appendChild(panel);
+  }
+  const row = rows[gi];
+  mapImagePanelEl.querySelector('.mip-title').textContent = row.type || '';
+  mapImagePanelEl.querySelector('.mip-img').src = row.imgUrl;
+  mapImagePanelEl.querySelector('.mip-desc').textContent = row.description || '';
+  if (mapImagePanelEl.style.display !== 'none') {
+    mapImagePanelEl.style.zIndex = nextPanelZ();
+    return;
+  }
+  const w = Math.min(480, window.innerWidth - 20);
+  const h = Math.min(576, window.innerHeight - 40);
+  mapImagePanelEl.style.width  = w + 'px';
+  mapImagePanelEl.style.height = h + 'px';
+  mapImagePanelEl.style.left = Math.max(10, (window.innerWidth  - w) / 2) + 'px';
+  mapImagePanelEl.style.top  = Math.max(10, (window.innerHeight - h) / 2) + 'px';
+  mapImagePanelEl.style.display = 'flex';
+  mapImagePanelEl.style.zIndex = nextPanelZ();
 }
 
 // ── CLUSTER PANELS (per-cluster floating docx windows) ─────────
