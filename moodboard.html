@@ -94,6 +94,9 @@ body.show-comments .card-desc{display:block}
 
 /* COMMENT TOGGLE */
 #commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto}
+body.gallery-mode #commentToggleWrap{display:flex}
+body.gallery-mode #sizeSliderWrap{display:flex}
+body.show-comments .card-desc{display:block!important}
 #commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
 #commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
 
@@ -141,8 +144,8 @@ body.show-comments .card-desc{display:block}
 
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
-.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:30px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
-.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:5px}
+.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
+.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:8px}
 
 /* ISLANDS */
 .map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
@@ -170,7 +173,7 @@ body.show-comments .card-desc{display:block}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
-.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:9px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.28);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
+.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:16px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.28);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
 .map-cluster-aciklama-btn:hover{color:var(--copper)}
 
 /* CLUSTER PANEL (floating docx windows, multiple can be open) */
@@ -582,6 +585,7 @@ function buildMap() {
 
   // scroll zoom
   view.addEventListener('wheel', e=>{
+    if (e.target.closest('.cluster-panel')) return;
     e.preventDefault();
     const f=e.deltaY>0?.92:1.08;
     const ns=Math.min(Math.max(scale*f,.1),5);
@@ -597,9 +601,8 @@ function buildMap() {
 function openMap() {
   document.getElementById('siteHeader').style.display='none';
   document.getElementById('galleryWrap').style.display='none';
-  document.getElementById('sizeSliderWrap').style.display='none';
-  document.getElementById('commentToggleWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
+  document.body.classList.remove('gallery-mode');
   document.body.style.overflow='hidden';
   if (!mapBuilt && rows.length) buildMap();
 }
@@ -608,8 +611,7 @@ function closeMap() {
   document.getElementById('mapView').style.display='none';
   document.getElementById('siteHeader').style.display='';
   document.getElementById('galleryWrap').style.display='';
-  document.getElementById('sizeSliderWrap').style.display='flex';
-  document.getElementById('commentToggleWrap').style.display='flex';
+  document.body.classList.add('gallery-mode');
   document.body.style.overflow='';
 }
 
