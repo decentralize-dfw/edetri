@@ -85,7 +85,7 @@ body.show-comments .card-desc{display:block}
 #sizeSlider{width:160px;accent-color:var(--copper);cursor:pointer}
 
 /* COMMENT TOGGLE */
-#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px}
+#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto}
 #commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
 #commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
 
@@ -132,7 +132,7 @@ body.show-comments .card-desc{display:block}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
 
 /* CLUSTER LABELS — always on top */
-.map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:500}
+.map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
 .map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:30px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
 .map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:5px}
 
@@ -162,8 +162,8 @@ body.show-comments .card-desc{display:block}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* MAP AÇIKLAMA BUTTON */
-#mapAciklamaBtn{position:fixed;top:48px;left:24px;font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(176,168,144,.35);letter-spacing:.1em;z-index:300;cursor:pointer;transition:color .2s;user-select:none}
-#mapAciklamaBtn:hover{color:rgba(176,168,144,.7)}
+#mapAciklamaBtn{position:fixed;top:48px;left:24px;font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(176,168,144,.6);letter-spacing:.1em;z-index:1002;cursor:pointer;transition:color .2s;user-select:none}
+#mapAciklamaBtn:hover{color:rgba(176,168,144,.9)}
 
 /* FINDER PANEL */
 #finderPanel{position:fixed;z-index:350;background:rgba(9,8,7,.96);backdrop-filter:blur(16px);border:1px solid rgba(176,168,144,.18);width:480px;height:420px;min-width:260px;min-height:180px;display:flex;flex-direction:column;top:80px;left:24px;overflow:hidden;resize:both}
@@ -289,6 +289,7 @@ const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AG&gid=0`;
 
 const SECTION_DOCS = [
+  { key: 'EDETRI_Bolum2_AnaCerceve', label: 'Ana Çerçeve' },
   { key: 'booklet',          label: 'Booklet' },
   { key: 'editoryel',        label: 'Editöryel' },
   { key: 'mekan',            label: 'Mekan' },
@@ -303,7 +304,9 @@ function toSlug(s) {
   return s.toLowerCase()
     .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
     .replace(/ö/g,'o').replace(/ç/g,'c').replace(/ı/g,'i')
-    .replace(/\s+/g,'-');
+    .replace(/[^a-z0-9\s]/g,'')
+    .replace(/\s+/g,'-')
+    .replace(/-+/g,'-');
 }
 
 let rows = [], visibleIdx = [], currentIdx = -1;
@@ -464,7 +467,7 @@ function buildMap() {
 
       const inner=document.createElement('div'); inner.className='map-island-inner';
       const img=document.createElement('img');
-      img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy';
+      img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy'; img.draggable=false;
       img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
       const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
       inner.appendChild(img); inner.appendChild(hl); island.appendChild(inner);
