@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EDETRI — Moodboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 :root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -39,6 +40,21 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 #ozetContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
 #ozetContent ul{padding-left:1.2em;margin:0 0 1em}
 #ozetContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
+
+/* RAPOR OVERLAY */
+#raporOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto}
+#raporOverlay.open{display:block}
+#raporInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
+#raporClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#raporClose:hover{color:var(--copper)}
+#raporContent{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.8}
+#raporContent h1,#raporContent h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:2em 0 .5em;font-weight:400}
+#raporContent h3,#raporContent h4{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.6em 0 .4em;font-weight:400}
+#raporContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
+#raporContent ul,#raporContent ol{padding-left:1.2em;margin:0 0 1em}
+#raporContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
+#raporContent strong{font-weight:400;color:var(--cream)}
+#raporLoading{color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0}
 
 /* FILTER BAR */
 .filter-bar{display:flex;align-items:center;gap:6px;padding:0 0 12px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
@@ -164,6 +180,7 @@ body.show-comments .card-desc{display:block}
       </div>
       <button class="btn-map" onclick="openMap()">⊕ Map</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
+      <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
     </div>
   </div>
   <div class="filter-bar" id="filterBar"></div>
@@ -603,7 +620,23 @@ init();
 
 function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOzet()});
+
+let raporLoaded=false;
+function openRapor(){
+  document.getElementById('raporOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  if(raporLoaded)return;
+  raporLoaded=true;
+  const content=document.getElementById('raporContent');
+  content.innerHTML='<div id="raporLoading">Yükleniyor...</div>';
+  fetch('https://xrweb.studio/edetri/edetri_curasyon_raporu.docx')
+    .then(r=>r.arrayBuffer())
+    .then(buf=>mammoth.convertToHtml({arrayBuffer:buf}))
+    .then(result=>{content.innerHTML=result.value})
+    .catch(()=>{content.innerHTML='<p style="color:var(--copper)">Dosya yüklenemedi.</p>'});
+}
+function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRapor()}});
 </script>
 
 <!-- ÖZET OVERLAY -->
@@ -643,6 +676,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOzet()});
       <p>EDETRI bir sahne kurarken — sergi, sofra, görsel, fiziksel nesne — hangi anda duruyor? Tam düzenmeden önce mi, tam bırakmadan önce mi? O eşik neresi?</p>
       <p>Bu sorunun cevabı hem sergi masasının tasarım kararını, hem fotoğraf dilini, hem booklet'in fiziksel yapısını, hem sosyal medya tonunu belirliyor. Kürasyon bu eşiği gösterdi — üçüncü aşama onu tanımlamalı.</p>
     </div>
+  </div>
+</div>
+
+<!-- RAPOR OVERLAY -->
+<div id="raporOverlay" onclick="if(event.target===this)closeRapor()">
+  <button id="raporClose" onclick="closeRapor()">✕</button>
+  <div id="raporInner">
+    <div id="raporContent"></div>
   </div>
 </div>
 </body>
