@@ -137,6 +137,7 @@ body.show-comments .card-desc{display:block!important}
 #mapCloseBtn{right:18px}
 #mapShuffleBtn{right:128px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
+#mapYaklasimBtn{left:24px;top:52px}
 .map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
 #mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
@@ -173,8 +174,8 @@ body.show-comments .card-desc{display:block!important}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
-.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:36px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.28);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
-.map-cluster-aciklama-btn:hover{color:var(--copper)}
+.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:36px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.82);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
+.map-cluster-aciklama-btn:hover{color:var(--cream)}
 
 /* CLUSTER PANEL (floating docx windows, multiple can be open) */
 .cluster-panel{position:fixed;z-index:1100;background:rgba(8,7,6,.97);backdrop-filter:blur(20px);border:1px solid rgba(176,168,144,.13);width:400px;height:480px;min-width:240px;min-height:160px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.75);overflow:visible}
@@ -237,6 +238,7 @@ body.show-comments .card-desc{display:block!important}
   /* Map UI buttons */
   .map-ui-btn{font-size:8px;padding:6px 9px}
   #mapShuffleBtn{right:80px}
+  #mapYaklasimBtn{left:16px;top:46px}
   .map-title-label{font-size:11px;top:20px;left:16px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
   /* Cluster panels: full width on mobile */
@@ -259,6 +261,7 @@ body.show-comments .card-desc{display:block!important}
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
   <div class="map-title-label">EDETRI — Constellation</div>
+  <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasim()">Yaklaşım</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
   <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
   <div id="mapStage"></div>
@@ -490,14 +493,14 @@ function buildMap() {
   document.getElementById('mapShuffleBtn').classList.remove('active');
 
   const VW=window.innerWidth, VH=window.innerHeight;
-  const isMobile = window.matchMedia('(pointer:coarse)').matches;
+  const isMobile = VW < 768;
   let seed=137;
   const rng=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/0xffffffff; };
 
   const types=[...new Set(rows.map(r=>r.type).filter(Boolean))];
   const ungrouped=rows.filter(r=>!r.type);
-  const WORLD_W = isMobile ? 1400 : 3400;
-  const WORLD_H = isMobile ? Math.max(types.length * 600 + 400, 2000) : 2600;
+  const WORLD_W = isMobile ? 800 : 3400;
+  const WORLD_H = isMobile ? Math.max(types.length * 420, 1800) : 2600;
   const cols = isMobile ? 1 : Math.ceil(Math.sqrt(types.length||1));
   const rcount=Math.ceil((types.length||1)/cols);
   const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
@@ -604,7 +607,7 @@ function buildMap() {
     lbl.appendChild(nm); lbl.appendChild(cnt);
     const sec=findDocForType(t);
     if (sec) {
-      const ab=document.createElement('div'); ab.className='map-cluster-aciklama-btn'; ab.textContent='açıklama';
+      const ab=document.createElement('div'); ab.className='map-cluster-aciklama-btn'; ab.textContent='+açıklama+';
       ab.addEventListener('click',e=>{e.stopPropagation();openClusterPanel(sec.key,ab);});
       lbl.appendChild(ab);
     }
@@ -617,9 +620,16 @@ function buildMap() {
   const minY=Math.min(...allItems.map(x=>x.baseY))-PAD;
   const maxX=Math.max(...allItems.map(x=>x.baseX+W_EST))+PAD;
   const maxY=Math.max(...allItems.map(x=>x.baseY+H_EST))+PAD;
-  scale=Math.min(VW/(maxX-minX), VH/(maxY-minY), 1);
-  panX=(VW-(maxX-minX)*scale)/2 - minX*scale;
-  panY=(VH-(maxY-minY)*scale)/2 - minY*scale;
+  if (isMobile) {
+    // Mobile: fit world width to screen, start scrolled to top
+    scale = Math.min(VW / WORLD_W * 0.92, 0.7);
+    panX = (VW - WORLD_W * scale) / 2;
+    panY = 60;
+  } else {
+    scale=Math.min(VW/(maxX-minX), VH/(maxY-minY), 1);
+    panX=(VW-(maxX-minX)*scale)/2 - minX*scale;
+    panY=(VH-(maxY-minY)*scale)/2 - minY*scale;
+  }
   applyTransform();
 
   document.querySelector('.map-hint-label').textContent = isMobile
