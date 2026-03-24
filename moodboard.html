@@ -151,6 +151,37 @@ body.show-comments .card-desc{display:block}
 .tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2}
 .tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5}
 
+/* RAPOR TABS */
+#raporTabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:28px;border-bottom:1px solid rgba(176,168,144,.12);padding-bottom:12px}
+.rapor-tab{background:none;border:none;color:rgba(176,168,144,.45);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.rapor-tab:hover{color:var(--silver)}
+.rapor-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
+
+/* BÖLÜM AÇIKLAMA */
+#bolumAciklamaWrap{padding:0 0 10px}
+#bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
+
+/* MAP AÇIKLAMA BUTTON */
+#mapAciklamaBtn{position:fixed;top:48px;left:24px;font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(176,168,144,.35);letter-spacing:.1em;z-index:300;cursor:pointer;transition:color .2s;user-select:none}
+#mapAciklamaBtn:hover{color:rgba(176,168,144,.7)}
+
+/* FINDER PANEL */
+#finderPanel{position:fixed;z-index:350;background:rgba(9,8,7,.96);backdrop-filter:blur(16px);border:1px solid rgba(176,168,144,.18);width:480px;height:420px;min-width:260px;min-height:180px;display:flex;flex-direction:column;top:80px;left:24px;overflow:hidden;resize:both}
+#finderTitleBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(176,168,144,.12);cursor:move;user-select:none;flex-shrink:0}
+#finderTitleText{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--silver);text-transform:uppercase}
+#finderCloseBtn{background:none;border:none;color:rgba(176,168,144,.4);cursor:pointer;font-size:14px;line-height:1;padding:0;transition:color .2s}
+#finderCloseBtn:hover{color:var(--silver)}
+#finderTabs{display:flex;gap:2px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid rgba(176,168,144,.08);flex-shrink:0}
+.finder-tab{background:none;border:none;color:rgba(176,168,144,.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent}
+.finder-tab:hover{color:var(--silver)}
+.finder-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
+#finderContent{flex:1;overflow-y:auto;padding:20px 24px;color:var(--cream);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.7}
+#finderContent h1,#finderContent h2{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:1.8em 0 .4em;font-weight:400}
+#finderContent h3,#finderContent h4{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.4em 0 .3em;font-weight:400}
+#finderContent p{text-align:justify;text-align-last:left;margin:0 0 .8em}
+#finderContent ul,#finderContent ol{padding-left:1.2em;margin:0 0 .8em}
+#finderContent li{margin-bottom:.3em}
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0)}
@@ -161,29 +192,46 @@ body.show-comments .card-desc{display:block}
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
   <div class="map-title-label">EDETRI — Constellation</div>
+  <div id="mapAciklamaBtn" onclick="toggleFinderPanel()">+ açıklama</div>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
   <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
   <div id="mapStage"></div>
   <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
   <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
   <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
+  <!-- FINDER PANEL -->
+  <div id="finderPanel" style="display:none">
+    <div id="finderTitleBar">
+      <span id="finderTitleText">Bölüm Açıklamaları</span>
+      <button id="finderCloseBtn" onclick="closeFinderPanel()">✕</button>
+    </div>
+    <div id="finderTabs"></div>
+    <div id="finderContent"></div>
+  </div>
 </div>
 
 <!-- HEADER — hidden until map closed -->
 <header id="siteHeader" style="display:none">
   <div class="header-top">
-    <div class="header-title">EDETRI — <span>Moodboard</span></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="header-title">EDETRI — <span>Moodboard</span></div>
+      <button class="btn-map" onclick="openOzet()">Özet</button>
+      <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
+    </div>
     <div class="header-right">
       <div style="display:flex;align-items:center;gap:6px">
         <span class="status-dot loading" id="statusDot"></span>
         <span class="status-text" id="statusText">Loading...</span>
       </div>
       <button class="btn-map" onclick="openMap()">⊕ Map</button>
-      <button class="btn-map" onclick="openOzet()">Özet</button>
-      <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
     </div>
   </div>
-  <div class="filter-bar" id="filterBar"></div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:12px"></div>
+    <div id="bolumAciklamaWrap" style="display:none;padding-bottom:12px;flex-shrink:0">
+      <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
+    </div>
+  </div>
 </header>
 
 <!-- GALLERY — hidden until map closed -->
@@ -239,6 +287,24 @@ body.show-comments .card-desc{display:block}
 <script>
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AG&gid=0`;
+
+const SECTION_DOCS = [
+  { key: 'booklet',          label: 'Booklet' },
+  { key: 'editoryel',        label: 'Editöryel' },
+  { key: 'mekan',            label: 'Mekan' },
+  { key: 'yasanmislik',      label: 'Yaşanmışlık' },
+  { key: 'sergi-platform',   label: 'Sergi Platform' },
+  { key: 'drape-ip-kaplama', label: 'Drape / İp Kaplama' },
+  { key: 'metal-kumas',      label: 'Metal Kumaş' }
+];
+const RAPOR_BASE = 'https://xrweb.studio/edetri/rapor/';
+
+function toSlug(s) {
+  return s.toLowerCase()
+    .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+    .replace(/ö/g,'o').replace(/ç/g,'c').replace(/ı/g,'i')
+    .replace(/\s+/g,'-');
+}
 
 let rows = [], visibleIdx = [], currentIdx = -1;
 let mapBuilt = false, isShuffled = false;
@@ -309,6 +375,16 @@ function applyFilter(f) {
     card.classList.toggle('hidden', f!=='all' && rows[+card.dataset.idx].type!==f);
   });
   visibleIdx = rows.map((_,i)=>i).filter(i=>f==='all'||rows[i].type===f);
+  // show/hide bölüm açıklama button
+  const wrap = document.getElementById('bolumAciklamaWrap');
+  if (f !== 'all') {
+    const slug = toSlug(f);
+    const hasDoc = SECTION_DOCS.some(s => s.key === slug);
+    wrap.style.display = hasDoc ? '' : 'none';
+    wrap.dataset.key = slug;
+  } else {
+    wrap.style.display = 'none';
+  }
 }
 
 // ── MASONRY ───────────────────────────────────────────────────
@@ -393,23 +469,24 @@ function buildMap() {
       const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
       inner.appendChild(img); inner.appendChild(hl); island.appendChild(inner);
 
-      // drag vs click logic
+      // drag vs click logic (pointer capture for clean stop on release anywhere)
       let dragging=false, hasMoved=false, dsx, dsy, dsl, dst;
-      island.addEventListener('mousedown', e=>{
+      island.addEventListener('pointerdown', e=>{
         e.stopPropagation();
         dragging=true; hasMoved=false;
         dsx=e.clientX; dsy=e.clientY;
         dsl=parseFloat(island.style.left); dst=parseFloat(island.style.top);
         island.style.transition='none'; island.style.zIndex='1000';
+        island.setPointerCapture(e.pointerId);
       });
-      window.addEventListener('mousemove', e=>{
+      island.addEventListener('pointermove', e=>{
         if (!dragging) return;
         const dx=(e.clientX-dsx)/scale, dy=(e.clientY-dsy)/scale;
         if (Math.abs(dx)>3||Math.abs(dy)>3) hasMoved=true;
         if (!hasMoved) return;
         island.style.left=(dsl+dx)+'px'; island.style.top=(dst+dy)+'px';
       });
-      window.addEventListener('mouseup', ()=>{
+      island.addEventListener('pointerup', ()=>{
         if (!dragging) return;
         dragging=false; island.style.zIndex=''; island.style.transition='';
         if (!hasMoved) {
@@ -418,6 +495,9 @@ function buildMap() {
           const item=mapAllItems.find(x=>x.el===island);
           if (item){ item.baseX=parseFloat(island.style.left); item.baseY=parseFloat(island.style.top); }
         }
+      });
+      island.addEventListener('pointercancel', ()=>{
+        dragging=false; island.style.zIndex=''; island.style.transition='';
       });
 
       // hover: +10deg rotation + tooltip
@@ -468,17 +548,20 @@ function buildMap() {
   document.getElementById('mapLoader').style.display='none';
   mapBuilt=true;
 
-  // pan
+  // pan (pointer capture for clean stop on release anywhere)
   const view=document.getElementById('mapView');
-  view.addEventListener('mousedown', e=>{
-    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')) return;
+  view.addEventListener('pointerdown', e=>{
+    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')||e.target.closest('#finderPanel')||e.target.closest('#mapAciklamaBtn')) return;
     isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
+    view.setPointerCapture(e.pointerId);
+    view.style.cursor='grabbing';
   });
-  window.addEventListener('mousemove', e=>{
+  view.addEventListener('pointermove', e=>{
     if (!isPanning) return;
     panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
   });
-  window.addEventListener('mouseup', ()=>{ isPanning=false; });
+  view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; });
+  view.addEventListener('pointercancel', ()=>{ isPanning=false; view.style.cursor=''; });
 
   // scroll zoom
   view.addEventListener('wheel', e=>{
@@ -491,17 +574,7 @@ function buildMap() {
     scale=ns; applyTransform();
   },{passive:false});
 
-  // touch pan
-  let t1x,t1y;
-  view.addEventListener('touchstart', e=>{
-    if (e.target.closest('.map-island')) return;
-    const t=e.touches[0]; isPanning=true; t1x=t.clientX; t1y=t.clientY; panOX=panX; panOY=panY;
-  },{passive:true});
-  view.addEventListener('touchmove', e=>{
-    if (!isPanning) return;
-    const t=e.touches[0]; panX=panOX+(t.clientX-t1x); panY=panOY+(t.clientY-t1y); applyTransform();
-  },{passive:true});
-  view.addEventListener('touchend', ()=>{ isPanning=false; });
+  // touch handled by pointer events above
 }
 
 function openMap() {
@@ -621,22 +694,102 @@ init();
 function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
 
-let raporLoaded=false;
-function openRapor(){
+// ── RAPOR (tabbed) ─────────────────────────────────────────────
+let raporLoadedTabs = {};
+function openRapor(initialKey) {
   document.getElementById('raporOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-  if(raporLoaded)return;
-  raporLoaded=true;
-  const content=document.getElementById('raporContent');
-  content.innerHTML='<div id="raporLoading">Yükleniyor...</div>';
-  fetch('https://xrweb.studio/edetri/edetri_curasyon_raporu.docx')
-    .then(r=>r.arrayBuffer())
-    .then(buf=>mammoth.convertToHtml({arrayBuffer:buf}))
-    .then(result=>{content.innerHTML=result.value})
-    .catch(()=>{content.innerHTML='<p style="color:var(--copper)">Dosya yüklenemedi.</p>'});
+  document.body.style.overflow = 'hidden';
+  buildRaporTabs();
+  switchRaporTab(initialKey || SECTION_DOCS[0].key);
+}
+function buildRaporTabs() {
+  const bar = document.getElementById('raporTabs');
+  if (bar.children.length) return;
+  SECTION_DOCS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'rapor-tab';
+    btn.textContent = s.label;
+    btn.dataset.key = s.key;
+    btn.onclick = () => switchRaporTab(s.key);
+    bar.appendChild(btn);
+  });
+}
+function switchRaporTab(key) {
+  document.querySelectorAll('.rapor-tab').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  const content = document.getElementById('raporContent');
+  if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
+  content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
+  fetch(RAPOR_BASE + key + '.docx')
+    .then(r => r.arrayBuffer())
+    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
 }
 function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRapor()}});
+
+// ── BÖLÜM AÇIKLAMA ─────────────────────────────────────────────
+function openBolumAciklama() {
+  const key = document.getElementById('bolumAciklamaWrap').dataset.key;
+  if (key) openRapor(key);
+}
+
+// ── FINDER PANEL (map mode) ────────────────────────────────────
+let finderTabsBuilt = false;
+function toggleFinderPanel() {
+  const p = document.getElementById('finderPanel');
+  if (p.style.display === 'none') openFinderPanel();
+  else closeFinderPanel();
+}
+function openFinderPanel(key) {
+  const p = document.getElementById('finderPanel');
+  p.style.display = 'flex';
+  if (!finderTabsBuilt) { buildFinderTabs(); finderTabsBuilt = true; }
+  switchFinderTab(key || SECTION_DOCS[0].key);
+}
+function closeFinderPanel() {
+  document.getElementById('finderPanel').style.display = 'none';
+}
+function buildFinderTabs() {
+  const bar = document.getElementById('finderTabs');
+  SECTION_DOCS.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'finder-tab';
+    btn.textContent = s.label;
+    btn.dataset.key = s.key;
+    btn.onclick = () => switchFinderTab(s.key);
+    bar.appendChild(btn);
+  });
+  // drag-by-titlebar using pointer capture
+  const titleBar = document.getElementById('finderTitleBar');
+  let dragDx, dragDy;
+  titleBar.addEventListener('pointerdown', e => {
+    if (e.target.id === 'finderCloseBtn') return;
+    const p = document.getElementById('finderPanel');
+    const r = p.getBoundingClientRect();
+    dragDx = e.clientX - r.left; dragDy = e.clientY - r.top;
+    titleBar.setPointerCapture(e.pointerId);
+  });
+  titleBar.addEventListener('pointermove', e => {
+    if (!titleBar.hasPointerCapture(e.pointerId)) return;
+    const p = document.getElementById('finderPanel');
+    p.style.left = (e.clientX - dragDx) + 'px';
+    p.style.top  = (e.clientY - dragDy) + 'px';
+  });
+}
+function switchFinderTab(key) {
+  document.querySelectorAll('.finder-tab').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  const content = document.getElementById('finderContent');
+  // reuse raporLoadedTabs cache
+  if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
+  content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em">Yükleniyor...</div>';
+  fetch(RAPOR_BASE + key + '.docx')
+    .then(r => r.arrayBuffer())
+    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRapor();closeFinderPanel()}});
 </script>
 
 <!-- ÖZET OVERLAY -->
@@ -683,6 +836,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOzet();closeRa
 <div id="raporOverlay" onclick="if(event.target===this)closeRapor()">
   <button id="raporClose" onclick="closeRapor()">✕</button>
   <div id="raporInner">
+    <div id="raporTabs"></div>
     <div id="raporContent"></div>
   </div>
 </div>
