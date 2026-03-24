@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EDETRI — Visual Archive</title>
+<title>EDETRI — Moodboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
@@ -27,6 +27,19 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-map{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 13px;cursor:pointer;transition:all .2s;white-space:nowrap;text-transform:uppercase}
 .btn-map:hover{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.08)}
 
+/* ÖZET OVERLAY */
+#ozetOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto}
+#ozetOverlay.open{display:block}
+#ozetInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
+#ozetClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#ozetClose:hover{color:var(--copper)}
+#ozetContent{color:var(--cream);font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;line-height:1.8}
+#ozetContent h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin:2em 0 .5em;font-weight:400}
+#ozetContent h3{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--silver);margin:1.6em 0 .4em;font-weight:400}
+#ozetContent p{text-align:justify;text-align-last:left;margin:0 0 1em}
+#ozetContent ul{padding-left:1.2em;margin:0 0 1em}
+#ozetContent li{text-align:justify;text-align-last:left;margin-bottom:.4em}
+
 /* FILTER BAR */
 .filter-bar{display:flex;align-items:center;gap:6px;padding:0 0 12px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
 .filter-bar::-webkit-scrollbar{display:none}
@@ -47,7 +60,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .card:hover .card-overlay{opacity:1}
 .card-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
 .card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,8px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
+.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,10px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
@@ -143,13 +156,14 @@ body.show-comments .card-desc{display:block}
 <!-- HEADER — hidden until map closed -->
 <header id="siteHeader" style="display:none">
   <div class="header-top">
-    <div class="header-title">EDETRI — <span>Visual Archive</span></div>
+    <div class="header-title">EDETRI — <span>Moodboard</span></div>
     <div class="header-right">
       <div style="display:flex;align-items:center;gap:6px">
         <span class="status-dot loading" id="statusDot"></span>
         <span class="status-text" id="statusText">Loading...</span>
       </div>
       <button class="btn-map" onclick="openMap()">⊕ Map</button>
+      <button class="btn-map" onclick="openOzet()">Özet</button>
     </div>
   </div>
   <div class="filter-bar" id="filterBar"></div>
@@ -303,7 +317,7 @@ function renderMasonry() {
 function applySize(v) {
   const cols = 10 - parseInt(v);
   document.getElementById('masonry').style.columnCount = cols;
-  document.documentElement.style.setProperty('--desc-font-size', Math.max(5, Math.round(80/cols)) + 'px');
+  document.documentElement.style.setProperty('--desc-font-size', Math.max(10, Math.round(80/cols)) + 'px');
 }
 
 // ── MAP BUILD ─────────────────────────────────────────────────
@@ -586,6 +600,50 @@ document.getElementById('commentToggle').addEventListener('change', function(){
 });
 
 init();
+
+function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOzet()});
 </script>
+
+<!-- ÖZET OVERLAY -->
+<div id="ozetOverlay" onclick="if(event.target===this)closeOzet()">
+  <button id="ozetClose" onclick="closeOzet()">✕</button>
+  <div id="ozetInner">
+    <div id="ozetContent">
+      <h2>Kürasyon Bilançosu</h2>
+      <h3>Genel Tanım</h3>
+      <p>Bu kürasyon bir estetik manifesto değil, bir malzeme düşüncesi. Her kategori aslında aynı soruyu farklı ölçeklerde soruyor: bir şey kendi doğasından koptuğunda ne olur? Kumaş taşıdığında, metal aktığında, masa giyindiğinde, bardak kirlendiğinde — o kopuş anı nedir?</p>
+      <h3>İskelet</h3>
+      <h3>Birinci eksen: Dönüşüm</h3>
+      <p>Kürasyon boyunca en çok tekrarlayan hareket şu — bir malzeme başka bir malzemenin dilini konuşuyor. Kumaş metal gibi duruyor, metal kumaş gibi akıyor, taş cam gibi davranıyor. Bu sadece estetik bir gözlem değil, bir üretim mantığı. "Bakteri × endüstri", "zanaat ve arsızlık" gibi notlar bu eksenin en net ifadesi. Dönüşüm burada bir süsleme değil, varoluş biçimi.</p>
+      <h3>İkinci eksen: Kontrol ve bırakma arasındaki gerilim</h3>
+      <p>Kürasyon iki uç arasında sürekli gidip geliyor. Bir yanda "kontrollü kaos", "ana referans" denen görseller — düzenli ama asla tam düzenli değil. Öte yanda "çok layerlı, o kadar layerlı ki kendinden çıkmış" diye reddedilen görseller. İstenen şey bu ikisi arasındaki eşik — ne tam kontrol ne tam bırakış. "Kontrollü bir dünyada kumaşların flörtözlük ve yaşanmışlık eklemesi" notu bu eksenin tam ortasını tarif ediyor.</p>
+      <h3>Üçüncü eksen: Ölçek kayması</h3>
+      <p>Kürasyon büyük mimari jestlerden (tepeden sarkıtılan kumaşlar, koolhaas bölünmeleri) çok küçük anlamlara (tabi arasındaki bardak, bulaşıktaki kirli kadeh) gidiyor. Ve en güçlü notlar çoğunlukla küçük ölçekte. "Küçük ölçekte de çalışabilecek bir fikir", "tek noktadan vurulmalı ve o nokta her şeyi tanımlıyor" — bu kürasyon büyük jesti reddederken küçük jesti yüceltiyor.</p>
+      <h3>Kategorilerin Birbiriyle İlişkisi</h3>
+      <p>Drape sahneyi kuruyor — dış kabuk, mekânın dili.<br>Metal kumaş ilişkisi malzemenin kendisini kuruyor — iç dönüşüm, maddenin dili.<br>Sergi platform bu ikisinin taşıyıcısını kuruyor — strüktür, iskelet.<br>Yaşanmışlık hepsinin sonrasına bakıyor — kullanım izi, zamanın dili.<br>Mekan bunların hepsinin içinde yaşadığı atmosferi kuruyor.<br>Editöryel bu sistemi nasıl göstereceğini soruyor — temsil, görsel dil.<br>Booklet ise bu sistemi nasıl taşıyacağını soruyor — kalıcılık, nesne olarak belge.</p>
+      <p>Bu yedi kategori aslında tek bir sorunun yedi farklı katmanı: EDETRI bir sahne kurarken neye bakıyor, neyle bakıyor, ne bırakıyor?</p>
+      <h3>Reddiyeler Sistemi</h3>
+      <p>Kürasyon neyi istediği kadar neyi istemediği konusunda da çok net. "Hayır", "bizlik değil", "fazla vintage", "fazla flörtöz", "alakasız", "fazla hightech" — bu reddiyeler rastgele değil, bir sınır çiziyor.</p>
+      <p>Red edilen şeyler üç grupta toplanıyor:</p>
+      <ul>
+        <li>Çok temiz olanlar — steril, simetrik, tam düzenli. Yaşanmamış.</li>
+        <li>Çok kaotik olanlar — "kendinden çıkmış", efekt objeyi yutmuş, mesaj kaybolmuş.</li>
+        <li>Yanlış referans taşıyanlar — fazla vintage, fazla hightech, fazla moda, yanlış çağrışım alanı.</li>
+      </ul>
+      <h3>Bu Kürasyonun Report-v4-3'e Kattığı</h3>
+      <p>Report'ta "The Split" bir konsept olarak vardı — iki dünyanın aynı karede buluşması. Kürasyon bunu somutlaştırıyor ve genişletiyor.</p>
+      <p>Report'ta olmayan ama kürasyonda güçlü çıkan birkaç şey var:</p>
+      <p>Kullanım izinin estetik değeri. Yaşanmışlık kategorisi bunu doğrudan söylüyor. Bitmiş masa, kirli bardak, dökülen şey — bunlar hata değil, içerik. Report "bırakılmış his" diyor ama kürasyon bunu çok daha somut bir yere taşıyor: "sırf masaları çekmek için yemek düzenlemek."</p>
+      <p>Ölçek kararı. Report büyük bir vizyon çiziyor — WebXR, hero kampanya, sergi. Kürasyon sürekli küçük ölçeğe çekiyor. "Tek noktadan vurulmalı", "küçük ölçekte de çalışır." Bu bir gerilim — üçüncü aşama raporda çözüme kavuşturulmalı.</p>
+      <p>Malzemenin kendi sesi. Kürasyon boyunca en güçlü notlar malzemenin "yanlış" davrandığı anlara yazılmış. Metal aktığında, kumaş taşıdığında, taş cam gibi konuştuğunda. Bu, EDETRI'nin ürün dilini de tarif ediyor aslında — cam ve seramik zaten "doğasından kopan" malzemeler. Ateşte şekillenen, sonra donup kalan.</p>
+      <h3>Üçüncü Aşama İçin Çerçeve</h3>
+      <p>Bu kürasyondan çıkan sistem şu soruyu sormak zorunda:</p>
+      <p>EDETRI bir sahne kurarken — sergi, sofra, görsel, fiziksel nesne — hangi anda duruyor? Tam düzenmeden önce mi, tam bırakmadan önce mi? O eşik neresi?</p>
+      <p>Bu sorunun cevabı hem sergi masasının tasarım kararını, hem fotoğraf dilini, hem booklet'in fiziksel yapısını, hem sosyal medya tonunu belirliyor. Kürasyon bu eşiği gösterdi — üçüncü aşama onu tanımlamalı.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
