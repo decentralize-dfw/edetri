@@ -173,7 +173,7 @@ body.show-comments .card-desc{display:block!important}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
-.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:16px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.28);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
+.map-cluster-aciklama-btn{display:block;text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:36px;letter-spacing:.18em;text-transform:uppercase;color:rgba(176,168,144,.28);cursor:pointer;transition:color .2s;pointer-events:auto;user-select:none}
 .map-cluster-aciklama-btn:hover{color:var(--copper)}
 
 /* CLUSTER PANEL (floating docx windows, multiple can be open) */
@@ -202,6 +202,56 @@ body.show-comments .card-desc{display:block!important}
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0)}
+
+/* YAKLAŞIM OVERLAY */
+#yaklasimOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
+#yaklasimOverlay.open{display:block}
+#yaklasimOverlay::-webkit-scrollbar{width:4px}
+#yaklasimOverlay::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
+#yaklasimInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
+#yaklasimClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#yaklasimClose:hover{color:var(--copper)}
+
+/* MOBILE */
+@media(max-width:768px){
+  /* Header */
+  #siteHeader{padding:0 10px}
+  .header-top{padding:10px 0;gap:8px;flex-wrap:wrap}
+  .header-top>div:first-child{flex-wrap:wrap;gap:6px}
+  .header-title{font-size:13px;letter-spacing:.05em;width:100%}
+  .header-right{gap:6px}
+  .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
+  /* Overlay inner: 5% margins each side */
+  #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
+  #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
+  /* Rapor tabs */
+  #raporTabs{gap:2px;margin-bottom:20px}
+  .rapor-tab{font-size:8px;padding:5px 7px;letter-spacing:.07em}
+  /* Masonry: 2 columns */
+  .masonry{column-count:2;column-gap:5px}
+  .gallery-wrap{padding:12px 5px}
+  /* Bottom controls */
+  #sizeSliderWrap{bottom:14px;padding:8px 13px}
+  #sizeSlider{width:100px}
+  #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
+  /* Map UI buttons */
+  .map-ui-btn{font-size:8px;padding:6px 9px}
+  #mapShuffleBtn{right:80px}
+  .map-title-label{font-size:11px;top:20px;left:16px}
+  .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
+  /* Cluster panels: full width on mobile */
+  .cluster-panel{width:calc(100vw - 20px)!important;left:10px!important;height:55vh;min-height:180px}
+  /* Cluster labels: smaller on mobile */
+  .map-cluster-name{font-size:36px}
+  .map-cluster-count{font-size:11px}
+  .map-cluster-aciklama-btn{font-size:22px!important}
+  /* Modal */
+  .modal-title{font-size:clamp(16px,5vw,26px);max-width:85vw}
+  .modal-desc-text{max-width:85vw;font-size:11px}
+  .modal-info-strip{padding:60px 16px 18px}
+  /* Bölüm açıklama: own row on mobile */
+  #bolumAciklamaWrap{width:100%;padding-bottom:8px}
+}
 </style>
 </head>
 <body>
@@ -222,6 +272,7 @@ body.show-comments .card-desc{display:block!important}
   <div class="header-top">
     <div style="display:flex;align-items:center;gap:12px">
       <div class="header-title">EDETRI — <span>Moodboard</span></div>
+      <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
     </div>
@@ -439,13 +490,15 @@ function buildMap() {
   document.getElementById('mapShuffleBtn').classList.remove('active');
 
   const VW=window.innerWidth, VH=window.innerHeight;
+  const isMobile = window.matchMedia('(pointer:coarse)').matches;
   let seed=137;
   const rng=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/0xffffffff; };
 
   const types=[...new Set(rows.map(r=>r.type).filter(Boolean))];
   const ungrouped=rows.filter(r=>!r.type);
-  const WORLD_W=3400, WORLD_H=2600;
-  const cols=Math.ceil(Math.sqrt(types.length||1));
+  const WORLD_W = isMobile ? 1400 : 3400;
+  const WORLD_H = isMobile ? Math.max(types.length * 600 + 400, 2000) : 2600;
+  const cols = isMobile ? 1 : Math.ceil(Math.sqrt(types.length||1));
   const rcount=Math.ceil((types.length||1)/cols);
   const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
 
@@ -461,12 +514,12 @@ function buildMap() {
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
       const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
-      const ring=Math.floor(j/6);
-      const dist=90+ring*130+rng()*35;
+      const ring=Math.floor(j/(isMobile?4:6));
+      const dist=isMobile?(55+ring*80+rng()*20):(90+ring*130+rng()*35);
       const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
       const sr=rng();
-      const w=sr<.12?120:sr<.38?85:58;
-      const h=sr<.12?160:sr<.38?112:77;
+      const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
+      const h=isMobile?(sr<.12?93:sr<.38?67:48):(sr<.12?160:sr<.38?112:77);
       const ix=px-w/2, iy=py-h/2;
       const rot=(rng()-.5)*6;
 
@@ -482,50 +535,54 @@ function buildMap() {
       const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
       inner.appendChild(img); inner.appendChild(hl); island.appendChild(inner);
 
-      // drag vs click logic (pointer capture for clean stop on release anywhere)
-      let dragging=false, hasMoved=false, dsx, dsy, dsl, dst;
-      island.addEventListener('pointerdown', e=>{
-        e.stopPropagation();
-        dragging=true; hasMoved=false;
-        dsx=e.clientX; dsy=e.clientY;
-        dsl=parseFloat(island.style.left); dst=parseFloat(island.style.top);
-        island.style.transition='none'; island.style.zIndex='1000';
-        island.setPointerCapture(e.pointerId);
-      });
-      island.addEventListener('pointermove', e=>{
-        if (!dragging) return;
-        const dx=(e.clientX-dsx)/scale, dy=(e.clientY-dsy)/scale;
-        if (Math.abs(dx)>3||Math.abs(dy)>3) hasMoved=true;
-        if (!hasMoved) return;
-        island.style.left=(dsl+dx)+'px'; island.style.top=(dst+dy)+'px';
-      });
-      island.addEventListener('pointerup', ()=>{
-        if (!dragging) return;
-        dragging=false; island.style.zIndex=''; island.style.transition='';
-        if (!hasMoved) {
-          openModal(gi);
-        } else {
-          const item=mapAllItems.find(x=>x.el===island);
-          if (item){ item.baseX=parseFloat(island.style.left); item.baseY=parseFloat(island.style.top); }
-        }
-      });
-      island.addEventListener('pointercancel', ()=>{
-        dragging=false; island.style.zIndex=''; island.style.transition='';
-      });
-
-      // hover: +10deg rotation + tooltip
-      island.addEventListener('mouseenter', ()=>{
-        const r=parseFloat(island.dataset.currentRot);
-        island.style.transform=`rotate(${r+10}deg)`;
-        document.getElementById('ttType').textContent=row.type||'';
-        document.getElementById('ttDesc').textContent=row.description||'';
-        if (row.type||row.description) document.getElementById('mapTooltip').classList.add('visible');
-      });
-      island.addEventListener('mouseleave', ()=>{
-        const r=parseFloat(island.dataset.currentRot);
-        island.style.transform=`rotate(${r}deg)`;
-        document.getElementById('mapTooltip').classList.remove('visible');
-      });
+      if (!isMobile) {
+        // Desktop: drag to reposition, click (no move) to open modal
+        let dragging=false, hasMoved=false, dsx, dsy, dsl, dst;
+        island.addEventListener('pointerdown', e=>{
+          e.stopPropagation();
+          dragging=true; hasMoved=false;
+          dsx=e.clientX; dsy=e.clientY;
+          dsl=parseFloat(island.style.left); dst=parseFloat(island.style.top);
+          island.style.transition='none'; island.style.zIndex='1000';
+          island.setPointerCapture(e.pointerId);
+        });
+        island.addEventListener('pointermove', e=>{
+          if (!dragging) return;
+          const dx=(e.clientX-dsx)/scale, dy=(e.clientY-dsy)/scale;
+          if (Math.abs(dx)>3||Math.abs(dy)>3) hasMoved=true;
+          if (!hasMoved) return;
+          island.style.left=(dsl+dx)+'px'; island.style.top=(dst+dy)+'px';
+        });
+        island.addEventListener('pointerup', ()=>{
+          if (!dragging) return;
+          dragging=false; island.style.zIndex=''; island.style.transition='';
+          if (!hasMoved) {
+            openModal(gi);
+          } else {
+            const item=mapAllItems.find(x=>x.el===island);
+            if (item){ item.baseX=parseFloat(island.style.left); item.baseY=parseFloat(island.style.top); }
+          }
+        });
+        island.addEventListener('pointercancel', ()=>{
+          dragging=false; island.style.zIndex=''; island.style.transition='';
+        });
+        // hover: +10deg rotation + tooltip
+        island.addEventListener('mouseenter', ()=>{
+          const r=parseFloat(island.dataset.currentRot);
+          island.style.transform=`rotate(${r+10}deg)`;
+          document.getElementById('ttType').textContent=row.type||'';
+          document.getElementById('ttDesc').textContent=row.description||'';
+          if (row.type||row.description) document.getElementById('mapTooltip').classList.add('visible');
+        });
+        island.addEventListener('mouseleave', ()=>{
+          const r=parseFloat(island.dataset.currentRot);
+          island.style.transform=`rotate(${r}deg)`;
+          document.getElementById('mapTooltip').classList.remove('visible');
+        });
+      } else {
+        // Mobile: tap to open modal, canvas pan/pinch handles movement
+        island.addEventListener('click', ()=>openModal(gi));
+      }
 
       stage.appendChild(island);
       allItems.push({el:island, baseX:ix, baseY:iy, baseRot:rot});
@@ -565,37 +622,80 @@ function buildMap() {
   panY=(VH-(maxY-minY)*scale)/2 - minY*scale;
   applyTransform();
 
+  document.querySelector('.map-hint-label').textContent = isMobile
+    ? 'tap to open · drag to pan · pinch to zoom'
+    : 'scroll to zoom · drag canvas to pan · drag image to move · click to open';
+
   document.getElementById('mapLoader').style.display='none';
   mapBuilt=true;
 
-  // pan (pointer capture for clean stop on release anywhere)
   const view=document.getElementById('mapView');
-  view.addEventListener('pointerdown', e=>{
-    if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
-    isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
-    view.setPointerCapture(e.pointerId);
-    view.style.cursor='grabbing';
-  });
-  view.addEventListener('pointermove', e=>{
-    if (!isPanning) return;
-    panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
-  });
-  view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; });
-  view.addEventListener('pointercancel', ()=>{ isPanning=false; view.style.cursor=''; });
 
-  // scroll zoom
-  view.addEventListener('wheel', e=>{
-    if (e.target.closest('.cluster-panel')) return;
-    e.preventDefault();
-    const f=e.deltaY>0?.92:1.08;
-    const ns=Math.min(Math.max(scale*f,.1),5);
-    const rect=view.getBoundingClientRect();
-    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-    panX=mx-(mx-panX)*(ns/scale); panY=my-(my-panY)*(ns/scale);
-    scale=ns; applyTransform();
-  },{passive:false});
-
-  // touch handled by pointer events above
+  if (isMobile) {
+    // Mobile: multi-pointer pan + pinch zoom; islands don't block pan
+    const activePtrs = new Map();
+    let pinchState = null;
+    view.addEventListener('pointerdown', e=>{
+      if (e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
+      activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+      if (activePtrs.size === 2) {
+        isPanning = false;
+        const pts=[...activePtrs.values()];
+        pinchState={
+          dist: Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y),
+          midX: (pts[0].x+pts[1].x)/2, midY: (pts[0].y+pts[1].y)/2,
+          scale, panX, panY
+        };
+      } else if (activePtrs.size === 1) {
+        isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
+      }
+    });
+    view.addEventListener('pointermove', e=>{
+      if (!activePtrs.has(e.pointerId)) return;
+      activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+      if (pinchState && activePtrs.size >= 2) {
+        const pts=[...activePtrs.values()];
+        const curDist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
+        const ns=Math.min(Math.max(pinchState.scale*(curDist/pinchState.dist), 0.05), 5);
+        panX=pinchState.midX-(pinchState.midX-pinchState.panX)*(ns/pinchState.scale);
+        panY=pinchState.midY-(pinchState.midY-pinchState.panY)*(ns/pinchState.scale);
+        scale=ns; applyTransform();
+      } else if (isPanning) {
+        panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+      }
+    });
+    const releaseMobile=e=>{
+      activePtrs.delete(e.pointerId);
+      if (activePtrs.size < 2) pinchState=null;
+      if (activePtrs.size === 0) { isPanning=false; }
+    };
+    view.addEventListener('pointerup', releaseMobile);
+    view.addEventListener('pointercancel', releaseMobile);
+  } else {
+    // Desktop: pan with pointer capture (skips islands), scroll to zoom
+    view.addEventListener('pointerdown', e=>{
+      if (e.target.closest('.map-island')||e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
+      isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
+      view.setPointerCapture(e.pointerId);
+      view.style.cursor='grabbing';
+    });
+    view.addEventListener('pointermove', e=>{
+      if (!isPanning) return;
+      panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+    });
+    view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; });
+    view.addEventListener('pointercancel', ()=>{ isPanning=false; view.style.cursor=''; });
+    view.addEventListener('wheel', e=>{
+      if (e.target.closest('.cluster-panel')) return;
+      e.preventDefault();
+      const f=e.deltaY>0?.92:1.08;
+      const ns=Math.min(Math.max(scale*f,.1),5);
+      const rect=view.getBoundingClientRect();
+      const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      panX=mx-(mx-panX)*(ns/scale); panY=my-(my-panY)*(ns/scale);
+      scale=ns; applyTransform();
+    },{passive:false});
+  }
 }
 
 function openMap() {
@@ -712,6 +812,26 @@ init();
 
 function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
+
+// ── YAKLAŞIM ───────────────────────────────────────────────────
+let yaklasimLoaded = false;
+function openYaklasim() {
+  document.getElementById('yaklasimOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!yaklasimLoaded) {
+    const content = document.getElementById('yaklasimContent');
+    content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0">Yükleniyor...</div>';
+    fetch(RAPOR_BASE + 'ozet.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { content.innerHTML = result.value; yaklasimLoaded = true; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  }
+}
+function closeYaklasim() {
+  document.getElementById('yaklasimOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
 // ── RAPOR (tabbed) ─────────────────────────────────────────────
 let raporLoadedTabs = {};
@@ -849,7 +969,7 @@ function setupPanelResize(panel) {
   });
 }
 
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeRapor();} });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeRapor();closeYaklasim();} });
 </script>
 
 <!-- ÖZET OVERLAY -->
@@ -898,6 +1018,14 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeR
   <div id="raporInner">
     <div id="raporTabs"></div>
     <div id="raporContent" class="doc-content"></div>
+  </div>
+</div>
+
+<!-- YAKLAŞIM OVERLAY -->
+<div id="yaklasimOverlay" onclick="if(event.target===this)closeYaklasim()">
+  <button id="yaklasimClose" onclick="closeYaklasim()">✕</button>
+  <div id="yaklasimInner">
+    <div id="yaklasimContent" class="doc-content"></div>
   </div>
 </div>
 </body>
