@@ -47,7 +47,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .card:hover .card-overlay{opacity:1}
 .card-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
 .card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,8px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
+.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,10px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
@@ -303,7 +303,7 @@ function renderMasonry() {
 function applySize(v) {
   const cols = 10 - parseInt(v);
   document.getElementById('masonry').style.columnCount = cols;
-  document.documentElement.style.setProperty('--desc-font-size', Math.max(5, Math.round(40/cols)) + 'px');
+  document.documentElement.style.setProperty('--desc-font-size', Math.max(10, Math.round(50/cols)) + 'px');
 }
 
 // ── MAP BUILD ─────────────────────────────────────────────────
