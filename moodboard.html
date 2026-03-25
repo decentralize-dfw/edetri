@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -15,11 +14,12 @@ body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px}
-.header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px}
+#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px 0 130px}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:12px}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
 .header-right{display:flex;align-items:center;gap:14px}
+.header-edetri{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:rgba(176,168,144,.3);text-transform:uppercase;margin-right:4px}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
 .status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
 .status-dot.ready{background:#5a8a5a}
@@ -135,10 +135,14 @@ body.show-comments .card-desc{display:block!important}
 #mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 .map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
 .map-ui-btn:hover{border-color:var(--copper);color:var(--copper)}
-#mapCloseBtn{right:18px}
-#mapShuffleBtn{right:128px}
+#mapDuvarBtn{left:18px;top:18px}
+#mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
-#mapYaklasimBtn{left:24px;top:52px}
+#mapYaklasimBtn{left:18px;top:58px}
+/* Gallery Pano button: fixed top-left, identical weight to Duvar */
+#galleryPanoBtn{position:fixed;top:18px;left:18px;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
+body.gallery-mode #galleryPanoBtn{display:block}
+#galleryPanoBtn:hover{border-color:var(--copper);color:var(--copper)}
 .map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
 #mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
@@ -171,7 +175,7 @@ body.show-comments .card-desc{display:block!important}
 .rapor-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
 
 /* BÖLÜM AÇIKLAMA */
-#bolumAciklamaWrap{padding:0 0 10px}
+#bolumAciklamaWrap{flex-shrink:0}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
@@ -202,7 +206,7 @@ body.show-comments .card-desc{display:block!important}
 .cp-resize-sw{bottom:-4px;left:-4px;width:12px;height:12px;cursor:sw-resize}
 
 /* MAP IMAGE PANEL (floating image+text popup) */
-.map-image-panel{width:480px!important;height:576px!important}
+.map-image-panel{width:480px;height:576px}
 .map-image-panel .mip-img-wrap{flex:1;overflow:hidden;min-height:0;background:rgba(0,0,0,.4)}
 .map-image-panel .mip-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
 .map-image-panel .mip-info{padding:10px 16px 14px;flex-shrink:0;border-top:1px solid rgba(176,168,144,.09)}
@@ -223,13 +227,19 @@ body.show-comments .card-desc{display:block!important}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Header */
+  /* Header — stack as column, Pano in flow (not fixed) */
   #siteHeader{padding:0 10px}
-  .header-top{padding:10px 0;gap:8px;flex-wrap:wrap}
-  .header-top>div:first-child{flex-wrap:wrap;gap:6px}
-  .header-title{font-size:13px;letter-spacing:.05em;width:100%}
-  .header-right{gap:6px}
+  .header-top{flex-direction:column;align-items:stretch;padding:10px 0;gap:6px}
+  /* Row 1: header-right (Pano + status), floats to top */
+  .header-right{order:-1;width:100%;justify-content:space-between;gap:6px}
+  /* Pano: back into flow on mobile */
+  #galleryPanoBtn{position:static!important;order:-1;background:none!important;backdrop-filter:none!important;border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:8px;padding:5px 9px;letter-spacing:.1em;top:auto;left:auto;z-index:auto;display:block}
+  body.gallery-mode #galleryPanoBtn{display:block}
+  /* Row 2+: left group with title + action buttons */
+  .header-top>div:first-child{order:0;flex-wrap:wrap;gap:5px;align-items:center}
+  .header-title{font-size:14px;letter-spacing:.06em;width:100%}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
+  .header-edetri{font-size:8px}
   /* Overlay inner: 5% margins each side */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
@@ -249,9 +259,10 @@ body.show-comments .card-desc{display:block!important}
   #mapYaklasimBtn{left:16px;top:46px}
   .map-title-label{font-size:11px;top:20px;left:16px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
-  /* Cluster panels: full width on mobile */
-  .cluster-panel{width:calc(100vw - 20px)!important;left:10px!important;height:55vh;min-height:180px}
-  .map-image-panel{height:70vh!important}
+  /* Cluster panels: mobile min-height, no forced width (JS sets 70% via inline style) */
+  .cluster-panel{min-height:160px}
+  /* Comments: always 8px on mobile, slider has no effect */
+  .card-desc{font-size:8px!important}
   /* Cluster labels: smaller on mobile */
   .map-cluster-name{font-size:36px}
   .map-cluster-count{font-size:11px}
@@ -269,10 +280,10 @@ body.show-comments .card-desc{display:block!important}
 
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
-  <div class="map-title-label">EDETRI — Constellation</div>
+  <div class="map-title-label">EDETRI — Pano</div>
   <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
-  <button class="map-ui-btn" id="mapCloseBtn" onclick="closeMap()">✕ Close</button>
+  <button class="map-ui-btn" id="mapDuvarBtn" onclick="closeMap()">Duvar</button>
   <div id="mapStage"></div>
   <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
   <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
@@ -282,25 +293,26 @@ body.show-comments .card-desc{display:block!important}
 <!-- HEADER — hidden until map closed -->
 <header id="siteHeader" style="display:none">
   <div class="header-top">
-    <div style="display:flex;align-items:center;gap:12px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <div class="header-title">EDETRI — <span>Moodboard</span></div>
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
+      <div id="bolumAciklamaWrap" style="display:none">
+        <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
+      </div>
     </div>
     <div class="header-right">
       <div style="display:flex;align-items:center;gap:6px">
+        <span class="header-edetri">EDETRI</span>
         <span class="status-dot loading" id="statusDot"></span>
         <span class="status-text" id="statusText">Loading...</span>
       </div>
-      <button class="btn-map" onclick="openMap()">⊕ Map</button>
+      <button id="galleryPanoBtn" onclick="openMap()">⊕ Pano</button>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;flex-wrap:wrap">
     <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:12px"></div>
-    <div id="bolumAciklamaWrap" style="display:none;padding-bottom:12px;flex-shrink:0">
-      <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
-    </div>
   </div>
 </header>
 
@@ -924,51 +936,63 @@ function openYaklasimPanel(anchorEl) {
   }
   const panel = clusterPanelCache[KEY];
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
-  const r = anchorEl ? anchorEl.getBoundingClientRect() : null;
-  panel.style.left = (r ? Math.min(r.right + 10, window.innerWidth - 420) : 80) + 'px';
-  panel.style.top  = (r ? Math.max(10, r.top) : 100) + 'px';
+  const mob = window.innerWidth < 768;
+  if (mob) {
+    const pw = Math.round(window.innerWidth  * 0.7);
+    const ph = Math.round(window.innerHeight * 0.7);
+    panel.style.width  = pw + 'px';
+    panel.style.height = ph + 'px';
+    panel.style.left   = Math.round((window.innerWidth  - pw) / 2) + 'px';
+    panel.style.top    = Math.round((window.innerHeight - ph) / 2) + 'px';
+  } else {
+    const r = anchorEl ? anchorEl.getBoundingClientRect() : null;
+    panel.style.left = (r ? Math.min(r.right + 10, window.innerWidth - 420) : 80) + 'px';
+    panel.style.top  = (r ? Math.max(10, r.top) : 100) + 'px';
+  }
   panel.style.display = 'flex';
   panel.style.zIndex = nextPanelZ();
 }
 
-// ── MAP IMAGE PANEL (floating island detail popup) ──────────────
-let mapImagePanelEl = null;
+// ── MAP IMAGE PANELS (per-image floating popup, multi-instance) ──
+const mapImagePanelCache = {};
 function openMapImagePanel(gi) {
-  if (!mapImagePanelEl) {
-    const panel = document.createElement('div');
-    panel.className = 'cluster-panel map-image-panel';
-    panel.style.display = 'none';
-    panel.innerHTML =
-      '<div class="cp-titlebar"><span class="cp-title mip-title"></span><button class="cp-close">✕</button></div>' +
-      '<div class="mip-img-wrap"><img class="mip-img" src="" alt="" referrerpolicy="no-referrer"></div>' +
-      '<div class="mip-info"><div class="mip-desc"></div></div>' +
-      '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
-      '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
-      '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
-      '<div class="cp-resize cp-resize-w"></div><div class="cp-resize cp-resize-nw"></div>';
-    panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
-    panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
-    setupPanelDrag(panel);
-    setupPanelResize(panel);
-    mapImagePanelEl = panel;
-    document.getElementById('mapView').appendChild(panel);
+  if (!mapImagePanelCache[gi]) {
+    mapImagePanelCache[gi] = _createMapImagePanel(gi);
+    document.getElementById('mapView').appendChild(mapImagePanelCache[gi]);
   }
+  const panel = mapImagePanelCache[gi];
+  if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
+  const mob = window.innerWidth < 768;
+  const count = Object.keys(mapImagePanelCache).length - 1;
+  const w = mob ? Math.round(window.innerWidth  * 0.7) : Math.min(480, window.innerWidth  - 20);
+  const h = mob ? Math.round(window.innerHeight * 0.7) : Math.min(576, window.innerHeight - 40);
+  const ox = (count % 6) * 22;
+  const oy = (count % 6) * 18;
+  panel.style.width  = w + 'px';
+  panel.style.height = h + 'px';
+  panel.style.left   = Math.max(10, (window.innerWidth  - w) / 2 + ox) + 'px';
+  panel.style.top    = Math.max(10, (window.innerHeight - h) / 2 + oy) + 'px';
+  panel.style.display = 'flex';
+  panel.style.zIndex = nextPanelZ();
+}
+function _createMapImagePanel(gi) {
   const row = rows[gi];
-  mapImagePanelEl.querySelector('.mip-title').textContent = row.type || '';
-  mapImagePanelEl.querySelector('.mip-img').src = row.imgUrl;
-  mapImagePanelEl.querySelector('.mip-desc').textContent = row.description || '';
-  if (mapImagePanelEl.style.display !== 'none') {
-    mapImagePanelEl.style.zIndex = nextPanelZ();
-    return;
-  }
-  const w = Math.min(480, window.innerWidth - 20);
-  const h = Math.min(576, window.innerHeight - 40);
-  mapImagePanelEl.style.width  = w + 'px';
-  mapImagePanelEl.style.height = h + 'px';
-  mapImagePanelEl.style.left = Math.max(10, (window.innerWidth  - w) / 2) + 'px';
-  mapImagePanelEl.style.top  = Math.max(10, (window.innerHeight - h) / 2) + 'px';
-  mapImagePanelEl.style.display = 'flex';
-  mapImagePanelEl.style.zIndex = nextPanelZ();
+  const panel = document.createElement('div');
+  panel.className = 'cluster-panel map-image-panel';
+  panel.style.display = 'none';
+  panel.innerHTML =
+    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + '</span><button class="cp-close">✕</button></div>' +
+    '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer"></div>' +
+    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div></div>' +
+    '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
+    '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
+    '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
+    '<div class="cp-resize cp-resize-w"></div><div class="cp-resize cp-resize-nw"></div>';
+  panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
+  panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
+  setupPanelDrag(panel);
+  setupPanelResize(panel);
+  return panel;
 }
 
 // ── CLUSTER PANELS (per-cluster floating docx windows) ─────────
@@ -983,9 +1007,19 @@ function openClusterPanel(key, anchorEl) {
   }
   const panel = clusterPanelCache[key];
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
-  const r = anchorEl.getBoundingClientRect();
-  panel.style.left = Math.max(0, Math.min(r.left + 20, window.innerWidth - 420)) + 'px';
-  panel.style.top  = Math.max(0, Math.min(r.bottom + 10, window.innerHeight - 500)) + 'px';
+  const mob = window.innerWidth < 768;
+  if (mob) {
+    const pw = Math.round(window.innerWidth  * 0.7);
+    const ph = Math.round(window.innerHeight * 0.7);
+    panel.style.width  = pw + 'px';
+    panel.style.height = ph + 'px';
+    panel.style.left   = Math.round((window.innerWidth  - pw) / 2) + 'px';
+    panel.style.top    = Math.round((window.innerHeight - ph) / 2) + 'px';
+  } else {
+    const r = anchorEl.getBoundingClientRect();
+    panel.style.left = Math.max(0, Math.min(r.left + 20, window.innerWidth - 420)) + 'px';
+    panel.style.top  = Math.max(0, Math.min(r.bottom + 10, window.innerHeight - 500)) + 'px';
+  }
   panel.style.display = 'flex';
   panel.style.zIndex = nextPanelZ();
   loadClusterPanel(key, panel);
