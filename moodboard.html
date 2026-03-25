@@ -14,11 +14,12 @@ body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px}
-.header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px}
+#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px 0 130px}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:12px}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
 .header-right{display:flex;align-items:center;gap:14px}
+.header-edetri{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:rgba(176,168,144,.3);text-transform:uppercase;margin-right:4px}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
 .status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
 .status-dot.ready{background:#5a8a5a}
@@ -174,7 +175,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
 .rapor-tab.active{color:var(--copper);border-bottom-color:var(--copper)}
 
 /* BÖLÜM AÇIKLAMA */
-#bolumAciklamaWrap{padding:0 0 10px}
+#bolumAciklamaWrap{flex-shrink:0}
 #bolumAciklamaBtn{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em}
 
 /* CLUSTER AÇIKLAMA BUTTON (inside map-cluster-label) */
@@ -205,7 +206,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
 .cp-resize-sw{bottom:-4px;left:-4px;width:12px;height:12px;cursor:sw-resize}
 
 /* MAP IMAGE PANEL (floating image+text popup) */
-.map-image-panel{width:480px!important;height:576px!important}
+.map-image-panel{width:480px;height:576px}
 .map-image-panel .mip-img-wrap{flex:1;overflow:hidden;min-height:0;background:rgba(0,0,0,.4)}
 .map-image-panel .mip-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
 .map-image-panel .mip-info{padding:10px 16px 14px;flex-shrink:0;border-top:1px solid rgba(176,168,144,.09)}
@@ -226,13 +227,19 @@ body.gallery-mode #galleryPanoBtn{display:block}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Header */
+  /* Header — stack as column, Pano in flow (not fixed) */
   #siteHeader{padding:0 10px}
-  .header-top{padding:10px 0;gap:8px;flex-wrap:wrap}
-  .header-top>div:first-child{flex-wrap:wrap;gap:6px}
-  .header-title{font-size:13px;letter-spacing:.05em;width:100%}
-  .header-right{gap:6px}
+  .header-top{flex-direction:column;align-items:stretch;padding:10px 0;gap:6px}
+  /* Row 1: header-right (Pano + status), floats to top */
+  .header-right{order:-1;width:100%;justify-content:space-between;gap:6px}
+  /* Pano: back into flow on mobile */
+  #galleryPanoBtn{position:static!important;order:-1;background:none!important;backdrop-filter:none!important;border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:8px;padding:5px 9px;letter-spacing:.1em;top:auto;left:auto;z-index:auto;display:block}
+  body.gallery-mode #galleryPanoBtn{display:block}
+  /* Row 2+: left group with title + action buttons */
+  .header-top>div:first-child{order:0;flex-wrap:wrap;gap:5px;align-items:center}
+  .header-title{font-size:14px;letter-spacing:.06em;width:100%}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
+  .header-edetri{font-size:8px}
   /* Overlay inner: 5% margins each side */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
@@ -254,8 +261,8 @@ body.gallery-mode #galleryPanoBtn{display:block}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
   /* Cluster panels: mobile min-height, no forced width (JS sets 70% via inline style) */
   .cluster-panel{min-height:160px}
-  /* Comments: always 6px on mobile, slider has no effect */
-  .card-desc{font-size:6px!important}
+  /* Comments: always 8px on mobile, slider has no effect */
+  .card-desc{font-size:8px!important}
   /* Cluster labels: smaller on mobile */
   .map-cluster-name{font-size:36px}
   .map-cluster-count{font-size:11px}
@@ -286,25 +293,26 @@ body.gallery-mode #galleryPanoBtn{display:block}
 <!-- HEADER — hidden until map closed -->
 <header id="siteHeader" style="display:none">
   <div class="header-top">
-    <div style="display:flex;align-items:center;gap:12px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <div class="header-title">EDETRI — <span>Moodboard</span></div>
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
+      <div id="bolumAciklamaWrap" style="display:none">
+        <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
+      </div>
     </div>
     <div class="header-right">
       <div style="display:flex;align-items:center;gap:6px">
+        <span class="header-edetri">EDETRI</span>
         <span class="status-dot loading" id="statusDot"></span>
         <span class="status-text" id="statusText">Loading...</span>
       </div>
       <button id="galleryPanoBtn" onclick="openMap()">⊕ Pano</button>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;flex-wrap:wrap">
     <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:12px"></div>
-    <div id="bolumAciklamaWrap" style="display:none;padding-bottom:12px;flex-shrink:0">
-      <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
-    </div>
   </div>
 </header>
 
