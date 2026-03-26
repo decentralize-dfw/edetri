@@ -159,7 +159,7 @@ body.show-comments .card-desc{display:block!important}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
-#mapFitBtn{left:18px;top:98px}
+#mapFitBtn{left:24px;top:auto;bottom:24px}
 /* Gallery Pano button: fixed top-left, identical weight to Duvar */
 #galleryPanoBtn{position:fixed;top:18px;left:18px;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
 body.gallery-mode #galleryPanoBtn{display:block}
@@ -232,7 +232,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
 .map-image-panel .mip-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
 .map-image-panel .mip-info{padding:10px 16px 14px;flex-shrink:0;border-top:1px solid rgba(176,168,144,.09)}
 .map-image-panel .mip-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);line-height:1.4;margin-top:4px}
-.mip-stars{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;z-index:2;pointer-events:none}
+.mip-stars{position:absolute;bottom:5%;left:0;right:0;text-align:center;z-index:2;pointer-events:none}
 .mip-stars .star{font-size:20px}
 #mStars .star-rating{justify-content:flex-start;gap:2px}
 #mStars .star{font-size:17px}
@@ -550,7 +550,6 @@ function renderMasonry() {
     const img = document.createElement('img');
     img.src=row.imgUrl; img.alt=row.type||''; img.loading='lazy'; img.referrerPolicy='no-referrer';
     const ov = document.createElement('div'); ov.className='card-overlay';
-    if (row.rating) { const sr=document.createElement('div'); sr.className='card-stars'; sr.innerHTML=buildStarRating(row.rating); ov.appendChild(sr); }
     const metaRow = document.createElement('div'); metaRow.className='card-meta-row';
     if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; metaRow.appendChild(d); }
     if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; metaRow.appendChild(s); }
@@ -623,7 +622,6 @@ function buildMap() {
       img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy'; img.draggable=false;
       img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
       inner.appendChild(img);
-      if (row.rating) { const ms=document.createElement('div'); ms.className='map-stars'; ms.innerHTML=buildStarRating(row.rating); inner.appendChild(ms); }
       const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
       inner.appendChild(hl); island.appendChild(inner);
 
@@ -1044,6 +1042,7 @@ function openMapImagePanel(gi) {
   panel.style.top    = Math.max(10, (window.innerHeight - h) / 2 + oy) + 'px';
   panel.style.display = 'flex';
   panel.style.zIndex = nextPanelZ();
+  positionMipStars(panel);
 }
 function _createMapImagePanel(gi) {
   const row = rows[gi];
@@ -1207,6 +1206,35 @@ function fitMap() {
   stage.style.transition = 'transform .5s cubic-bezier(.25,.46,.45,.94)';
   applyTransform();
   setTimeout(() => { stage.style.transition = ''; }, 520);
+}
+
+function positionMipStars(panel) {
+  const mipImg   = panel.querySelector('.mip-img');
+  const mipWrap  = panel.querySelector('.mip-img-wrap');
+  const mipStars = panel.querySelector('.mip-stars');
+  if (!mipStars || !mipImg || !mipWrap) return;
+  const doPos = () => {
+    const cW = mipWrap.clientWidth, cH = mipWrap.clientHeight;
+    if (!cW || !cH || !mipImg.naturalWidth) return;
+    const iRatio = mipImg.naturalWidth / mipImg.naturalHeight;
+    const cRatio = cW / cH;
+    let renderedH, imgBottom;
+    if (iRatio > cRatio) {
+      renderedH = cW / iRatio;
+      imgBottom = (cH + renderedH) / 2;
+    } else {
+      renderedH = cH;
+      imgBottom = cH;
+    }
+    mipStars.style.top    = (imgBottom - renderedH * 0.05) + 'px';
+    mipStars.style.bottom = 'auto';
+    mipStars.style.transform = 'translateY(-100%)';
+  };
+  if (mipImg.complete && mipImg.naturalWidth) {
+    requestAnimationFrame(doPos);
+  } else {
+    mipImg.addEventListener('load', () => requestAnimationFrame(doPos), { once: true });
+  }
 }
 
 document.getElementById('star-filter-btn').addEventListener('click', e => {
