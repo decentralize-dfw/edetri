@@ -113,7 +113,8 @@
                 color: row.c[3]?.v || '#CCCCCC', // D Kolonu
                 pinterestLink: row.c[4]?.v || '#', // E Kolonu
                 type: row.c[5]?.v || '', // F Kolonu
-                description: row.c[6]?.v || '' // G Kolonu
+                description: row.c[6]?.v || '', // G Kolonu
+                rating: parseFloat(String(row.c[7]?.v || '').replace(',', '.')) || 0 // H Kolonu
               });
             }
 
@@ -125,7 +126,8 @@
                 return {
                   ...img,
                   type: pendingObj[img.id].type,
-                  description: pendingObj[img.id].description
+                  description: pendingObj[img.id].description,
+                  rating: pendingObj[img.id].rating ?? img.rating
                 };
               }
               return img;
@@ -143,15 +145,15 @@
       }, []);
 
       // Değişiklikleri hafızaya al
-      const handleLocalSave = (id, type, description) => {
-        setImages(prevImages => prevImages.map(item => 
-          item.id === id ? { ...item, type, description } : item
+      const handleLocalSave = (id, type, description, rating) => {
+        setImages(prevImages => prevImages.map(item =>
+          item.id === id ? { ...item, type, description, rating } : item
         ));
-        
+
         setPendingChanges(prev => {
           const updatedPending = {
             ...prev,
-            [id]: { row: id, type, description }
+            [id]: { row: id, type, description, rating }
           };
           safeStorage.set('pinterest_pending_changes', updatedPending);
           return updatedPending;
@@ -280,21 +282,64 @@
       );
     }
 
+    // Yıldız Puanlama Bileşeni
+    function StarRating({ value, onChange }) {
+      const [hovered, setHovered] = React.useState(null);
+      const display = hovered ?? value;
+      return (
+        <div>
+          <div style={{ display:'flex', gap:'3px', marginBottom:'8px' }}>
+            {[1,2,3,4,5].map(i => {
+              const fill = Math.min(100, Math.max(0, (display - (i-1)) * 100));
+              return (
+                <span
+                  key={i}
+                  onClick={() => onChange(i)}
+                  onMouseEnter={() => setHovered(i)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    fontSize:'28px', cursor:'pointer', userSelect:'none',
+                    background:`linear-gradient(to right,#f59e0b ${fill}%,#d1d5db ${fill}%)`,
+                    WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'
+                  }}
+                >★</span>
+              );
+            })}
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+            <input
+              type="number" min="0" max="5" step="0.1"
+              value={value || ''}
+              onChange={e => {
+                const v = parseFloat(e.target.value);
+                onChange(isNaN(v) ? 0 : Math.min(5, Math.max(0, Math.round(v * 10) / 10)));
+              }}
+              placeholder="0.0"
+              className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none bg-gray-50 focus:bg-white"
+            />
+            <span className="text-sm text-gray-400">/ 5</span>
+          </div>
+        </div>
+      );
+    }
+
     // Tam Ekran Modal Bileşeni
     function Modal({ img, onClose, onSaveLocally, onNavigate }) {
       const [type, setType] = useState(img.type || '');
       const [description, setDescription] = useState(img.description || '');
+      const [rating, setRating] = useState(img.rating || 0);
 
       // Resim değiştiğinde form alanlarını yeni resmin bilgileriyle güncellemek için
       useEffect(() => {
         setType(img.type || '');
         setDescription(img.description || '');
-      }, [img.id, img.type, img.description]);
+        setRating(img.rating || 0);
+      }, [img.id, img.type, img.description, img.rating]);
 
       // Yalnızca gerçekten bir şey değiştirildiyse kaydet
       const saveCurrentChanges = () => {
-        if (type !== (img.type || '') || description !== (img.description || '')) {
-          onSaveLocally(img.id, type, description);
+        if (type !== (img.type || '') || description !== (img.description || '') || rating !== (img.rating || 0)) {
+          onSaveLocally(img.id, type, description, rating);
         }
       };
 
@@ -328,7 +373,7 @@
         
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [type, description, img, onNavigate, onSaveLocally, onClose]); // Güncel referansları tut
+      }, [type, description, rating, img, onNavigate, onSaveLocally, onClose]); // Güncel referansları tut
 
       return (
         <div className="fixed inset-0 z-50 bg-black flex flex-col md:flex-row">
@@ -394,8 +439,13 @@
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Puan / 5</label>
+                <StarRating value={rating} onChange={setRating} />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">Description (Açıklama)</label>
-                <textarea 
+                <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Bu görsel hakkında notlar ekleyin..."
