@@ -371,7 +371,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
     <div class="sfp-row" data-val="2">2 ★</div>
     <div class="sfp-row" data-val="1">1 ★</div>
   </div>
-  <button id="star-filter-btn" title="Yıldıza göre filtrele">★</button>
+  <button id="star-filter-btn">★</button>
 </div>
 
 <!-- MODAL -->
@@ -1230,6 +1230,13 @@ function positionMipStars(panel) {
     mipStars.style.bottom = 'auto';
     mipStars.style.transform = 'translateY(-100%)';
   };
+  // ResizeObserver: recalculate on every panel/window resize
+  if (!panel._starsObserver) {
+    panel._starsObserver = new ResizeObserver(() => {
+      if (mipImg.complete && mipImg.naturalWidth) doPos();
+    });
+    panel._starsObserver.observe(mipWrap);
+  }
   if (mipImg.complete && mipImg.naturalWidth) {
     requestAnimationFrame(doPos);
   } else {
