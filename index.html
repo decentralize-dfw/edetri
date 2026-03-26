@@ -17,7 +17,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 #siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);transition:transform .22s ease}
 body.header-hidden #siteHeader{transform:translateY(-100%)}
 body:not(.gallery-mode) #siteHeader{background:none;backdrop-filter:none;border-bottom:none;pointer-events:none}
-body:not(.gallery-mode) #siteHeader>*{pointer-events:all}
+body:not(.gallery-mode) #siteHeader>*{pointer-events:none}
+body:not(.gallery-mode) #siteHeader button:not(#filterCollapseBtn),body:not(.gallery-mode) #siteHeader a{pointer-events:all}
 #top-bar-row{display:flex;align-items:center;gap:12px;padding:10px 24px 10px 14px;flex-wrap:nowrap}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
@@ -263,7 +264,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 #mobileNavPopup .btn-map{text-align:left;padding:11px 14px;font-size:9px;border:1px solid rgba(176,168,144,.12)}
 
 /* GALLERY SHUFFLE */
-#galleryShuffleBtn{display:none;position:fixed;z-index:300;bottom:14px;right:12px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;padding:7px 14px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+#galleryShuffleBtn{display:none;position:fixed;z-index:450;bottom:14px;right:12px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;padding:7px 14px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+body.gallery-mode #galleryShuffleBtn{display:block}
 #galleryShuffleBtn:hover{border-color:var(--copper);color:var(--copper)}
 #galleryShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 
