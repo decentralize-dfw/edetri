@@ -2,24 +2,38 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EDETRI — Moodboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 :root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif;font-weight:200;min-height:100vh;overflow-x:hidden}
+html{scroll-behavior:smooth;scrollbar-width:none}html::-webkit-scrollbar{display:none}
+body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif;font-weight:200;min-height:100vh;overflow-x:hidden;scrollbar-width:none}body::-webkit-scrollbar{display:none}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px 0 130px}
-.header-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:12px}
+#siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12)}
+body:not(.gallery-mode) #siteHeader{background:none;backdrop-filter:none;border-bottom:none;pointer-events:none}
+body:not(.gallery-mode) #siteHeader>*{pointer-events:all}
+#top-bar-row{display:flex;align-items:center;gap:12px;padding:10px 24px 10px 14px;flex-wrap:nowrap}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
-.header-right{display:flex;align-items:center;gap:14px}
-.header-edetri{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:rgba(176,168,144,.3);text-transform:uppercase;margin-right:4px}
+#site-logo{height:26px;width:auto;filter:invert(1);display:block;pointer-events:none;flex-shrink:0}
+#header-moodboard{display:none!important}
+#modeToggleBtn{order:2;background:var(--gold);border:1px solid var(--gold);color:var(--black);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 13px;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap;flex-shrink:0;font-weight:500}
+#modeToggleBtn:hover{background:var(--copper);border-color:var(--copper);color:var(--black)}
+#wall-nav{display:none;align-items:center;gap:12px;flex-wrap:wrap;flex:1;order:4}
+body.gallery-mode #wall-nav{display:flex}
+#header-status{display:flex;align-items:center;gap:6px;flex-shrink:0;order:5}
+body:not(.gallery-mode) #header-status{display:none}
+#filter-row{display:none;align-items:center;padding:0 24px 8px 14px;gap:6px;min-height:28px}
+body.gallery-mode #filter-row{display:flex}
+body.filters-collapsed #filter-row .filter-bar{display:none}
+body.filters-collapsed #wall-nav{display:none}
+#filterCollapseBtn{background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;padding:2px 8px;transition:color .2s;flex-shrink:0;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;display:none}
+#filterCollapseBtn:hover{color:var(--copper)}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
 .status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
 .status-dot.ready{background:#5a8a5a}
@@ -109,9 +123,10 @@ body.has-data #star-filter-wrap{display:block}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
-#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:10px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 18px;border-radius:2px}
-#sizeSliderWrap span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase}
-#sizeSlider{width:160px;accent-color:var(--copper);cursor:pointer}
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px}
+.size-step-btn{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:15px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;flex-shrink:0;padding:0}
+.size-step-btn:hover{border-color:var(--copper);color:var(--copper)}
+#sizeDisplay{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);min-width:18px;text-align:center;letter-spacing:.05em}
 
 /* COMMENT TOGGLE */
 #commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto}
@@ -150,29 +165,30 @@ body.show-comments .card-desc{display:block!important}
 .keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.25;letter-spacing:.06em}
 
 /* MAP VIEW */
-#mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none}
+#mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none;touch-action:none}
 #mapView:active{cursor:grabbing}
 #mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 .map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
 .map-ui-btn:hover{border-color:var(--copper);color:var(--copper)}
-#mapDuvarBtn{left:18px;top:18px}
+#mapDuvarBtn{left:150px;top:13px}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
-#mapFitBtn{left:24px;top:auto;bottom:24px}
-/* Gallery Pano button: fixed top-left, identical weight to Duvar */
-#galleryPanoBtn{position:fixed;top:18px;left:18px;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
-body.gallery-mode #galleryPanoBtn{display:block}
-#galleryPanoBtn:hover{border-color:var(--copper);color:var(--copper)}
-.map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
+#mapFitBtn{left:24px;right:auto;top:auto;bottom:24px}
+/* Old individual toggle buttons — replaced by #modeToggleBtn in header */
+#galleryPanoBtn{display:none!important}
+#mapDuvarBtn{display:none!important}
+.map-title-label{display:none}
+#corner-gif{position:fixed;bottom:18px;right:18px;width:64px;height:auto;filter:invert(1);pointer-events:none;z-index:50}
+body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
 #mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
 
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
-.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
-.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:8px}
+.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.90);letter-spacing:.04em;white-space:nowrap;line-height:1;-webkit-text-stroke:2px rgba(0,0,0,.85);paint-order:stroke fill}
+.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.5);margin-top:8px;-webkit-text-stroke:1px rgba(0,0,0,.7);paint-order:stroke fill}
 
 /* ISLANDS */
 .map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
@@ -252,20 +268,30 @@ body.gallery-mode #galleryPanoBtn{display:block}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Header — stack as column, Pano in flow (not fixed) */
-  #siteHeader{padding:0 10px}
-  .header-top{flex-direction:column;align-items:stretch;padding:10px 0;gap:6px}
-  /* Row 1: header-right (Pano + status), floats to top */
-  .header-right{order:-1;width:100%;justify-content:space-between;gap:6px}
-  /* Pano: back into flow on mobile */
-  #galleryPanoBtn{position:static!important;order:-1;background:none!important;backdrop-filter:none!important;border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:8px;padding:5px 9px;letter-spacing:.1em;top:auto;left:auto;z-index:auto;display:block}
-  body.gallery-mode #galleryPanoBtn{display:block}
-  /* Row 2+: left group with title + action buttons */
-  .header-top>div:first-child{order:0;flex-wrap:wrap;gap:5px;align-items:center}
-  .header-title{font-size:14px;letter-spacing:.06em;width:100%}
+  /* Header: logo + toggle tek satırda, wall-nav hemen altında */
+  #top-bar-row{flex-wrap:wrap;align-items:center;padding:8px 12px;gap:6px}
+  #site-logo{height:20px;flex-shrink:0;order:1}
+  /* Moodboard yazısını mobilde gizle */
+  #header-moodboard{display:none!important}
+  /* Toggle: logo hemen yanında (margin-left:8px) */
+  #modeToggleBtn{order:1;flex-basis:auto;font-size:8px;padding:5px 9px;margin-left:8px;letter-spacing:.08em}
+  /* Filtre oku: her iki modda da alan ayır (layout kaymasın), sadece galeri modunda görünür */
+  #filterCollapseBtn{display:flex!important;visibility:hidden;pointer-events:none;order:1;margin-left:auto;font-size:13px;padding:5px 10px;align-items:center;justify-content:center}
+  body.gallery-mode #filterCollapseBtn{visibility:visible;pointer-events:auto}
+  /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
+  #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
+  body.filters-collapsed #wall-nav{display:flex!important}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
-  .header-edetri{font-size:8px}
-  /* Overlay inner: 5% margins each side */
+  #header-status{display:none}
+  /* Filter row */
+  #filter-row{padding:0 12px 6px 12px}
+  /* mapYaklasimBtn mobilde gizle */
+  #mapYaklasimBtn{display:none!important}
+  /* Filtre kapalıyken filter-row tamamen gizle → içerik üç tuşun hemen altından başlar */
+  body.filters-collapsed #filter-row{display:none!important}
+  /* Shuffle: modeToggleBtn ile aynı boyut/yükseklik */
+  #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
+  /* Overlay inner */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
   /* Rapor tabs */
@@ -273,23 +299,19 @@ body.gallery-mode #galleryPanoBtn{display:block}
   .rapor-tab{font-size:8px;padding:5px 7px;letter-spacing:.07em}
   /* Masonry: 2 columns */
   .masonry{column-count:2;column-gap:5px}
-  .gallery-wrap{padding:12px 5px}
+  .gallery-wrap{padding:0 5px 12px}
   /* Bottom controls */
-  #sizeSliderWrap{bottom:14px;padding:8px 13px}
-  #sizeSlider{width:100px}
+  #sizeSliderWrap{bottom:14px;padding:6px 10px}
+  .size-step-btn{width:32px;height:32px;font-size:18px}
   #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
-  .map-ui-btn{font-size:8px;padding:6px 9px}
-  #mapShuffleBtn{right:80px}
-  #mapYaklasimBtn{left:16px;top:46px}
-  .map-title-label{font-size:11px;top:20px;left:16px}
+  .map-ui-btn{font-size:9px;padding:7px 14px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
-  /* Cluster panels: mobile min-height, no forced width (JS sets 70% via inline style) */
-  .cluster-panel{min-height:160px}
-  /* Comments: always 8px on mobile, slider has no effect */
+  /* Cluster panels: geniş touch alanı için titlebar büyük */
+  .cluster-panel{min-height:180px}
+  .cp-titlebar{padding:14px 16px;min-height:48px}
   .card-desc{font-size:8px!important}
-  /* Cluster labels: smaller on mobile */
   .map-cluster-name{font-size:36px}
   .map-cluster-count{font-size:11px}
   .map-cluster-aciklama-btn{font-size:22px!important}
@@ -297,8 +319,16 @@ body.gallery-mode #galleryPanoBtn{display:block}
   .modal-title{font-size:clamp(16px,5vw,26px);max-width:85vw}
   .modal-desc-text{max-width:85vw;font-size:11px}
   .modal-info-strip{padding:60px 16px 18px}
-  /* Bölüm açıklama: own row on mobile */
   #bolumAciklamaWrap{width:100%;padding-bottom:8px}
+  /* GIF: scrollbar kaymasın, sabit pozisyon */
+  #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
+}
+
+/* DESKTOP — wall-nav her iki modda görünür, moodboard kapalı */
+@media(min-width:769px){
+  #wall-nav{display:flex!important}
+  body.filters-collapsed #wall-nav{display:flex!important}
+  #mapYaklasimBtn{display:none!important}
 }
 </style>
 </head>
@@ -306,7 +336,6 @@ body.gallery-mode #galleryPanoBtn{display:block}
 
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
-  <div class="map-title-label">EDETRI — Pano</div>
   <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
   <button class="map-ui-btn" id="mapFitBtn" onclick="fitMap()">⊡ Sığdır</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
@@ -317,11 +346,13 @@ body.gallery-mode #galleryPanoBtn{display:block}
   <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
 </div>
 
-<!-- HEADER — hidden until map closed -->
-<header id="siteHeader" style="display:none">
-  <div class="header-top">
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <div class="header-title">EDETRI — <span>Moodboard</span></div>
+<!-- HEADER — always visible, transparent in pano mode -->
+<header id="siteHeader">
+  <div id="top-bar-row">
+    <img id="site-logo" src="https://edetri.com/cdn/shop/files/EDETRI.png?v=1721483775&width=400" alt="EDETRI" referrerpolicy="no-referrer">
+    <button id="modeToggleBtn" onclick="handleModeToggle()">Duvar</button>
+    <span id="header-moodboard" class="header-title"><span>Moodboard</span></span>
+    <div id="wall-nav">
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
@@ -329,17 +360,14 @@ body.gallery-mode #galleryPanoBtn{display:block}
         <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
       </div>
     </div>
-    <div class="header-right">
-      <div style="display:flex;align-items:center;gap:6px">
-        <span class="header-edetri">EDETRI</span>
-        <span class="status-dot loading" id="statusDot"></span>
-        <span class="status-text" id="statusText">Loading...</span>
-      </div>
-      <button id="galleryPanoBtn" onclick="openMap()">⊕ Pano</button>
+    <div id="header-status">
+      <span class="status-dot loading" id="statusDot"></span>
+      <span class="status-text" id="statusText">Loading...</span>
     </div>
+    <button id="filterCollapseBtn" onclick="toggleFilters()">▲</button>
   </div>
-  <div style="display:flex;align-items:center;flex-wrap:wrap">
-    <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:12px"></div>
+  <div id="filter-row">
+    <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:8px"></div>
   </div>
 </header>
 
@@ -350,10 +378,11 @@ body.gallery-mode #galleryPanoBtn{display:block}
   </div>
 </main>
 
-<!-- SIZE SLIDER (masonry mode) -->
+<!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <span>Size</span>
-  <input type="range" id="sizeSlider" min="1" max="9" value="5" step="1" oninput="applySize(this.value)">
+  <button class="size-step-btn" onclick="changeSizeStep(-1)">−</button>
+  <span id="sizeDisplay">5</span>
+  <button class="size-step-btn" onclick="changeSizeStep(1)">+</button>
 </div>
 
 <!-- COMMENT TOGGLE (masonry mode) -->
@@ -407,6 +436,13 @@ body.gallery-mode #galleryPanoBtn{display:block}
 <div id="toast"></div>
 
 <script>
+function txtToHtml(txt) {
+  return txt.split(/\n\n+/)
+    .map(p => '<p>' + p.trim().replace(/\n/g, '<br>') + '</p>')
+    .filter(p => p !== '<p></p>')
+    .join('');
+}
+
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AH&gid=0`;
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
@@ -416,8 +452,7 @@ const SECTION_DOCS = [
   { key: 'booklet',          label: 'Booklet' },
   { key: 'editoryel',        label: 'Editöryel' },
   { key: 'mekan',            label: 'Mekan' },
-  { key: 'yasanmislik',      label: 'Yaşanmışlık' },
-  { key: 'sergi-platform',   label: 'Sergi Platform' },
+{ key: 'sergi-platform',   label: 'Sergi Platform' },
   { key: 'drape-ip-kaplama', label: 'Drape / İp Kaplama' },
   { key: 'metal-kumas',      label: 'Metal Kumaş' }
 ];
@@ -606,6 +641,13 @@ function renderMasonry() {
   });
 }
 
+let _sizeVal = 5;
+function changeSizeStep(dir) {
+  _sizeVal = Math.min(9, Math.max(1, _sizeVal + dir));
+  const el = document.getElementById('sizeDisplay');
+  if (el) el.textContent = _sizeVal;
+  applySize(_sizeVal);
+}
 function applySize(v) {
   const cols = 10 - parseInt(v);
   document.getElementById('masonry').style.columnCount = cols;
@@ -646,16 +688,29 @@ function buildMap() {
 
   function placeCluster(group, cx, cy) {
     const n=group.length;
+    // Desktop: daire içi yerleşim — her küme kendi dairesinde, tam örtüşme yok
+    const placedRects=[];
+    // Daire yarıçapı: desktopta daha geniş (0.46), mobilde hücre boyutuna göre
+    const circR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
+    // İtemler arası minimum boşluk (desktop daha büyük)
+    const GAP=isMobile?2:8;
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
-      const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
-      const ring=Math.floor(j/(isMobile?4:6));
-      const dist=isMobile?(44+ring*64+rng()*16):(72+ring*104+rng()*28);
-      const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
       const sr=rng();
       const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
       const h=isMobile?(sr<.12?93:sr<.38?67:48):(sr<.12?160:sr<.38?112:77);
-      const ix=px-w/2, iy=py-h/2;
+      // Mobil ve desktop için aynı daire algoritması
+      let ix=cx-w/2, iy=cy-h/2;
+      for(let att=0;att<80;att++){
+        const a=rng()*Math.PI*2;
+        const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.6);
+        const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
+        // Hiçbir mevcut itemle GAP'ten fazla örtüşme olmasın
+        if(!placedRects.some(r=>
+          tx<r.x+r.w+GAP&&tx+w+GAP>r.x&&ty<r.y+r.h+GAP&&ty+h+GAP>r.y
+        )){ix=tx;iy=ty;break;}
+      }
+      placedRects.push({x:ix,y:iy,w,h});
       const rot=(rng()-.5)*6;
 
       const island=document.createElement('div');
@@ -716,8 +771,19 @@ function buildMap() {
           document.getElementById('mapTooltip').classList.remove('visible');
         });
       } else {
-        // Mobile: tap to open modal, canvas pan/pinch handles movement
-        island.addEventListener('click', ()=>openMapImagePanel(gi));
+        // Mobile: tap to open panel — only fire if no pan/pinch occurred
+        let _tapStart = null;
+        island.addEventListener('touchstart', e => {
+          if (e.touches.length === 1) _tapStart = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+          else _tapStart = null;
+        }, {passive:true});
+        island.addEventListener('touchend', e => {
+          if (!_tapStart) return;
+          const dx = e.changedTouches[0].clientX - _tapStart.x;
+          const dy = e.changedTouches[0].clientY - _tapStart.y;
+          if (Math.hypot(dx,dy) < 10) { e.preventDefault(); openMapImagePanel(gi); }
+          _tapStart = null;
+        });
       }
 
       stage.appendChild(island);
@@ -781,6 +847,8 @@ function buildMap() {
     let pinchState = null;
     view.addEventListener('pointerdown', e=>{
       if (e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
+      e.preventDefault();
+      view.setPointerCapture(e.pointerId);
       activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (activePtrs.size === 2) {
         isPanning = false;
@@ -793,9 +861,10 @@ function buildMap() {
       } else if (activePtrs.size === 1) {
         isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
       }
-    });
+    }, {passive:false});
     view.addEventListener('pointermove', e=>{
       if (!activePtrs.has(e.pointerId)) return;
+      e.preventDefault();
       activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (pinchState && activePtrs.size >= 2) {
         const pts=[...activePtrs.values()];
@@ -807,7 +876,7 @@ function buildMap() {
       } else if (isPanning) {
         panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
       }
-    });
+    }, {passive:false});
     const releaseMobile=e=>{
       activePtrs.delete(e.pointerId);
       if (activePtrs.size < 2) pinchState=null;
@@ -843,7 +912,6 @@ function buildMap() {
 }
 
 function openMap() {
-  document.getElementById('siteHeader').style.display='none';
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
   document.getElementById('commentToggleWrap').style.display='none';
@@ -851,16 +919,39 @@ function openMap() {
   document.body.classList.remove('gallery-mode');
   document.body.style.overflow='hidden';
   if (!mapBuilt && rows.length) buildMap();
+  const tb = document.getElementById('modeToggleBtn');
+  if (tb) tb.textContent = 'Duvar';
 }
 
 function closeMap() {
   document.getElementById('mapView').style.display='none';
-  document.getElementById('siteHeader').style.display='';
   document.getElementById('galleryWrap').style.display='';
   document.getElementById('commentToggleWrap').style.display='flex';
   document.getElementById('sizeSliderWrap').style.display='flex';
   document.body.classList.add('gallery-mode');
   document.body.style.overflow='';
+  const tb = document.getElementById('modeToggleBtn');
+  if (tb) tb.textContent = '⊕ Pano';
+  requestAnimationFrame(updateGalleryPadding);
+}
+
+function handleModeToggle() {
+  if (document.body.classList.contains('gallery-mode')) openMap();
+  else closeMap();
+}
+
+function toggleFilters() {
+  document.body.classList.toggle('filters-collapsed');
+  const btn = document.getElementById('filterCollapseBtn');
+  if (btn) btn.textContent = document.body.classList.contains('filters-collapsed') ? '▼' : '▲';
+  requestAnimationFrame(updateGalleryPadding);
+}
+
+function updateGalleryPadding() {
+  const header = document.getElementById('siteHeader');
+  const gallery = document.getElementById('galleryWrap');
+  if (!header || !gallery) return;
+  gallery.style.paddingTop = header.offsetHeight + 'px';
 }
 
 // ── SHUFFLE ───────────────────────────────────────────────────
@@ -958,7 +1049,16 @@ document.getElementById('commentToggle').addEventListener('change', function(){
   document.body.classList.toggle('show-comments', this.checked);
 });
 
+// Browser pinch-zoom'u engelle — sadece iç canvas zoom'u kullan
+document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
+document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, {passive:false});
+
 init();
+window.addEventListener('resize', updateGalleryPadding);
 
 function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
@@ -1008,11 +1108,18 @@ function switchRaporTab(key) {
   const content = document.getElementById('raporContent');
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
   content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
-  fetch(RAPOR_BASE + key + '.docx')
-    .then(r => r.arrayBuffer())
-    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
-    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  if (key === 'EDETRI_Bolum2_AnaCerceve') {
+    fetch(RAPOR_BASE + key + '.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  } else {
+    fetch(RAPOR_BASE + key + '.txt')
+      .then(r => r.text())
+      .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  }
 }
 function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
 
@@ -1053,8 +1160,8 @@ function openYaklasimPanel(anchorEl) {
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
   const mob = window.innerWidth < 768;
   if (mob) {
-    const pw = Math.round(window.innerWidth  * 0.7);
-    const ph = Math.round(window.innerHeight * 0.7);
+    const pw = Math.round(window.innerWidth  * 0.88);
+    const ph = Math.round(window.innerHeight * 0.78);
     panel.style.width  = pw + 'px';
     panel.style.height = ph + 'px';
     panel.style.left   = Math.round((window.innerWidth  - pw) / 2) + 'px';
@@ -1079,10 +1186,11 @@ function openMapImagePanel(gi) {
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
   const mob = window.innerWidth < 768;
   const count = Object.keys(mapImagePanelCache).length - 1;
-  const w = mob ? Math.round(window.innerWidth  * 0.7) : Math.min(480, window.innerWidth  - 20);
-  const h = mob ? Math.round(window.innerHeight * 0.7) : Math.min(576, window.innerHeight - 40);
-  const ox = (count % 6) * 22;
-  const oy = (count % 6) * 18;
+  const w = mob ? Math.round(window.innerWidth  * 0.88) : Math.min(480, window.innerWidth  - 20);
+  const h = mob ? Math.round(window.innerHeight * 0.78) : Math.min(576, window.innerHeight - 40);
+  // Mobilde her zaman ekran merkezine — canvas zoom'undan bağımsız
+  const ox = mob ? 0 : (count % 6) * 22;
+  const oy = mob ? 0 : (count % 6) * 18;
   panel.style.width  = w + 'px';
   panel.style.height = h + 'px';
   panel.style.left   = Math.max(10, (window.innerWidth  - w) / 2 + ox) + 'px';
@@ -1125,8 +1233,8 @@ function openClusterPanel(key, anchorEl) {
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
   const mob = window.innerWidth < 768;
   if (mob) {
-    const pw = Math.round(window.innerWidth  * 0.7);
-    const ph = Math.round(window.innerHeight * 0.7);
+    const pw = Math.round(window.innerWidth  * 0.88);
+    const ph = Math.round(window.innerHeight * 0.78);
     panel.style.width  = pw + 'px';
     panel.style.height = ph + 'px';
     panel.style.left   = Math.round((window.innerWidth  - pw) / 2) + 'px';
@@ -1173,11 +1281,18 @@ function loadClusterPanel(key, panel) {
   if (content.dataset.loaded) return;
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; content.dataset.loaded = '1'; return; }
   content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:20px 0">Yükleniyor...</div>';
-  fetch(RAPOR_BASE + key + '.docx')
-    .then(r => r.arrayBuffer())
-    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
-    .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
+  if (key === 'EDETRI_Bolum2_AnaCerceve') {
+    fetch(RAPOR_BASE + key + '.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
+  } else {
+    fetch(RAPOR_BASE + key + '.txt')
+      .then(r => r.text())
+      .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; content.dataset.loaded = '1'; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
+  }
 }
 
 function setupPanelDrag(panel) {
@@ -1347,16 +1462,7 @@ document.addEventListener('mousedown', e => {
         <li>Çok kaotik olanlar — "kendinden çıkmış", efekt objeyi yutmuş, mesaj kaybolmuş.</li>
         <li>Yanlış referans taşıyanlar — fazla vintage, fazla hightech, fazla moda, yanlış çağrışım alanı.</li>
       </ul>
-      <h3>Bu Kürasyonun Report-v4-3'e Kattığı</h3>
-      <p>Report'ta "The Split" bir konsept olarak vardı — iki dünyanın aynı karede buluşması. Kürasyon bunu somutlaştırıyor ve genişletiyor.</p>
-      <p>Report'ta olmayan ama kürasyonda güçlü çıkan birkaç şey var:</p>
-      <p>Kullanım izinin estetik değeri. Yaşanmışlık kategorisi bunu doğrudan söylüyor. Bitmiş masa, kirli bardak, dökülen şey — bunlar hata değil, içerik. Report "bırakılmış his" diyor ama kürasyon bunu çok daha somut bir yere taşıyor: "sırf masaları çekmek için yemek düzenlemek."</p>
-      <p>Ölçek kararı. Report büyük bir vizyon çiziyor — WebXR, hero kampanya, sergi. Kürasyon sürekli küçük ölçeğe çekiyor. "Tek noktadan vurulmalı", "küçük ölçekte de çalışır." Bu bir gerilim — üçüncü aşama raporda çözüme kavuşturulmalı.</p>
-      <p>Malzemenin kendi sesi. Kürasyon boyunca en güçlü notlar malzemenin "yanlış" davrandığı anlara yazılmış. Metal aktığında, kumaş taşıdığında, taş cam gibi konuştuğunda. Bu, EDETRI'nin ürün dilini de tarif ediyor aslında — cam ve seramik zaten "doğasından kopan" malzemeler. Ateşte şekillenen, sonra donup kalan.</p>
-      <h3>Üçüncü Aşama İçin Çerçeve</h3>
-      <p>Bu kürasyondan çıkan sistem şu soruyu sormak zorunda:</p>
-      <p>EDETRI bir sahne kurarken — sergi, sofra, görsel, fiziksel nesne — hangi anda duruyor? Tam düzenmeden önce mi, tam bırakmadan önce mi? O eşik neresi?</p>
-      <p>Bu sorunun cevabı hem sergi masasının tasarım kararını, hem fotoğraf dilini, hem booklet'in fiziksel yapısını, hem sosyal medya tonunu belirliyor. Kürasyon bu eşiği gösterdi — üçüncü aşama onu tanımlamalı.</p>
+      
     </div>
   </div>
 </div>
@@ -1377,5 +1483,6 @@ document.addEventListener('mousedown', e => {
     <div id="yaklasimContent" class="doc-content"></div>
   </div>
 </div>
+<img id="corner-gif" src="https://virtuallyeverafter.xyz/assets/img/logo-anim.gif" alt="" referrerpolicy="no-referrer">
 </body>
 </html>
