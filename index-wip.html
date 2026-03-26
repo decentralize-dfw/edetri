@@ -174,7 +174,7 @@ body.show-comments .card-desc{display:block!important}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
-#mapFitBtn{left:24px;top:auto;bottom:24px}
+#mapFitBtn{right:18px;left:auto;top:auto;bottom:24px}
 /* Old individual toggle buttons — replaced by #modeToggleBtn in header */
 #galleryPanoBtn{display:none!important}
 #mapDuvarBtn{display:none!important}
@@ -273,10 +273,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #site-logo{height:20px;flex-shrink:0;order:1}
   /* Moodboard yazısını mobilde gizle */
   #header-moodboard{display:none!important}
-  /* Toggle: logo hemen yanında, normal buton boyutu */
-  #modeToggleBtn{order:1;flex-basis:auto;font-size:9px;padding:7px 14px;margin-left:6px}
-  /* Filtre açıp-kapama oku: top-bar-row sağ ucunda, sabit konum */
-  #filterCollapseBtn{display:block;order:5;margin-left:auto;font-size:13px;padding:5px 10px}
+  /* Toggle: margin-left:auto → sağ tarafa it, ▲ ile yan yana */
+  #modeToggleBtn{order:1;flex-basis:auto;font-size:9px;padding:7px 14px;margin-left:auto}
+  /* Filtre oku: toggle hemen yanında, sabit sağ konumda */
+  #filterCollapseBtn{display:block;order:1;margin-left:8px;font-size:13px;padding:5px 10px}
   /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
   #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
   body.filters-collapsed #wall-nav{display:flex!important}
@@ -284,8 +284,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #header-status{display:none}
   /* Filter row */
   #filter-row{padding:0 12px 6px 12px}
-  /* mapYaklasimBtn gizle: wall-nav'da Yaklaşım butonu var */
+  /* mapYaklasimBtn mobilde gizle */
   #mapYaklasimBtn{display:none!important}
+  /* Sığdır: sağ tarafa */
+  #mapFitBtn{right:12px;left:auto}
   /* Shuffle: modeToggleBtn ile aynı boyut/yükseklik */
   #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
   /* Overlay inner */
@@ -296,7 +298,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .rapor-tab{font-size:8px;padding:5px 7px;letter-spacing:.07em}
   /* Masonry: 2 columns */
   .masonry{column-count:2;column-gap:5px}
-  .gallery-wrap{padding:12px 5px}
+  .gallery-wrap{padding:0 5px 12px}
   /* Bottom controls */
   #sizeSliderWrap{bottom:14px;padding:8px 13px}
   #sizeSlider{width:100px}
@@ -319,6 +321,14 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #bolumAciklamaWrap{width:100%;padding-bottom:8px}
   /* GIF: scrollbar kaymasın, sabit pozisyon */
   #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
+}
+
+/* DESKTOP — wall-nav + moodboard her iki modda da görünür */
+@media(min-width:769px){
+  #header-moodboard{display:block!important}
+  #wall-nav{display:flex!important}
+  body.filters-collapsed #wall-nav{display:flex!important}
+  #mapYaklasimBtn{display:none!important}
 }
 </style>
 </head>
@@ -670,16 +680,34 @@ function buildMap() {
 
   function placeCluster(group, cx, cy) {
     const n=group.length;
+    // Desktop: daire içi yerleşim — her küme kendi dairesinde, tam örtüşme yok
+    const deskRects=[];
+    const circR=Math.min(cellW,cellH)*0.42; // daire yarıçapı: hücreden taşmasın
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
-      const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
-      const ring=Math.floor(j/(isMobile?4:6));
-      const dist=isMobile?(44+ring*64+rng()*16):(72+ring*104+rng()*28);
-      const px=cx+Math.cos(angle)*dist, py=cy+Math.sin(angle)*dist;
       const sr=rng();
       const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
       const h=isMobile?(sr<.12?93:sr<.38?67:48):(sr<.12?160:sr<.38?112:77);
-      const ix=px-w/2, iy=py-h/2;
+      let ix,iy;
+      if(isMobile){
+        const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
+        const ring=Math.floor(j/4);
+        const dist=44+ring*64+rng()*16;
+        ix=cx+Math.cos(angle)*dist-w/2; iy=cy+Math.sin(angle)*dist-h/2;
+      } else {
+        // Daire içinde rastgele, tam örtüşme olmayacak şekilde
+        ix=cx-w/2; iy=cy-h/2;
+        for(let att=0;att<60;att++){
+          const a=rng()*Math.PI*2;
+          const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.65);
+          const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
+          // Tam örtüşme kontrolü: başka bir resim bu resmi tamamen kapatıyor mu?
+          if(!deskRects.some(r=>r.x<=tx&&r.y<=ty&&r.x+r.w>=tx+w&&r.y+r.h>=ty+h)){
+            ix=tx; iy=ty; break;
+          }
+        }
+        deskRects.push({x:ix,y:iy,w,h});
+      }
       const rot=(rng()-.5)*6;
 
       const island=document.createElement('div');
