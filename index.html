@@ -95,8 +95,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .map-stars .star{font-size:10px}
 
 /* STAR FILTER */
-#star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:250;display:none}
-body.gallery-mode #star-filter-wrap{display:block}
+#star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:350;display:none;pointer-events:all}
+body.has-data #star-filter-wrap{display:block}
 #star-filter-btn{background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 12px;cursor:pointer;border-radius:2px;line-height:1;transition:all .2s}
 #star-filter-btn:hover{border-color:rgba(176,168,144,.4);color:var(--gold)}
 #star-filter-btn.has-active{border-color:var(--gold);color:var(--gold);background:rgba(184,152,80,.08)}
@@ -159,6 +159,7 @@ body.show-comments .card-desc{display:block!important}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
+#mapFitBtn{left:18px;top:98px}
 /* Gallery Pano button: fixed top-left, identical weight to Duvar */
 #galleryPanoBtn{position:fixed;top:18px;left:18px;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
 body.gallery-mode #galleryPanoBtn{display:block}
@@ -227,10 +228,14 @@ body.gallery-mode #galleryPanoBtn{display:block}
 
 /* MAP IMAGE PANEL (floating image+text popup) */
 .map-image-panel{width:480px;height:576px}
-.map-image-panel .mip-img-wrap{flex:1;overflow:hidden;min-height:0;background:rgba(0,0,0,.4)}
+.map-image-panel .mip-img-wrap{flex:1;overflow:hidden;min-height:0;background:rgba(0,0,0,.4);position:relative}
 .map-image-panel .mip-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
 .map-image-panel .mip-info{padding:10px 16px 14px;flex-shrink:0;border-top:1px solid rgba(176,168,144,.09)}
 .map-image-panel .mip-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);line-height:1.4;margin-top:4px}
+.mip-stars{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;z-index:2;pointer-events:none}
+.mip-stars .star{font-size:20px}
+#mStars .star-rating{justify-content:flex-start;gap:2px}
+#mStars .star{font-size:17px}
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
@@ -303,6 +308,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
 <div id="mapView">
   <div class="map-title-label">EDETRI — Pano</div>
   <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
+  <button class="map-ui-btn" id="mapFitBtn" onclick="fitMap()">⊡ Sığdır</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
   <button class="map-ui-btn" id="mapDuvarBtn" onclick="closeMap()">Duvar</button>
   <div id="mapStage"></div>
@@ -387,6 +393,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
         <div class="modal-color-dot" id="mColorDot" style="display:none"></div>
         <span class="modal-color-hex" id="mColorHex"></span>
       </div>
+      <div id="mStars"></div>
       <div class="modal-title" id="mTitle"></div>
       <div class="modal-desc-text" id="mDesc"></div>
     </div>
@@ -474,6 +481,7 @@ async function init() {
     visibleIdx = rows.map((_,i)=>i);
     renderFilters();
     renderMasonry();
+    document.body.classList.add('has-data');
     setStatus('ready', `${rows.length} images`);
     buildMap();
   } catch(e) {
@@ -608,7 +616,7 @@ function buildMap() {
       const island=document.createElement('div');
       island.className='map-island';
       island.style.cssText=`left:${ix}px;top:${iy}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg)`;
-      island.dataset.baseRot=rot; island.dataset.currentRot=rot;
+      island.dataset.baseRot=rot; island.dataset.currentRot=rot; island.dataset.idx=gi;
 
       const inner=document.createElement('div'); inner.className='map-island-inner';
       const img=document.createElement('img');
@@ -719,6 +727,7 @@ function buildMap() {
 
   document.getElementById('mapLoader').style.display='none';
   mapBuilt=true;
+  applyStarFilterToMap();
 
   const view=document.getElementById('mapView');
 
@@ -855,6 +864,7 @@ function openModal(idx) {
   const dot=document.getElementById('mColorDot'), hex=document.getElementById('mColorHex');
   if (row.color){ dot.style.background=row.color; dot.style.display='block'; hex.textContent=row.color.toUpperCase(); }
   else { dot.style.display='none'; hex.textContent=''; }
+  document.getElementById('mStars').innerHTML = row.rating ? buildStarRating(row.rating) : '';
   document.getElementById('mTitle').textContent=row.type||'';
   document.getElementById('mDesc').textContent=row.description||'';
   const lnk=document.getElementById('mLink');
@@ -1042,7 +1052,7 @@ function _createMapImagePanel(gi) {
   panel.style.display = 'none';
   panel.innerHTML =
     '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + '</span><button class="cp-close">✕</button></div>' +
-    '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer"></div>' +
+    '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer">' + (row.rating ? '<div class="mip-stars">' + buildStarRating(row.rating) + '</div>' : '') + '</div>' +
     '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div></div>' +
     '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
     '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
@@ -1165,13 +1175,49 @@ function setupPanelResize(panel) {
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeRapor();closeYaklasim();} });
 
 // ── STAR FILTER ────────────────────────────────────────────────
+function applyStarFilterToMap() {
+  if (!mapBuilt) return;
+  document.querySelectorAll('.map-island').forEach(island => {
+    const gi = +island.dataset.idx;
+    if (isNaN(gi)) return;
+    const starOk = selectedStars.size === 0 || selectedStars.has(Math.round(rows[gi].rating));
+    island.style.display = starOk ? '' : 'none';
+  });
+}
+
+function fitMap() {
+  if (!mapAllItems.length) return;
+  const PAD = 80;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  mapAllItems.forEach(item => {
+    const x = parseFloat(item.el.style.left);
+    const y = parseFloat(item.el.style.top);
+    const w = parseFloat(item.el.style.width) || 80;
+    const h = parseFloat(item.el.style.height) || 100;
+    minX = Math.min(minX, x); minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + w); maxY = Math.max(maxY, y + h);
+  });
+  const VW = window.innerWidth, VH = window.innerHeight;
+  const contentW = maxX - minX + PAD * 2;
+  const contentH = maxY - minY + PAD * 2;
+  scale = Math.min(VW / contentW, VH / contentH);
+  panX = (VW - contentW * scale) / 2 - (minX - PAD) * scale;
+  panY = (VH - contentH * scale) / 2 - (minY - PAD) * scale;
+  const stage = document.getElementById('mapStage');
+  stage.style.transition = 'transform .5s cubic-bezier(.25,.46,.45,.94)';
+  applyTransform();
+  setTimeout(() => { stage.style.transition = ''; }, 520);
+}
+
 document.getElementById('star-filter-btn').addEventListener('click', e => {
   e.stopPropagation();
+  e.preventDefault();
   document.getElementById('star-filter-panel').classList.toggle('open');
 });
 
 document.querySelectorAll('.sfp-row').forEach(rowEl => {
-  rowEl.addEventListener('click', () => {
+  rowEl.addEventListener('click', e => {
+    e.stopPropagation();
     const val = parseInt(rowEl.dataset.val);
     if (selectedStars.has(val)) {
       selectedStars.delete(val);
@@ -1182,10 +1228,11 @@ document.querySelectorAll('.sfp-row').forEach(rowEl => {
     }
     document.getElementById('star-filter-btn').classList.toggle('has-active', selectedStars.size > 0);
     applyFilter(currentFilter);
+    applyStarFilterToMap();
   });
 });
 
-document.addEventListener('click', e => {
+document.addEventListener('mousedown', e => {
   if (!e.target.closest('#star-filter-wrap')) {
     document.getElementById('star-filter-panel').classList.remove('open');
   }
