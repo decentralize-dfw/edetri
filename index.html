@@ -255,6 +255,18 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 #mStars .star-rating{justify-content:flex-start;gap:2px}
 #mStars .star{font-size:17px}
 
+/* MOBILE NAV POPUP */
+#mobileNavBtn{display:none;background:none;border:1px solid rgba(176,168,144,.2);color:rgba(176,168,144,.6);font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;transition:all .2s;flex-shrink:0;letter-spacing:.08em}
+#mobileNavBtn:hover,#mobileNavBtn.active{border-color:var(--copper);color:var(--copper)}
+#mobileNavPopup{display:none;position:fixed;z-index:390;left:0;right:0;background:rgba(9,8,7,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(176,168,144,.12);padding:10px 12px;flex-direction:column;gap:4px}
+#mobileNavPopup.open{display:flex}
+#mobileNavPopup .btn-map{text-align:left;padding:11px 14px;font-size:9px;border:1px solid rgba(176,168,144,.12)}
+
+/* GALLERY SHUFFLE */
+#galleryShuffleBtn{display:none;position:fixed;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;padding:7px 14px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+#galleryShuffleBtn:hover{border-color:var(--copper);color:var(--copper)}
+#galleryShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0)}
@@ -280,9 +292,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   /* Filtre oku: her iki modda da alan ayır (layout kaymasın), sadece galeri modunda görünür */
   #filterCollapseBtn{display:flex!important;visibility:hidden;pointer-events:none;order:1;margin-left:auto;font-size:13px;padding:5px 10px;align-items:center;justify-content:center}
   body.gallery-mode #filterCollapseBtn{visibility:visible;pointer-events:auto}
-  /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
-  #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
-  body.filters-collapsed #wall-nav{display:flex!important}
+  /* Wall-nav: mobilde popup'a taşındı, inline gizli */
+  #wall-nav{display:none!important}
+  /* Popup menü butonu: toggle'ın yanında */
+  #mobileNavBtn{display:flex!important;order:1;margin-left:6px;align-items:center}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
   #header-status{display:none}
   /* Filter row */
@@ -294,8 +307,13 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #mapYaklasimBtn{display:none!important}
   /* Filtre kapalıyken filter-row tamamen gizle → içerik üç tuşun hemen altından başlar */
   body.filters-collapsed #filter-row{display:none!important}
-  /* Shuffle: modeToggleBtn ile aynı boyut/yükseklik */
-  #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
+  /* Shuffle tuşları: aynı konum/boyut */
+  #mapShuffleBtn,#galleryShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
+  body.gallery-mode #galleryShuffleBtn{display:block}
+  /* mapFitBtn: yorum tuşuyla aynı konum ve boyut */
+  #mapFitBtn{bottom:14px;left:10px;top:auto;right:auto;font-size:9px;padding:8px 11px}
+  /* Masonry: her zaman 2 sütun */
+  .masonry{column-count:2!important}
   /* Overlay inner */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
@@ -356,6 +374,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   <div id="top-bar-row">
     <img id="site-logo" src="https://edetri.com/cdn/shop/files/EDETRI.png?v=1721483775&width=400" alt="EDETRI" referrerpolicy="no-referrer">
     <button id="modeToggleBtn" onclick="handleModeToggle()">Duvar</button>
+    <button id="mobileNavBtn" onclick="toggleMobileNav()">···</button>
     <span id="header-moodboard" class="header-title"><span>Moodboard</span></span>
     <div id="wall-nav">
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
@@ -375,6 +394,16 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
     <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:8px"></div>
   </div>
 </header>
+
+<!-- MOBILE NAV POPUP -->
+<div id="mobileNavPopup">
+  <button class="btn-map" onclick="closeMobileNav();openYaklasim()">Yaklaşım</button>
+  <button class="btn-map" onclick="closeMobileNav();openOzet()">Özet</button>
+  <button class="btn-map" onclick="closeMobileNav();openRapor()">Ful Rapor</button>
+</div>
+
+<!-- GALLERY SHUFFLE (mobile pano mode) -->
+<button id="galleryShuffleBtn" onclick="toggleGalleryShuffle()">⇄ Shuffle</button>
 
 <!-- GALLERY — hidden until map closed -->
 <main id="galleryWrap" style="display:none">
@@ -920,6 +949,8 @@ function buildMap() {
 }
 
 function openMap() {
+  closeMobileNav();
+  if (isGalleryShuffled) toggleGalleryShuffle();
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
   document.getElementById('commentToggleWrap').style.display='none';
@@ -941,6 +972,13 @@ function closeMap() {
   document.body.style.overflow='';
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = '⊕ Pano';
+  // Mobilde masonry 2 sütun default
+  if (window.innerWidth < 768) {
+    document.getElementById('masonry').style.columnCount = '2';
+    _sizeVal = 8;
+    const sd = document.getElementById('sizeDisplay');
+    if (sd) sd.textContent = _sizeVal;
+  }
   requestAnimationFrame(updateGalleryPadding);
 }
 
@@ -961,6 +999,45 @@ function updateGalleryPadding() {
   const gallery = document.getElementById('galleryWrap');
   if (!header || !gallery) return;
   gallery.style.paddingTop = header.offsetHeight + 'px';
+}
+
+// ── MOBILE NAV POPUP ──────────────────────────────────────────
+function toggleMobileNav() {
+  const popup = document.getElementById('mobileNavPopup');
+  const btn   = document.getElementById('mobileNavBtn');
+  const open  = popup.classList.toggle('open');
+  btn.classList.toggle('active', open);
+  if (open) popup.style.top = document.getElementById('siteHeader').offsetHeight + 'px';
+}
+function closeMobileNav() {
+  document.getElementById('mobileNavPopup').classList.remove('open');
+  document.getElementById('mobileNavBtn').classList.remove('active');
+}
+document.addEventListener('click', e => {
+  const popup = document.getElementById('mobileNavPopup');
+  if (!popup.classList.contains('open')) return;
+  const btn = document.getElementById('mobileNavBtn');
+  if (!popup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) closeMobileNav();
+}, {passive:true});
+
+// ── GALLERY SHUFFLE ────────────────────────────────────────────
+let isGalleryShuffled = false;
+function toggleGalleryShuffle() {
+  const btn = document.getElementById('galleryShuffleBtn');
+  isGalleryShuffled = !isGalleryShuffled;
+  btn.classList.toggle('active', isGalleryShuffled);
+  const masonry = document.getElementById('masonry');
+  const cards = [...masonry.children];
+  if (isGalleryShuffled) {
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    cards.forEach(c => masonry.appendChild(c));
+  } else {
+    cards.sort((a, b) => +a.dataset.idx - +b.dataset.idx);
+    cards.forEach(c => masonry.appendChild(c));
+  }
 }
 
 // ── SHUFFLE ───────────────────────────────────────────────────
