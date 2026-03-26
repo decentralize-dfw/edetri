@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EDETRI — Moodboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 :root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -422,8 +423,7 @@ const SECTION_DOCS = [
   { key: 'booklet',          label: 'Booklet' },
   { key: 'editoryel',        label: 'Editöryel' },
   { key: 'mekan',            label: 'Mekan' },
-  { key: 'yasanmislik',      label: 'Yaşanmışlık' },
-  { key: 'sergi-platform',   label: 'Sergi Platform' },
+{ key: 'sergi-platform',   label: 'Sergi Platform' },
   { key: 'drape-ip-kaplama', label: 'Drape / İp Kaplama' },
   { key: 'metal-kumas',      label: 'Metal Kumaş' }
 ];
@@ -977,9 +977,10 @@ function openYaklasim() {
   if (!yaklasimLoaded) {
     const content = document.getElementById('yaklasimContent');
     content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0">Yükleniyor...</div>';
-    fetch(RAPOR_BASE + 'ozet.txt')
-      .then(r => r.text())
-      .then(txt => { content.innerHTML = txtToHtml(txt); yaklasimLoaded = true; })
+    fetch(RAPOR_BASE + 'ozet.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { content.innerHTML = result.value; yaklasimLoaded = true; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
 }
@@ -1013,10 +1014,18 @@ function switchRaporTab(key) {
   const content = document.getElementById('raporContent');
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
   content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
-  fetch(RAPOR_BASE + key + '.txt')
-    .then(r => r.text())
-    .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; })
-    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  if (key === 'EDETRI_Bolum2_AnaCerceve') {
+    fetch(RAPOR_BASE + key + '.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  } else {
+    fetch(RAPOR_BASE + key + '.txt')
+      .then(r => r.text())
+      .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
+  }
 }
 function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
 
@@ -1047,9 +1056,10 @@ function openYaklasimPanel(anchorEl) {
     clusterPanelCache[KEY] = panel;
     document.getElementById('mapView').appendChild(panel);
     const content = panel.querySelector('.cp-content');
-    fetch(RAPOR_BASE + 'ozet.txt')
-      .then(r => r.text())
-      .then(txt => { content.innerHTML = txtToHtml(txt); })
+    fetch(RAPOR_BASE + 'ozet.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { content.innerHTML = result.value; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
   const panel = clusterPanelCache[KEY];
@@ -1176,10 +1186,18 @@ function loadClusterPanel(key, panel) {
   if (content.dataset.loaded) return;
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; content.dataset.loaded = '1'; return; }
   content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:20px 0">Yükleniyor...</div>';
-  fetch(RAPOR_BASE + key + '.txt')
-    .then(r => r.text())
-    .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; content.dataset.loaded = '1'; })
-    .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
+  if (key === 'EDETRI_Bolum2_AnaCerceve') {
+    fetch(RAPOR_BASE + key + '.docx')
+      .then(r => r.arrayBuffer())
+      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
+  } else {
+    fetch(RAPOR_BASE + key + '.txt')
+      .then(r => r.text())
+      .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; content.dataset.loaded = '1'; })
+      .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
+  }
 }
 
 function setupPanelDrag(panel) {
