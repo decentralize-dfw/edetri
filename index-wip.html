@@ -14,27 +14,12 @@ body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12)}
-body:not(.gallery-mode) #siteHeader{background:none;backdrop-filter:none;border-bottom:none;pointer-events:none}
-body:not(.gallery-mode) #siteHeader>*{pointer-events:all}
-#top-bar-row{display:flex;align-items:center;gap:12px;padding:10px 24px 10px 14px;flex-wrap:nowrap}
+#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px 0 130px}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:12px}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
-#site-logo{height:26px;width:auto;filter:invert(1);display:block;pointer-events:none;flex-shrink:0}
-#header-moodboard{display:none;order:3}
-body.gallery-mode #header-moodboard{display:block}
-#modeToggleBtn{order:2;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;white-space:nowrap;flex-shrink:0}
-#modeToggleBtn:hover{border-color:var(--copper);color:var(--copper)}
-#wall-nav{display:none;align-items:center;gap:12px;flex-wrap:wrap;flex:1;order:4}
-body.gallery-mode #wall-nav{display:flex}
-#header-status{display:flex;align-items:center;gap:6px;flex-shrink:0;order:5}
-body:not(.gallery-mode) #header-status{display:none}
-#filter-row{display:none;align-items:center;padding:0 24px 8px 14px;gap:6px;min-height:28px}
-body.gallery-mode #filter-row{display:flex}
-body.filters-collapsed #filter-row .filter-bar{display:none}
-body.filters-collapsed #wall-nav{display:none}
-#filterCollapseBtn{background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;padding:2px 8px;transition:color .2s;flex-shrink:0;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em}
-#filterCollapseBtn:hover{color:var(--copper)}
+.header-right{display:flex;align-items:center;gap:14px}
+.header-edetri{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:rgba(176,168,144,.3);text-transform:uppercase;margin-right:4px}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
 .status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
 .status-dot.ready{background:#5a8a5a}
@@ -170,17 +155,16 @@ body.show-comments .card-desc{display:block!important}
 #mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 .map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
 .map-ui-btn:hover{border-color:var(--copper);color:var(--copper)}
-#mapDuvarBtn{left:150px;top:13px}
+#mapDuvarBtn{left:18px;top:18px}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
 #mapFitBtn{left:24px;top:auto;bottom:24px}
-/* Old individual toggle buttons — replaced by #modeToggleBtn in header */
-#galleryPanoBtn{display:none!important}
-#mapDuvarBtn{display:none!important}
-.map-title-label{display:none}
-#corner-gif{position:fixed;bottom:18px;right:18px;width:64px;height:auto;filter:invert(1);pointer-events:none;z-index:50}
-body:not(.gallery-mode) #corner-gif{z-index:250}
+/* Gallery Pano button: fixed top-left, identical weight to Duvar */
+#galleryPanoBtn{position:fixed;top:18px;left:18px;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
+body.gallery-mode #galleryPanoBtn{display:block}
+#galleryPanoBtn:hover{border-color:var(--copper);color:var(--copper)}
+.map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
 #mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
@@ -268,23 +252,19 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Header: stack vertically */
-  #top-bar-row{flex-wrap:wrap;align-items:flex-start;padding:8px 12px;gap:6px}
-  #site-logo{height:20px;flex-shrink:0;order:1}
-  /* Moodboard text: same row as logo (order 1 = both row 1) */
-  #header-moodboard{order:1;font-size:13px;letter-spacing:.06em}
-  /* Toggle: own row below logo */
-  #modeToggleBtn{order:2;flex-basis:100%;font-size:8px;padding:5px 9px}
-  /* Wall-nav: own row below toggle */
-  #wall-nav{order:3;flex-basis:100%;gap:5px}
+  /* Header — stack as column, Pano in flow (not fixed) */
+  #siteHeader{padding:0 10px}
+  .header-top{flex-direction:column;align-items:stretch;padding:10px 0;gap:6px}
+  /* Row 1: header-right (Pano + status), floats to top */
+  .header-right{order:-1;width:100%;justify-content:space-between;gap:6px}
+  /* Pano: back into flow on mobile */
+  #galleryPanoBtn{position:static!important;order:-1;background:none!important;backdrop-filter:none!important;border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:8px;padding:5px 9px;letter-spacing:.1em;top:auto;left:auto;z-index:auto;display:block}
+  body.gallery-mode #galleryPanoBtn{display:block}
+  /* Row 2+: left group with title + action buttons */
+  .header-top>div:first-child{order:0;flex-wrap:wrap;gap:5px;align-items:center}
+  .header-title{font-size:14px;letter-spacing:.06em;width:100%}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
-  #header-status{display:none}
-  /* Filter row */
-  #filter-row{padding:0 12px 6px 12px}
-  /* Yaklaşım button: below stacked header (~76px) */
-  #mapYaklasimBtn{left:12px;top:76px}
-  /* Shuffle: top-right */
-  #mapShuffleBtn{right:18px;top:13px}
+  .header-edetri{font-size:8px}
   /* Overlay inner: 5% margins each side */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
@@ -301,10 +281,15 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
   .map-ui-btn{font-size:8px;padding:6px 9px}
+  #mapShuffleBtn{right:80px}
+  #mapYaklasimBtn{left:16px;top:46px}
+  .map-title-label{font-size:11px;top:20px;left:16px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
-  /* Cluster panels */
+  /* Cluster panels: mobile min-height, no forced width (JS sets 70% via inline style) */
   .cluster-panel{min-height:160px}
+  /* Comments: always 8px on mobile, slider has no effect */
   .card-desc{font-size:8px!important}
+  /* Cluster labels: smaller on mobile */
   .map-cluster-name{font-size:36px}
   .map-cluster-count{font-size:11px}
   .map-cluster-aciklama-btn{font-size:22px!important}
@@ -312,8 +297,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .modal-title{font-size:clamp(16px,5vw,26px);max-width:85vw}
   .modal-desc-text{max-width:85vw;font-size:11px}
   .modal-info-strip{padding:60px 16px 18px}
+  /* Bölüm açıklama: own row on mobile */
   #bolumAciklamaWrap{width:100%;padding-bottom:8px}
-  #corner-gif{width:44px;bottom:12px;right:12px}
 }
 </style>
 </head>
@@ -321,6 +306,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
+  <div class="map-title-label">EDETRI — Pano</div>
   <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
   <button class="map-ui-btn" id="mapFitBtn" onclick="fitMap()">⊡ Sığdır</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
@@ -331,13 +317,11 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
 </div>
 
-<!-- HEADER — always visible, transparent in pano mode -->
-<header id="siteHeader">
-  <div id="top-bar-row">
-    <img id="site-logo" src="https://edetri.com/cdn/shop/files/EDETRI.png?v=1721483775&width=400" alt="EDETRI" referrerpolicy="no-referrer">
-    <button id="modeToggleBtn" onclick="handleModeToggle()">Duvar</button>
-    <span id="header-moodboard" class="header-title"><span>Moodboard</span></span>
-    <div id="wall-nav">
+<!-- HEADER — hidden until map closed -->
+<header id="siteHeader" style="display:none">
+  <div class="header-top">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="header-title">EDETRI — <span>Moodboard</span></div>
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
@@ -345,14 +329,17 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
         <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
       </div>
     </div>
-    <div id="header-status">
-      <span class="status-dot loading" id="statusDot"></span>
-      <span class="status-text" id="statusText">Loading...</span>
+    <div class="header-right">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="header-edetri">EDETRI</span>
+        <span class="status-dot loading" id="statusDot"></span>
+        <span class="status-text" id="statusText">Loading...</span>
+      </div>
+      <button id="galleryPanoBtn" onclick="openMap()">⊕ Pano</button>
     </div>
   </div>
-  <div id="filter-row">
-    <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:8px"></div>
-    <button id="filterCollapseBtn" onclick="toggleFilters()">▲</button>
+  <div style="display:flex;align-items:center;flex-wrap:wrap">
+    <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:12px"></div>
   </div>
 </header>
 
@@ -420,13 +407,6 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 <div id="toast"></div>
 
 <script>
-function txtToHtml(txt) {
-  return txt.split(/\n\n+/)
-    .map(p => '<p>' + p.trim().replace(/\n/g, '<br>') + '</p>')
-    .filter(p => p !== '<p></p>')
-    .join('');
-}
-
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AH&gid=0`;
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
@@ -436,7 +416,8 @@ const SECTION_DOCS = [
   { key: 'booklet',          label: 'Booklet' },
   { key: 'editoryel',        label: 'Editöryel' },
   { key: 'mekan',            label: 'Mekan' },
-{ key: 'sergi-platform',   label: 'Sergi Platform' },
+  { key: 'yasanmislik',      label: 'Yaşanmışlık' },
+  { key: 'sergi-platform',   label: 'Sergi Platform' },
   { key: 'drape-ip-kaplama', label: 'Drape / İp Kaplama' },
   { key: 'metal-kumas',      label: 'Metal Kumaş' }
 ];
@@ -862,6 +843,7 @@ function buildMap() {
 }
 
 function openMap() {
+  document.getElementById('siteHeader').style.display='none';
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
   document.getElementById('commentToggleWrap').style.display='none';
@@ -869,39 +851,16 @@ function openMap() {
   document.body.classList.remove('gallery-mode');
   document.body.style.overflow='hidden';
   if (!mapBuilt && rows.length) buildMap();
-  const tb = document.getElementById('modeToggleBtn');
-  if (tb) tb.textContent = 'Duvar';
 }
 
 function closeMap() {
   document.getElementById('mapView').style.display='none';
+  document.getElementById('siteHeader').style.display='';
   document.getElementById('galleryWrap').style.display='';
   document.getElementById('commentToggleWrap').style.display='flex';
   document.getElementById('sizeSliderWrap').style.display='flex';
   document.body.classList.add('gallery-mode');
   document.body.style.overflow='';
-  const tb = document.getElementById('modeToggleBtn');
-  if (tb) tb.textContent = '⊕ Pano';
-  requestAnimationFrame(updateGalleryPadding);
-}
-
-function handleModeToggle() {
-  if (document.body.classList.contains('gallery-mode')) openMap();
-  else closeMap();
-}
-
-function toggleFilters() {
-  document.body.classList.toggle('filters-collapsed');
-  const btn = document.getElementById('filterCollapseBtn');
-  if (btn) btn.textContent = document.body.classList.contains('filters-collapsed') ? '▼' : '▲';
-  requestAnimationFrame(updateGalleryPadding);
-}
-
-function updateGalleryPadding() {
-  const header = document.getElementById('siteHeader');
-  const gallery = document.getElementById('galleryWrap');
-  if (!header || !gallery) return;
-  gallery.style.paddingTop = header.offsetHeight + 'px';
 }
 
 // ── SHUFFLE ───────────────────────────────────────────────────
@@ -1000,7 +959,6 @@ document.getElementById('commentToggle').addEventListener('change', function(){
 });
 
 init();
-window.addEventListener('resize', updateGalleryPadding);
 
 function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
@@ -1050,18 +1008,11 @@ function switchRaporTab(key) {
   const content = document.getElementById('raporContent');
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
   content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
-  if (key === 'EDETRI_Bolum2_AnaCerceve') {
-    fetch(RAPOR_BASE + key + '.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
-      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
-  } else {
-    fetch(RAPOR_BASE + key + '.txt')
-      .then(r => r.text())
-      .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; })
-      .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
-  }
+  fetch(RAPOR_BASE + key + '.docx')
+    .then(r => r.arrayBuffer())
+    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
 }
 function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
 
@@ -1222,18 +1173,11 @@ function loadClusterPanel(key, panel) {
   if (content.dataset.loaded) return;
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; content.dataset.loaded = '1'; return; }
   content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:20px 0">Yükleniyor...</div>';
-  if (key === 'EDETRI_Bolum2_AnaCerceve') {
-    fetch(RAPOR_BASE + key + '.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
-      .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
-  } else {
-    fetch(RAPOR_BASE + key + '.txt')
-      .then(r => r.text())
-      .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; content.dataset.loaded = '1'; })
-      .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
-  }
+  fetch(RAPOR_BASE + key + '.docx')
+    .then(r => r.arrayBuffer())
+    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
+    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
+    .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
 }
 
 function setupPanelDrag(panel) {
@@ -1433,6 +1377,5 @@ document.addEventListener('mousedown', e => {
     <div id="yaklasimContent" class="doc-content"></div>
   </div>
 </div>
-<img id="corner-gif" src="https://virtuallyeverafter.xyz/assets/img/logo-anim.gif" alt="" referrerpolicy="no-referrer">
 </body>
 </html>
