@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EDETRI — Moodboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 :root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -407,6 +406,13 @@ body.gallery-mode #galleryPanoBtn{display:block}
 <div id="toast"></div>
 
 <script>
+function txtToHtml(txt) {
+  return txt.split(/\n\n+/)
+    .map(p => '<p>' + p.trim().replace(/\n/g, '<br>') + '</p>')
+    .filter(p => p !== '<p></p>')
+    .join('');
+}
+
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AH&gid=0`;
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
@@ -971,10 +977,9 @@ function openYaklasim() {
   if (!yaklasimLoaded) {
     const content = document.getElementById('yaklasimContent');
     content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0">Yükleniyor...</div>';
-    fetch(RAPOR_BASE + 'ozet.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { content.innerHTML = result.value; yaklasimLoaded = true; })
+    fetch(RAPOR_BASE + 'ozet.txt')
+      .then(r => r.text())
+      .then(txt => { content.innerHTML = txtToHtml(txt); yaklasimLoaded = true; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
 }
@@ -1008,10 +1013,9 @@ function switchRaporTab(key) {
   const content = document.getElementById('raporContent');
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
   content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
-  fetch(RAPOR_BASE + key + '.docx')
-    .then(r => r.arrayBuffer())
-    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+  fetch(RAPOR_BASE + key + '.txt')
+    .then(r => r.text())
+    .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; })
     .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
 }
 function closeRapor(){document.getElementById('raporOverlay').classList.remove('open');document.body.style.overflow=''}
@@ -1043,10 +1047,9 @@ function openYaklasimPanel(anchorEl) {
     clusterPanelCache[KEY] = panel;
     document.getElementById('mapView').appendChild(panel);
     const content = panel.querySelector('.cp-content');
-    fetch(RAPOR_BASE + 'ozet.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { content.innerHTML = result.value; })
+    fetch(RAPOR_BASE + 'ozet.txt')
+      .then(r => r.text())
+      .then(txt => { content.innerHTML = txtToHtml(txt); })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
   const panel = clusterPanelCache[KEY];
@@ -1173,10 +1176,9 @@ function loadClusterPanel(key, panel) {
   if (content.dataset.loaded) return;
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; content.dataset.loaded = '1'; return; }
   content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:20px 0">Yükleniyor...</div>';
-  fetch(RAPOR_BASE + key + '.docx')
-    .then(r => r.arrayBuffer())
-    .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-    .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
+  fetch(RAPOR_BASE + key + '.txt')
+    .then(r => r.text())
+    .then(txt => { const html = txtToHtml(txt); raporLoadedTabs[key] = html; content.innerHTML = html; content.dataset.loaded = '1'; })
     .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
 }
 
