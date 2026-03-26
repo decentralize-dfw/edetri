@@ -165,7 +165,7 @@ body.show-comments .card-desc{display:block!important}
 .keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.25;letter-spacing:.06em}
 
 /* MAP VIEW */
-#mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none}
+#mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none;touch-action:none}
 #mapView:active{cursor:grabbing}
 #mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 .map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
@@ -847,6 +847,8 @@ function buildMap() {
     let pinchState = null;
     view.addEventListener('pointerdown', e=>{
       if (e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
+      e.preventDefault();
+      view.setPointerCapture(e.pointerId);
       activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (activePtrs.size === 2) {
         isPanning = false;
@@ -859,9 +861,10 @@ function buildMap() {
       } else if (activePtrs.size === 1) {
         isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
       }
-    });
+    }, {passive:false});
     view.addEventListener('pointermove', e=>{
       if (!activePtrs.has(e.pointerId)) return;
+      e.preventDefault();
       activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (pinchState && activePtrs.size >= 2) {
         const pts=[...activePtrs.values()];
@@ -873,7 +876,7 @@ function buildMap() {
       } else if (isPanning) {
         panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
       }
-    });
+    }, {passive:false});
     const releaseMobile=e=>{
       activePtrs.delete(e.pointerId);
       if (activePtrs.size < 2) pinchState=null;
