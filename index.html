@@ -14,7 +14,8 @@ body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12)}
+#siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);transition:transform .22s ease}
+body.header-hidden #siteHeader{transform:translateY(-100%)}
 body:not(.gallery-mode) #siteHeader{background:none;backdrop-filter:none;border-bottom:none;pointer-events:none}
 body:not(.gallery-mode) #siteHeader>*{pointer-events:all}
 #top-bar-row{display:flex;align-items:center;gap:12px;padding:10px 24px 10px 14px;flex-wrap:nowrap}
@@ -192,6 +193,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 /* ISLANDS */
 .map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+#mapView.panning .map-island{transition:none!important}
 .map-island:hover{z-index:999!important}
 .map-island-inner{position:relative;border-radius:2px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.55);transition:box-shadow .2s,outline .2s;width:100%;height:100%}
 .map-island:hover .map-island-inner{outline:1px solid rgba(168,104,40,.55);box-shadow:0 0 28px rgba(168,104,40,.12),0 14px 44px rgba(0,0,0,.75)}
@@ -285,6 +287,9 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #header-status{display:none}
   /* Filter row */
   #filter-row{padding:0 12px 6px 12px}
+  /* Filter chips: yatay scroll, wrap yok */
+  .filter-bar{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+  .filter-chip{flex-shrink:0}
   /* mapYaklasimBtn mobilde gizle */
   #mapYaklasimBtn{display:none!important}
   /* Filtre kapalıyken filter-row tamamen gizle → içerik üç tuşun hemen altından başlar */
@@ -849,6 +854,7 @@ function buildMap() {
       if (e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
       e.preventDefault();
       view.setPointerCapture(e.pointerId);
+      view.classList.add('panning');
       activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (activePtrs.size === 2) {
         isPanning = false;
@@ -862,6 +868,8 @@ function buildMap() {
         isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
       }
     }, {passive:false});
+    let _rafId=null;
+    const scheduleTransform=()=>{ if(_rafId) return; _rafId=requestAnimationFrame(()=>{ _rafId=null; applyTransform(); }); };
     view.addEventListener('pointermove', e=>{
       if (!activePtrs.has(e.pointerId)) return;
       e.preventDefault();
@@ -872,15 +880,15 @@ function buildMap() {
         const ns=Math.min(Math.max(pinchState.scale*(curDist/pinchState.dist), 0.05), 5);
         panX=pinchState.midX-(pinchState.midX-pinchState.panX)*(ns/pinchState.scale);
         panY=pinchState.midY-(pinchState.midY-pinchState.panY)*(ns/pinchState.scale);
-        scale=ns; applyTransform();
+        scale=ns; scheduleTransform();
       } else if (isPanning) {
-        panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+        panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); scheduleTransform();
       }
     }, {passive:false});
     const releaseMobile=e=>{
       activePtrs.delete(e.pointerId);
       if (activePtrs.size < 2) pinchState=null;
-      if (activePtrs.size === 0) { isPanning=false; }
+      if (activePtrs.size === 0) { isPanning=false; view.classList.remove('panning'); }
     };
     view.addEventListener('pointerup', releaseMobile);
     view.addEventListener('pointercancel', releaseMobile);
@@ -929,6 +937,7 @@ function closeMap() {
   document.getElementById('commentToggleWrap').style.display='flex';
   document.getElementById('sizeSliderWrap').style.display='flex';
   document.body.classList.add('gallery-mode');
+  document.body.classList.remove('header-hidden');
   document.body.style.overflow='';
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = '⊕ Pano';
@@ -1059,6 +1068,24 @@ document.addEventListener('touchmove', e => {
 
 init();
 window.addEventListener('resize', updateGalleryPadding);
+
+// Gallery modunda mobil: scroll aşağı → header gizle, scroll yukarı → göster
+(function(){
+  let lastY=0;
+  window.addEventListener('scroll',()=>{
+    if(window.innerWidth>=768||!document.body.classList.contains('gallery-mode')) return;
+    const y=window.scrollY;
+    const gw=document.getElementById('galleryWrap');
+    if(y>lastY&&y>70){
+      document.body.classList.add('header-hidden');
+      gw.style.paddingTop='0';
+    } else if(y<lastY-12||y<70){
+      document.body.classList.remove('header-hidden');
+      requestAnimationFrame(updateGalleryPadding);
+    }
+    lastY=y;
+  },{passive:true});
+})();
 
 function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
