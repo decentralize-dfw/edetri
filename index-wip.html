@@ -123,9 +123,10 @@ body.has-data #star-filter-wrap{display:block}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
-#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:10px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 18px;border-radius:2px}
-#sizeSliderWrap span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase}
-#sizeSlider{width:160px;accent-color:var(--copper);cursor:pointer}
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px}
+.size-step-btn{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:15px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;flex-shrink:0;padding:0}
+.size-step-btn:hover{border-color:var(--copper);color:var(--copper)}
+#sizeDisplay{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);min-width:18px;text-align:center;letter-spacing:.05em}
 
 /* COMMENT TOGGLE */
 #commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto}
@@ -186,8 +187,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
-.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.80);letter-spacing:.04em;white-space:nowrap;line-height:1}
-.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.35);margin-top:8px}
+.map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.90);letter-spacing:.04em;white-space:nowrap;line-height:1;-webkit-text-stroke:2px rgba(0,0,0,.85);paint-order:stroke fill}
+.map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.5);margin-top:8px;-webkit-text-stroke:1px rgba(0,0,0,.7);paint-order:stroke fill}
 
 /* ISLANDS */
 .map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
@@ -274,9 +275,9 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #header-moodboard{display:none!important}
   /* Toggle: logo hemen yanında (margin-left:8px) */
   #modeToggleBtn{order:1;flex-basis:auto;font-size:8px;padding:5px 9px;margin-left:8px;letter-spacing:.08em}
-  /* Filtre oku: sadece galeri modunda, sağ tarafa yasla */
-  #filterCollapseBtn{display:none}
-  body.gallery-mode #filterCollapseBtn{display:block;order:1;margin-left:auto;font-size:13px;padding:5px 10px}
+  /* Filtre oku: her iki modda da alan ayır (layout kaymasın), sadece galeri modunda görünür */
+  #filterCollapseBtn{display:flex!important;visibility:hidden;pointer-events:none;order:1;margin-left:auto;font-size:13px;padding:5px 10px;align-items:center;justify-content:center}
+  body.gallery-mode #filterCollapseBtn{visibility:visible;pointer-events:auto}
   /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
   #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
   body.filters-collapsed #wall-nav{display:flex!important}
@@ -300,8 +301,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .masonry{column-count:2;column-gap:5px}
   .gallery-wrap{padding:0 5px 12px}
   /* Bottom controls */
-  #sizeSliderWrap{bottom:14px;padding:8px 13px}
-  #sizeSlider{width:100px}
+  #sizeSliderWrap{bottom:14px;padding:6px 10px}
+  .size-step-btn{width:32px;height:32px;font-size:18px}
   #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
@@ -377,10 +378,11 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   </div>
 </main>
 
-<!-- SIZE SLIDER (masonry mode) -->
+<!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <span>Size</span>
-  <input type="range" id="sizeSlider" min="1" max="9" value="5" step="1" oninput="applySize(this.value)">
+  <button class="size-step-btn" onclick="changeSizeStep(-1)">−</button>
+  <span id="sizeDisplay">5</span>
+  <button class="size-step-btn" onclick="changeSizeStep(1)">+</button>
 </div>
 
 <!-- COMMENT TOGGLE (masonry mode) -->
@@ -639,6 +641,13 @@ function renderMasonry() {
   });
 }
 
+let _sizeVal = 5;
+function changeSizeStep(dir) {
+  _sizeVal = Math.min(9, Math.max(1, _sizeVal + dir));
+  const el = document.getElementById('sizeDisplay');
+  if (el) el.textContent = _sizeVal;
+  applySize(_sizeVal);
+}
 function applySize(v) {
   const cols = 10 - parseInt(v);
   document.getElementById('masonry').style.columnCount = cols;
@@ -680,33 +689,28 @@ function buildMap() {
   function placeCluster(group, cx, cy) {
     const n=group.length;
     // Desktop: daire içi yerleşim — her küme kendi dairesinde, tam örtüşme yok
-    const deskRects=[];
-    const circR=Math.min(cellW,cellH)*0.42; // daire yarıçapı: hücreden taşmasın
+    const placedRects=[];
+    // Daire yarıçapı: desktopta daha geniş (0.46), mobilde hücre boyutuna göre
+    const circR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
+    // İtemler arası minimum boşluk (desktop daha büyük)
+    const GAP=isMobile?2:8;
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
       const sr=rng();
       const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
       const h=isMobile?(sr<.12?93:sr<.38?67:48):(sr<.12?160:sr<.38?112:77);
-      let ix,iy;
-      if(isMobile){
-        const angle=(j/Math.max(n,1))*Math.PI*2+rng()*.35;
-        const ring=Math.floor(j/4);
-        const dist=44+ring*64+rng()*16;
-        ix=cx+Math.cos(angle)*dist-w/2; iy=cy+Math.sin(angle)*dist-h/2;
-      } else {
-        // Daire içinde rastgele, tam örtüşme olmayacak şekilde
-        ix=cx-w/2; iy=cy-h/2;
-        for(let att=0;att<60;att++){
-          const a=rng()*Math.PI*2;
-          const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.65);
-          const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
-          // Tam örtüşme kontrolü: başka bir resim bu resmi tamamen kapatıyor mu?
-          if(!deskRects.some(r=>r.x<=tx&&r.y<=ty&&r.x+r.w>=tx+w&&r.y+r.h>=ty+h)){
-            ix=tx; iy=ty; break;
-          }
-        }
-        deskRects.push({x:ix,y:iy,w,h});
+      // Mobil ve desktop için aynı daire algoritması
+      let ix=cx-w/2, iy=cy-h/2;
+      for(let att=0;att<80;att++){
+        const a=rng()*Math.PI*2;
+        const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.6);
+        const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
+        // Hiçbir mevcut itemle GAP'ten fazla örtüşme olmasın
+        if(!placedRects.some(r=>
+          tx<r.x+r.w+GAP&&tx+w+GAP>r.x&&ty<r.y+r.h+GAP&&ty+h+GAP>r.y
+        )){ix=tx;iy=ty;break;}
       }
+      placedRects.push({x:ix,y:iy,w,h});
       const rot=(rng()-.5)*6;
 
       const island=document.createElement('div');
