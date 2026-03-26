@@ -2,15 +2,15 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EDETRI — Moodboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo:wght@200;300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 :root{--black:#090807;--cream:#e8e0d0;--silver:#b0a890;--copper:#a86828;--burgundy:#581020;--gold:#b89850;--dim:#2a2720}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif;font-weight:200;min-height:100vh;overflow-x:hidden}
+html{scroll-behavior:smooth;scrollbar-width:none}html::-webkit-scrollbar{display:none}
+body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif;font-weight:200;min-height:100vh;overflow-x:hidden;scrollbar-width:none}body::-webkit-scrollbar{display:none}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
@@ -33,7 +33,7 @@ body:not(.gallery-mode) #header-status{display:none}
 body.gallery-mode #filter-row{display:flex}
 body.filters-collapsed #filter-row .filter-bar{display:none}
 body.filters-collapsed #wall-nav{display:none}
-#filterCollapseBtn{background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;padding:2px 8px;transition:color .2s;flex-shrink:0;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em}
+#filterCollapseBtn{background:none;border:none;color:var(--silver);cursor:pointer;font-size:11px;padding:2px 8px;transition:color .2s;flex-shrink:0;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;display:none}
 #filterCollapseBtn:hover{color:var(--copper)}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);display:inline-block;margin-right:6px;transition:background .3s}
 .status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
@@ -268,24 +268,27 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Header: stack vertically */
-  #top-bar-row{flex-wrap:wrap;align-items:flex-start;padding:8px 12px;gap:6px}
+  /* Header: logo + toggle tek satırda, wall-nav hemen altında */
+  #top-bar-row{flex-wrap:wrap;align-items:center;padding:8px 12px;gap:6px}
   #site-logo{height:20px;flex-shrink:0;order:1}
-  /* Moodboard text: same row as logo (order 1 = both row 1) */
-  #header-moodboard{order:1;font-size:13px;letter-spacing:.06em}
-  /* Toggle: own row below logo */
-  #modeToggleBtn{order:2;flex-basis:100%;font-size:8px;padding:5px 9px}
-  /* Wall-nav: own row below toggle */
-  #wall-nav{order:3;flex-basis:100%;gap:5px}
+  /* Moodboard yazısını mobilde gizle */
+  #header-moodboard{display:none!important}
+  /* Toggle: logo hemen yanında, normal buton boyutu */
+  #modeToggleBtn{order:1;flex-basis:auto;font-size:9px;padding:7px 14px;margin-left:6px}
+  /* Filtre açıp-kapama oku: top-bar-row sağ ucunda, sabit konum */
+  #filterCollapseBtn{display:block;order:5;margin-left:auto;font-size:13px;padding:5px 10px}
+  /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
+  #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
+  body.filters-collapsed #wall-nav{display:flex!important}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
   #header-status{display:none}
   /* Filter row */
   #filter-row{padding:0 12px 6px 12px}
-  /* Yaklaşım button: below stacked header (~76px) */
-  #mapYaklasimBtn{left:12px;top:76px}
-  /* Shuffle: top-right */
-  #mapShuffleBtn{right:18px;top:13px}
-  /* Overlay inner: 5% margins each side */
+  /* mapYaklasimBtn gizle: wall-nav'da Yaklaşım butonu var */
+  #mapYaklasimBtn{display:none!important}
+  /* Shuffle: modeToggleBtn ile aynı boyut/yükseklik */
+  #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
+  /* Overlay inner */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
   /* Rapor tabs */
@@ -300,10 +303,11 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
-  .map-ui-btn{font-size:8px;padding:6px 9px}
+  .map-ui-btn{font-size:9px;padding:7px 14px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
-  /* Cluster panels */
-  .cluster-panel{min-height:160px}
+  /* Cluster panels: geniş touch alanı için titlebar büyük */
+  .cluster-panel{min-height:180px}
+  .cp-titlebar{padding:14px 16px;min-height:48px}
   .card-desc{font-size:8px!important}
   .map-cluster-name{font-size:36px}
   .map-cluster-count{font-size:11px}
@@ -313,7 +317,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .modal-desc-text{max-width:85vw;font-size:11px}
   .modal-info-strip{padding:60px 16px 18px}
   #bolumAciklamaWrap{width:100%;padding-bottom:8px}
-  #corner-gif{width:44px;bottom:12px;right:12px}
+  /* GIF: scrollbar kaymasın, sabit pozisyon */
+  #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
 }
 </style>
 </head>
@@ -349,10 +354,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
       <span class="status-dot loading" id="statusDot"></span>
       <span class="status-text" id="statusText">Loading...</span>
     </div>
+    <button id="filterCollapseBtn" onclick="toggleFilters()">▲</button>
   </div>
   <div id="filter-row">
     <div class="filter-bar" id="filterBar" style="flex:1;padding-bottom:8px"></div>
-    <button id="filterCollapseBtn" onclick="toggleFilters()">▲</button>
   </div>
 </header>
 
@@ -735,8 +740,19 @@ function buildMap() {
           document.getElementById('mapTooltip').classList.remove('visible');
         });
       } else {
-        // Mobile: tap to open modal, canvas pan/pinch handles movement
-        island.addEventListener('click', ()=>openMapImagePanel(gi));
+        // Mobile: tap to open panel — only fire if no pan/pinch occurred
+        let _tapStart = null;
+        island.addEventListener('touchstart', e => {
+          if (e.touches.length === 1) _tapStart = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+          else _tapStart = null;
+        }, {passive:true});
+        island.addEventListener('touchend', e => {
+          if (!_tapStart) return;
+          const dx = e.changedTouches[0].clientX - _tapStart.x;
+          const dy = e.changedTouches[0].clientY - _tapStart.y;
+          if (Math.hypot(dx,dy) < 10) { e.preventDefault(); openMapImagePanel(gi); }
+          _tapStart = null;
+        });
       }
 
       stage.appendChild(island);
@@ -999,6 +1015,14 @@ document.getElementById('commentToggle').addEventListener('change', function(){
   document.body.classList.toggle('show-comments', this.checked);
 });
 
+// Browser pinch-zoom'u engelle — sadece iç canvas zoom'u kullan
+document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
+document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, {passive:false});
+
 init();
 window.addEventListener('resize', updateGalleryPadding);
 
@@ -1102,8 +1126,8 @@ function openYaklasimPanel(anchorEl) {
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
   const mob = window.innerWidth < 768;
   if (mob) {
-    const pw = Math.round(window.innerWidth  * 0.7);
-    const ph = Math.round(window.innerHeight * 0.7);
+    const pw = Math.round(window.innerWidth  * 0.88);
+    const ph = Math.round(window.innerHeight * 0.78);
     panel.style.width  = pw + 'px';
     panel.style.height = ph + 'px';
     panel.style.left   = Math.round((window.innerWidth  - pw) / 2) + 'px';
@@ -1128,10 +1152,11 @@ function openMapImagePanel(gi) {
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
   const mob = window.innerWidth < 768;
   const count = Object.keys(mapImagePanelCache).length - 1;
-  const w = mob ? Math.round(window.innerWidth  * 0.7) : Math.min(480, window.innerWidth  - 20);
-  const h = mob ? Math.round(window.innerHeight * 0.7) : Math.min(576, window.innerHeight - 40);
-  const ox = (count % 6) * 22;
-  const oy = (count % 6) * 18;
+  const w = mob ? Math.round(window.innerWidth  * 0.88) : Math.min(480, window.innerWidth  - 20);
+  const h = mob ? Math.round(window.innerHeight * 0.78) : Math.min(576, window.innerHeight - 40);
+  // Mobilde her zaman ekran merkezine — canvas zoom'undan bağımsız
+  const ox = mob ? 0 : (count % 6) * 22;
+  const oy = mob ? 0 : (count % 6) * 18;
   panel.style.width  = w + 'px';
   panel.style.height = h + 'px';
   panel.style.left   = Math.max(10, (window.innerWidth  - w) / 2 + ox) + 'px';
@@ -1174,8 +1199,8 @@ function openClusterPanel(key, anchorEl) {
   if (panel.style.display !== 'none') { panel.style.zIndex = nextPanelZ(); return; }
   const mob = window.innerWidth < 768;
   if (mob) {
-    const pw = Math.round(window.innerWidth  * 0.7);
-    const ph = Math.round(window.innerHeight * 0.7);
+    const pw = Math.round(window.innerWidth  * 0.88);
+    const ph = Math.round(window.innerHeight * 0.78);
     panel.style.width  = pw + 'px';
     panel.style.height = ph + 'px';
     panel.style.left   = Math.round((window.innerWidth  - pw) / 2) + 'px';
