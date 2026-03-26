@@ -409,6 +409,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
 <script>
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AH&gid=0`;
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
 
 const SECTION_DOCS = [
   { key: 'EDETRI_Bolum2_AnaCerceve', label: 'Ana Çerçeve' },
@@ -450,6 +451,48 @@ function buildStarRating(rating) {
   html += '</div>';
   return html;
 }
+
+function buildInteractiveStarRating(idx, rating) {
+  let html = `<div class="star-rating star-interactive" data-idx="${idx}">`;
+  for (let i = 1; i <= 5; i++) {
+    const fill = Math.min(100, Math.max(0, (rating - (i - 1)) * 100)).toFixed(1);
+    html += `<span class="star" data-val="${i}" style="--fill:${fill}%;cursor:pointer">★</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function initStarInteraction(idx) {
+  const container = document.querySelector('#mStars .star-interactive');
+  if (!container) return;
+  const stars = [...container.querySelectorAll('.star')];
+  stars.forEach(star => {
+    const val = parseInt(star.dataset.val);
+    star.addEventListener('mouseenter', () => {
+      stars.forEach(s => s.style.setProperty('--fill', parseInt(s.dataset.val) <= val ? '100%' : '0%'));
+    });
+    star.addEventListener('mouseleave', () => {
+      stars.forEach(s => {
+        const f = Math.min(100, Math.max(0, (rows[idx].rating - (parseInt(s.dataset.val) - 1)) * 100));
+        s.style.setProperty('--fill', f + '%');
+      });
+    });
+    star.addEventListener('click', () => saveRating(idx, val));
+  });
+}
+
+async function saveRating(idx, rating) {
+  rows[idx].rating = rating;
+  document.getElementById('mStars').innerHTML = buildInteractiveStarRating(idx, rating);
+  initStarInteraction(idx);
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ row: rows[idx].excelRow, type: rows[idx].type, description: rows[idx].description, rating })
+    });
+  } catch(e) { console.error('Rating save failed:', e); }
+}
 let mapAllItems = [];
 let panX = 0, panY = 0, scale = 1;
 let isPanning = false, panSX, panSY, panOX, panOY;
@@ -464,7 +507,9 @@ async function init() {
     if (json.status !== 'ok') throw new Error('Sheet unavailable — make sure it is public');
 
     rows = [];
-    for (const row of (json.table.rows||[])) {
+    const tableRows = json.table.rows || [];
+    for (let i = 0; i < tableRows.length; i++) {
+      const row = tableRows[i];
       const c = (row.c||[]).map(x => x&&x.v!=null ? String(x.v) : '');
       const imgUrl = (c[0]||'').trim();
       if (!imgUrl) continue;
@@ -474,7 +519,8 @@ async function init() {
         pinterestUrl: (c[3]||'').trim(),
         type:         (c[4]||'').trim(),
         description:  (c[5]||'').trim(),
-        rating:       parseFloat((c[6]||'').replace(',','.')) || 0
+        rating:       parseFloat((c[6]||'').replace(',','.')) || 0,
+        excelRow:     i + 10
       });
     }
 
@@ -862,7 +908,8 @@ function openModal(idx) {
   const dot=document.getElementById('mColorDot'), hex=document.getElementById('mColorHex');
   if (row.color){ dot.style.background=row.color; dot.style.display='block'; hex.textContent=row.color.toUpperCase(); }
   else { dot.style.display='none'; hex.textContent=''; }
-  document.getElementById('mStars').innerHTML = row.rating ? buildStarRating(row.rating) : '';
+  document.getElementById('mStars').innerHTML = buildInteractiveStarRating(idx, row.rating);
+  initStarInteraction(idx);
   document.getElementById('mTitle').textContent=row.type||'';
   document.getElementById('mDesc').textContent=row.description||'';
   const lnk=document.getElementById('mLink');
