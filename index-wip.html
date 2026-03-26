@@ -21,10 +21,9 @@ body:not(.gallery-mode) #siteHeader>*{pointer-events:all}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
 #site-logo{height:26px;width:auto;filter:invert(1);display:block;pointer-events:none;flex-shrink:0}
-#header-moodboard{display:none;order:3}
-body.gallery-mode #header-moodboard{display:block}
-#modeToggleBtn{order:2;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;white-space:nowrap;flex-shrink:0}
-#modeToggleBtn:hover{border-color:var(--copper);color:var(--copper)}
+#header-moodboard{display:none!important}
+#modeToggleBtn{order:2;background:var(--gold);border:1px solid var(--gold);color:var(--black);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 13px;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap;flex-shrink:0;font-weight:500}
+#modeToggleBtn:hover{background:var(--copper);border-color:var(--copper);color:var(--black)}
 #wall-nav{display:none;align-items:center;gap:12px;flex-wrap:wrap;flex:1;order:4}
 body.gallery-mode #wall-nav{display:flex}
 #header-status{display:flex;align-items:center;gap:6px;flex-shrink:0;order:5}
@@ -174,7 +173,7 @@ body.show-comments .card-desc{display:block!important}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
-#mapFitBtn{right:18px;left:auto;top:auto;bottom:24px}
+#mapFitBtn{left:24px;right:auto;top:auto;bottom:24px}
 /* Old individual toggle buttons — replaced by #modeToggleBtn in header */
 #galleryPanoBtn{display:none!important}
 #mapDuvarBtn{display:none!important}
@@ -273,10 +272,11 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #site-logo{height:20px;flex-shrink:0;order:1}
   /* Moodboard yazısını mobilde gizle */
   #header-moodboard{display:none!important}
-  /* Toggle: margin-left:auto → sağ tarafa it, ▲ ile yan yana */
-  #modeToggleBtn{order:1;flex-basis:auto;font-size:9px;padding:7px 14px;margin-left:auto}
-  /* Filtre oku: toggle hemen yanında, sabit sağ konumda */
-  #filterCollapseBtn{display:block;order:1;margin-left:8px;font-size:13px;padding:5px 10px}
+  /* Toggle: logo hemen yanında (margin-left:8px) */
+  #modeToggleBtn{order:1;flex-basis:auto;font-size:8px;padding:5px 9px;margin-left:8px;letter-spacing:.08em}
+  /* Filtre oku: sadece galeri modunda, sağ tarafa yasla */
+  #filterCollapseBtn{display:none}
+  body.gallery-mode #filterCollapseBtn{display:block;order:1;margin-left:auto;font-size:13px;padding:5px 10px}
   /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
   #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
   body.filters-collapsed #wall-nav{display:flex!important}
@@ -286,8 +286,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #filter-row{padding:0 12px 6px 12px}
   /* mapYaklasimBtn mobilde gizle */
   #mapYaklasimBtn{display:none!important}
-  /* Sığdır: sağ tarafa */
-  #mapFitBtn{right:12px;left:auto}
+  /* Filtre kapalıyken filter-row tamamen gizle → içerik üç tuşun hemen altından başlar */
+  body.filters-collapsed #filter-row{display:none!important}
   /* Shuffle: modeToggleBtn ile aynı boyut/yükseklik */
   #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
   /* Overlay inner */
@@ -323,9 +323,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
 }
 
-/* DESKTOP — wall-nav + moodboard her iki modda da görünür */
+/* DESKTOP — wall-nav her iki modda görünür, moodboard kapalı */
 @media(min-width:769px){
-  #header-moodboard{display:block!important}
   #wall-nav{display:flex!important}
   body.filters-collapsed #wall-nav{display:flex!important}
   #mapYaklasimBtn{display:none!important}
