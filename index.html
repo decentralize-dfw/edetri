@@ -14,7 +14,7 @@ body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px 0 130px}
+#siteHeader{position:sticky;top:0;z-index:100;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);padding:0 24px 0 230px}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:12px}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
@@ -155,16 +155,19 @@ body.show-comments .card-desc{display:block!important}
 #mapStage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
 .map-ui-btn{position:fixed;top:18px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;z-index:300;transition:all .2s;text-transform:uppercase;backdrop-filter:blur(8px)}
 .map-ui-btn:hover{border-color:var(--copper);color:var(--copper)}
-#mapDuvarBtn{left:18px;top:18px}
+#mapDuvarBtn{left:150px;top:13px}
 #mapShuffleBtn{right:18px}
 #mapShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 #mapYaklasimBtn{left:18px;top:58px}
 #mapFitBtn{left:24px;top:auto;bottom:24px}
-/* Gallery Pano button: fixed top-left, identical weight to Duvar */
-#galleryPanoBtn{position:fixed;top:18px;left:18px;z-index:300;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
+/* Gallery Pano button: fixed top-left, same position as Duvar button */
+#galleryPanoBtn{position:fixed;top:13px;left:150px;z-index:400;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s;display:none}
 body.gallery-mode #galleryPanoBtn{display:block}
 #galleryPanoBtn:hover{border-color:var(--copper);color:var(--copper)}
-.map-title-label{position:fixed;top:22px;left:24px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:rgba(176,168,144,.25);letter-spacing:.1em;z-index:300;pointer-events:none}
+.map-title-label{display:none}
+#site-logo{position:fixed;top:13px;left:14px;height:26px;width:auto;filter:invert(1);z-index:400;pointer-events:none;display:block}
+#corner-gif{position:fixed;bottom:18px;right:18px;width:64px;height:auto;filter:invert(1);pointer-events:none;z-index:50}
+body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
 #mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
@@ -252,19 +255,19 @@ body.gallery-mode #galleryPanoBtn{display:block}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Header — stack as column, Pano in flow (not fixed) */
-  #siteHeader{padding:0 10px}
+  /* Header — no left padding needed, toggle button is fixed */
+  #siteHeader{padding:0 10px 0 10px}
   .header-top{flex-direction:column;align-items:stretch;padding:10px 0;gap:6px}
-  /* Row 1: header-right (Pano + status), floats to top */
-  .header-right{order:-1;width:100%;justify-content:space-between;gap:6px}
-  /* Pano: back into flow on mobile */
-  #galleryPanoBtn{position:static!important;order:-1;background:none!important;backdrop-filter:none!important;border:1px solid rgba(176,168,144,.2);color:var(--silver);font-size:8px;padding:5px 9px;letter-spacing:.1em;top:auto;left:auto;z-index:auto;display:block}
-  body.gallery-mode #galleryPanoBtn{display:block}
+  /* Row 1: header-right (status only) */
+  .header-right{order:-1;width:100%;justify-content:flex-end;gap:6px}
   /* Row 2+: left group with title + action buttons */
   .header-top>div:first-child{order:0;flex-wrap:wrap;gap:5px;align-items:center}
   .header-title{font-size:14px;letter-spacing:.06em;width:100%}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
-  .header-edetri{font-size:8px}
+  /* Logo + toggle buttons: same fixed position on mobile */
+  #site-logo{top:9px;left:10px;height:20px}
+  #galleryPanoBtn{top:8px;left:100px;font-size:8px;padding:5px 9px}
+  #mapDuvarBtn{top:8px;left:100px}
   /* Overlay inner: 5% margins each side */
   #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
   #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
@@ -282,8 +285,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
   /* Map UI buttons */
   .map-ui-btn{font-size:8px;padding:6px 9px}
   #mapShuffleBtn{right:80px}
-  #mapYaklasimBtn{left:16px;top:46px}
-  .map-title-label{font-size:11px;top:20px;left:16px}
+  #mapYaklasimBtn{left:16px;top:40px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
   /* Cluster panels: mobile min-height, no forced width (JS sets 70% via inline style) */
   .cluster-panel{min-height:160px}
@@ -299,6 +301,8 @@ body.gallery-mode #galleryPanoBtn{display:block}
   .modal-info-strip{padding:60px 16px 18px}
   /* Bölüm açıklama: own row on mobile */
   #bolumAciklamaWrap{width:100%;padding-bottom:8px}
+  /* Corner GIF: smaller on mobile */
+  #corner-gif{width:44px;bottom:12px;right:12px}
 }
 </style>
 </head>
@@ -306,7 +310,6 @@ body.gallery-mode #galleryPanoBtn{display:block}
 
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
-  <div class="map-title-label">EDETRI — Pano</div>
   <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
   <button class="map-ui-btn" id="mapFitBtn" onclick="fitMap()">⊡ Sığdır</button>
   <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
@@ -321,7 +324,7 @@ body.gallery-mode #galleryPanoBtn{display:block}
 <header id="siteHeader" style="display:none">
   <div class="header-top">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <div class="header-title">EDETRI — <span>Moodboard</span></div>
+      <div class="header-title"><span>Moodboard</span></div>
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
       <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
@@ -331,11 +334,9 @@ body.gallery-mode #galleryPanoBtn{display:block}
     </div>
     <div class="header-right">
       <div style="display:flex;align-items:center;gap:6px">
-        <span class="header-edetri">EDETRI</span>
         <span class="status-dot loading" id="statusDot"></span>
         <span class="status-text" id="statusText">Loading...</span>
       </div>
-      <button id="galleryPanoBtn" onclick="openMap()">⊕ Pano</button>
     </div>
   </div>
   <div style="display:flex;align-items:center;flex-wrap:wrap">
@@ -1397,5 +1398,8 @@ document.addEventListener('mousedown', e => {
     <div id="yaklasimContent" class="doc-content"></div>
   </div>
 </div>
+<img id="site-logo" src="https://edetri.com/cdn/shop/files/EDETRI.png?v=1721483775&width=400" alt="EDETRI" referrerpolicy="no-referrer">
+<button id="galleryPanoBtn" onclick="openMap()">⊕ Pano</button>
+<img id="corner-gif" src="https://virtuallyeverafter.xyz/assets/img/logo-anim.gif" alt="" referrerpolicy="no-referrer">
 </body>
 </html>
