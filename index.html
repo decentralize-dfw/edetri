@@ -337,7 +337,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .modal-title{font-size:clamp(16px,5vw,26px);max-width:85vw}
   .modal-desc-text{max-width:85vw;font-size:11px}
   .modal-info-strip{padding:60px 16px 18px}
-  #bolumAciklamaWrap{width:100%;padding-bottom:8px}
+  #bolumAciklamaWrap{padding-bottom:0}
   /* GIF: scrollbar kaymasın, sabit pozisyon */
   #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
   .map-island{transition:none!important}
@@ -405,7 +405,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <input type="range" id="colSlider" min="1" max="9" value="5" oninput="applyColSlider(this.value)">
+  <input type="range" id="colSlider" min="1" max="13" value="5" oninput="applyColSlider(this.value)">
   <button class="size-step-btn" onclick="changeSizeStep(-1)">−</button>
   <span id="sizeDisplay">5</span>
   <button class="size-step-btn" onclick="changeSizeStep(1)">+</button>
@@ -836,7 +836,7 @@ function renderMasonry() {
 
 let _cols = 5;
 function changeSizeStep(dir) {
-  _cols = Math.min(9, Math.max(1, _cols + dir));
+  _cols = Math.min(13, Math.max(1, _cols + dir));
   const el = document.getElementById('sizeDisplay');
   if (el) el.textContent = _cols;
   const sl = document.getElementById('colSlider');
@@ -1300,6 +1300,25 @@ document.addEventListener('keydown', e=>{
 document.getElementById('modal').addEventListener('click', e=>{
   if (e.target===document.getElementById('modal')) closeModal();
 });
+
+// Modal swipe navigation (mobile)
+(function(){
+  const m = document.getElementById('modal');
+  let sx = 0, sy = 0;
+  m.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, {passive:true});
+  m.addEventListener('touchend', e => {
+    if (!m.classList.contains('open')) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      navModal(dx < 0 ? 1 : -1);
+    }
+  }, {passive:true});
+})();
 
 document.getElementById('commentToggle').addEventListener('change', function(){
   document.body.classList.toggle('show-comments', this.checked);
