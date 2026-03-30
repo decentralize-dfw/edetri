@@ -264,10 +264,6 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 #mobileNavPopup .btn-map{text-align:left;padding:11px 14px;font-size:9px;border:1px solid rgba(176,168,144,.12)}
 
 /* GALLERY SHUFFLE */
-#galleryShuffleBtn{display:none;position:fixed;z-index:450;bottom:14px;right:12px;background:rgba(14,12,10,.92);border:1px solid rgba(176,168,144,.2);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;padding:7px 14px;cursor:pointer;text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
-body.gallery-mode #galleryShuffleBtn{display:block}
-#galleryShuffleBtn:hover{border-color:var(--copper);color:var(--copper)}
-#galleryShuffleBtn.active{border-color:var(--copper);color:var(--copper);background:rgba(168,104,40,.1)}
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
@@ -309,13 +305,8 @@ body.gallery-mode #galleryShuffleBtn{display:block}
   body.filters-collapsed #filter-row{display:none!important}
   /* Map shuffle: küçük dokunmatik boyut */
   #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
-  /* Gallery shuffle: sağ alt köşe (header'ın arkasına girmez) */
-  #galleryShuffleBtn{bottom:14px;right:12px;top:auto;font-size:9px;padding:8px 11px}
-  body.gallery-mode #galleryShuffleBtn{display:block}
   /* mapFitBtn: yorum tuşuyla aynı konum ve boyut */
   #mapFitBtn{bottom:14px;left:10px;top:auto;right:auto;font-size:9px;padding:8px 11px}
-  /* Masonry: her zaman 2 sütun */
-  .masonry{column-count:2!important}
   /* Overlay popup: mobilde tam genişlik */
   #ozetInner,#raporInner,#yaklasimInner{width:92%;padding:28px 18px 36px}
   #ozetClose,#raporClose,#yaklasimClose{top:10px;right:12px;font-size:16px}
@@ -327,8 +318,9 @@ body.gallery-mode #galleryShuffleBtn{display:block}
   .masonry{column-count:2;column-gap:5px}
   .gallery-wrap{padding:0 5px 12px}
   /* Bottom controls */
-  #sizeSliderWrap{bottom:14px;padding:6px 10px}
-  .size-step-btn{width:32px;height:32px;font-size:18px}
+  /* Size slider: yorum tuşuyla aynı boyut/konum */
+  #sizeSliderWrap{bottom:14px;padding:8px 11px;gap:6px}
+  .size-step-btn{width:24px;height:24px;font-size:14px}
   #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
@@ -404,9 +396,6 @@ body.gallery-mode #galleryShuffleBtn{display:block}
   <button class="btn-map" onclick="closeMobileNav();openOzet()">Özet</button>
   <button class="btn-map" onclick="closeMobileNav();openRapor()">Ful Rapor</button>
 </div>
-
-<!-- GALLERY SHUFFLE (mobile pano mode) -->
-<button id="galleryShuffleBtn" onclick="toggleGalleryShuffle()">⇄ Shuffle</button>
 
 <!-- GALLERY — hidden until map closed -->
 <main id="galleryWrap" style="display:none">
@@ -953,7 +942,6 @@ function buildMap() {
 
 function openMap() {
   closeMobileNav();
-  if (isGalleryShuffled) toggleGalleryShuffle();
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
   document.getElementById('commentToggleWrap').style.display='none';
@@ -1024,26 +1012,6 @@ document.addEventListener('click', e => {
   const btn = document.getElementById('mobileNavBtn');
   if (!popup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) closeMobileNav();
 }, {passive:true});
-
-// ── GALLERY SHUFFLE ────────────────────────────────────────────
-let isGalleryShuffled = false;
-function toggleGalleryShuffle() {
-  const btn = document.getElementById('galleryShuffleBtn');
-  isGalleryShuffled = !isGalleryShuffled;
-  btn.classList.toggle('active', isGalleryShuffled);
-  const masonry = document.getElementById('masonry');
-  const cards = [...masonry.children];
-  if (isGalleryShuffled) {
-    for (let i = cards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [cards[i], cards[j]] = [cards[j], cards[i]];
-    }
-    cards.forEach(c => masonry.appendChild(c));
-  } else {
-    cards.sort((a, b) => +a.dataset.idx - +b.dataset.idx);
-    cards.forEach(c => masonry.appendChild(c));
-  }
-}
 
 // ── SHUFFLE ───────────────────────────────────────────────────
 function toggleShuffle() {
