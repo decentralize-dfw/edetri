@@ -585,18 +585,30 @@ let mapAllItems = [];
 let panX = 0, panY = 0, scale = 1;
 let isPanning = false, panSX, panSY, panOX, panOY;
 
-// ── BATCH IMAGE LOADER ────────────────────────────────────────
+// ── THUMBNAIL URL TRANSFORM ───────────────────────────────────
+// Pinterest CDN: get 236x thumbnail instead of originals/736x (10-50x smaller file & decoded bitmap)
+function thumbUrl(url) {
+  if (!url) return url;
+  if (url.includes('pinimg.com')) {
+    return url.replace(/\/(originals|736x|564x|474x|600x|1200x|750x)\//g, '/236x/');
+  }
+  return url;
+}
+
+// ── BATCH IMAGE LOADER + MEMORY MANAGER ──────────────────────
 let _mapImagesReady = false;
+let _cullerTimer    = null;
 
 function startBatchLoad() {
-  const loader  = document.getElementById('mapLoader');
-  const bar     = document.getElementById('loader-bar');
-  const txt     = document.getElementById('loaderText');
-  const isMob   = window.innerWidth < 768;
-  const BATCH   = isMob ? 3 : 8;   // parallel per tick
-  const PAUSE   = isMob ? 80 : 15; // ms between batches (let browser breathe)
+  const loader = document.getElementById('mapLoader');
+  const bar    = document.getElementById('loader-bar');
+  const txt    = document.getElementById('loaderText');
+  const isMob  = window.innerWidth < 768;
+  // Mobile: 2 parallel, 120ms pause — keeps decoded bitmap count low per tick
+  // Desktop: 8 parallel, 20ms pause
+  const BATCH  = isMob ? 2 : 8;
+  const PAUSE  = isMob ? 120 : 20;
 
-  // Collect unloaded island images
   const queue = [];
   mapAllItems.forEach(item => {
     const img = item.el.querySelector('img');
@@ -606,74 +618,103 @@ function startBatchLoad() {
   const total = queue.length;
   if (!total) { finishLoad(loader); return; }
 
+  if (bar) bar.style.width = '0%';
   let done = 0;
-  function updProgress() {
+
+  function updProg() {
     const pct = Math.round((done / total) * 100);
-    if (bar) bar.style.width = pct + '%';
-    if (txt) txt.textContent = done + ' / ' + total + ' görsel yüklendi';
+    if (bar)  bar.style.width = pct + '%';
+    if (txt)  txt.textContent = pct + '%  (' + done + ' / ' + total + ')';
   }
 
   function loadBatch(i) {
-    if (i >= queue.length) { finishLoad(loader); return; }
-    const batch = queue.slice(i, i + BATCH);
-    let pending = batch.length;
-    function onDone() {
-      done++; updProgress();
-      if (--pending === 0) setTimeout(() => loadBatch(i + BATCH), PAUSE);
-    }
-    batch.forEach(img => {
+    if (i >= total) { finishLoad(loader); return; }
+    const slice = queue.slice(i, i + BATCH);
+    let pending = slice.length;
+    const next = () => { if (--pending === 0) setTimeout(() => loadBatch(i + BATCH), PAUSE); };
+    slice.forEach(img => {
       const src = img.dataset.src;
-      if (!src) { onDone(); return; }
-      delete img.dataset.src;
-      img.addEventListener('load',  onDone, {once:true});
-      img.addEventListener('error', onDone, {once:true});
+      if (!src) { done++; updProg(); next(); return; }
+      delete img.dataset.src;               // mark as "loading/loaded"
+      img.addEventListener('load',  () => { done++; updProg(); next(); }, {once:true});
+      img.addEventListener('error', () => { done++; updProg(); next(); }, {once:true});
       img.src = src;
     });
   }
-
-  if (bar) bar.style.width = '0%';
   loadBatch(0);
 }
 
 function finishLoad(loader) {
   _mapImagesReady = true;
   const bar = document.getElementById('loader-bar');
-  if (bar) bar.style.width = '100%';
   const txt = document.getElementById('loaderText');
-  if (txt) txt.textContent = 'Hazır';
+  if (bar) bar.style.width = '100%';
+  if (txt) txt.textContent = 'Hazır!';
+  // Start memory culler on mobile after a short delay
+  if (window.innerWidth < 768) {
+    setTimeout(startMemoryCuller, 3000);
+  }
   setTimeout(() => {
     if (!loader) return;
     loader.classList.add('fade-out');
-    setTimeout(() => { loader.style.display='none'; loader.classList.remove('fade-out'); }, 520);
-  }, 300);
+    setTimeout(() => { loader.style.display = 'none'; loader.classList.remove('fade-out'); }, 520);
+  }, 400);
 }
 
-// ── VIEWPORT LAZY LOADING ─────────────────────────────────────
-function updateMapVisibility() {
+// ── MEMORY CULLER (mobile only) ───────────────────────────────
+// After loading, periodically evict decoded bitmaps that are far from viewport.
+// Brings them back when user pans near them.
+function startMemoryCuller() {
+  if (_cullerTimer) return;
+  _cullerTimer = setInterval(runMemoryCuller, 5000);
+}
+
+function runMemoryCuller() {
   if (!mapBuilt) return;
   const VW = window.innerWidth, VH = window.innerHeight;
-  const isMob = VW < 768;
-  // Load images within a buffer zone around the current viewport
-  const BUFFER = isMob ? 250 : 500;
+  const EVICT_DIST = Math.max(VW, VH) * 3;   // world-space px
+  const LOAD_DIST  = Math.max(VW, VH) * 1.8;
   mapAllItems.forEach(item => {
     const el = item.el;
     if (el.style.display === 'none') return;
     const img = el.querySelector('img');
-    if (!img || !img.dataset.src) return; // already loaded or no src
+    if (!img) return;
+    const cx = parseFloat(el.style.left) + (parseFloat(el.style.width)  || 80) / 2;
+    const cy = parseFloat(el.style.top)  + (parseFloat(el.style.height) || 100) / 2;
+    // screen distance from viewport centre
+    const sx = cx * scale + panX - VW / 2;
+    const sy = cy * scale + panY - VH / 2;
+    const dist = Math.hypot(sx, sy);
+    if (dist > EVICT_DIST && img.src && !img.dataset.src) {
+      // Evict: store src back in data-src, clear src to free decoded bitmap
+      img.dataset.src = img.src;
+      img.src = '';
+    } else if (dist < LOAD_DIST && !img.src && img.dataset.src) {
+      // Reload on approach
+      const s = img.dataset.src; delete img.dataset.src; img.src = s;
+    }
+  });
+}
+
+// ── VIEWPORT RELOAD (after pan/zoom — reloads evicted images) ─
+function updateMapVisibility() {
+  if (!mapBuilt) return;
+  const VW = window.innerWidth, VH = window.innerHeight;
+  const BUFFER = window.innerWidth < 768 ? 300 : 600;
+  mapAllItems.forEach(item => {
+    const el = item.el;
+    if (el.style.display === 'none') return;
+    const img = el.querySelector('img');
+    if (!img || !img.dataset.src) return;   // nothing pending
     const curX = parseFloat(el.style.left);
     const curY = parseFloat(el.style.top);
     const iw   = parseFloat(el.style.width)  || 80;
     const ih   = parseFloat(el.style.height) || 100;
-    // World → screen
     const sx = curX * scale + panX;
     const sy = curY * scale + panY;
-    const sw = iw * scale;
-    const sh = ih * scale;
-    const visible = sx + sw > -BUFFER && sx < VW + BUFFER &&
-                    sy + sh > -BUFFER && sy < VH + BUFFER;
-    if (visible) {
-      img.src = img.dataset.src;
-      delete img.dataset.src;
+    if (sx + iw * scale > -BUFFER && sx < VW + BUFFER &&
+        sy + ih * scale > -BUFFER && sy < VH + BUFFER) {
+      const s = img.dataset.src; delete img.dataset.src; img.src = s;
     }
   });
 }
@@ -718,10 +759,11 @@ async function init() {
     buildMap(); // startBatchLoad() is called inside buildMap, handles 0→100%
   } catch(e) {
     setStatus('error','Failed to load');
-    document.getElementById('mapLoader').innerHTML =
+    const ml = document.getElementById('mapLoader');
+    ml.innerHTML =
       `<div style="text-align:center;padding:40px 20px">
-        <p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;margin-bottom:12px">Error: ${e.message}</p>
-        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(176,168,144,.4);letter-spacing:.06em">Make sure the Google Sheet is set to<br>"Anyone with the link can view"</p>
+        <p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;margin-bottom:12px">Hata: ${e.message}</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(176,168,144,.4);letter-spacing:.06em">Google Sheet "Herkese açık" ayarında olmalı.<br><br><button onclick="location.reload()" style="background:var(--copper);border:none;color:var(--black);font-family:'IBM Plex Mono',monospace;font-size:10px;padding:8px 18px;cursor:pointer;letter-spacing:.1em">Yeniden Dene</button></p>
       </div>`;
   }
 }
@@ -855,8 +897,8 @@ function buildMap() {
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
       const sr=rng();
-      const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
-      const h=isMobile?(sr<.12?93:sr<.38?67:48):(sr<.12?160:sr<.38?112:77);
+      const w=isMobile?(sr<.12?56:sr<.38?40:28):(sr<.12?120:sr<.38?85:58);
+      const h=isMobile?(sr<.12?75:sr<.38?53:37):(sr<.12?160:sr<.38?112:77);
       // Mobil ve desktop için aynı daire algoritması
       let ix=cx-w/2, iy=cy-h/2;
       for(let att=0;att<80;att++){
@@ -878,8 +920,10 @@ function buildMap() {
 
       const inner=document.createElement('div'); inner.className='map-island-inner';
       const img=document.createElement('img');
-      img.dataset.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.draggable=false;
-      img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
+      img.dataset.src=thumbUrl(row.imgUrl); img.referrerPolicy='no-referrer'; img.alt=''; img.draggable=false; img.decoding='async';
+      // placeholder colour while loading
+      inner.style.background=row.color||'var(--dim)';
+      img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.style.display='none'; };
       inner.appendChild(img);
       const bottomBar=document.createElement('div'); bottomBar.className='map-island-bottom';
       const starsWrap=document.createElement('div'); starsWrap.className='map-stars';
@@ -1100,11 +1144,15 @@ function openMap() {
     // still loading — loader already visible, nothing to do
   }
   if (firstBuild && window.innerWidth < 768) requestAnimationFrame(fitMap);
+  // Resume memory culler on mobile if images are already loaded
+  if (window.innerWidth < 768 && _mapImagesReady && !_cullerTimer) startMemoryCuller();
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = 'Duvar';
 }
 
 function closeMap() {
+  // Pause memory culler while in gallery mode
+  if (_cullerTimer) { clearInterval(_cullerTimer); _cullerTimer = null; }
   document.getElementById('mapView').style.display='none';
   document.getElementById('galleryWrap').style.display='';
   document.getElementById('commentToggleWrap').style.display='flex';
