@@ -180,11 +180,11 @@ body.show-comments .card-desc{display:block!important}
 #corner-gif{position:fixed;bottom:18px;right:18px;width:64px;height:auto;filter:invert(1);pointer-events:none;z-index:50}
 body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
-#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:all;background:var(--black);transition:opacity .5s}
+#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:500;pointer-events:all;background:var(--black);transition:opacity .5s}
 #mapLoader.fade-out{opacity:0;pointer-events:none}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
-#loader-bar-wrap{width:140px;height:1px;background:rgba(176,168,144,.12);position:relative;overflow:hidden}
-#loader-bar{position:absolute;left:0;top:0;height:100%;background:var(--copper);width:0%;transition:width .35s}
+#loader-bar-wrap{width:180px;height:2px;background:rgba(176,168,144,.15);position:relative;overflow:hidden;border-radius:1px}
+#loader-bar{position:absolute;left:0;top:0;height:100%;background:var(--copper);width:0%;transition:width .3s ease}
 
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
@@ -585,6 +585,69 @@ let mapAllItems = [];
 let panX = 0, panY = 0, scale = 1;
 let isPanning = false, panSX, panSY, panOX, panOY;
 
+// ── BATCH IMAGE LOADER ────────────────────────────────────────
+let _mapImagesReady = false;
+
+function startBatchLoad() {
+  const loader  = document.getElementById('mapLoader');
+  const bar     = document.getElementById('loader-bar');
+  const txt     = document.getElementById('loaderText');
+  const isMob   = window.innerWidth < 768;
+  const BATCH   = isMob ? 3 : 8;   // parallel per tick
+  const PAUSE   = isMob ? 80 : 15; // ms between batches (let browser breathe)
+
+  // Collect unloaded island images
+  const queue = [];
+  mapAllItems.forEach(item => {
+    const img = item.el.querySelector('img');
+    if (img && img.dataset.src) queue.push(img);
+  });
+
+  const total = queue.length;
+  if (!total) { finishLoad(loader); return; }
+
+  let done = 0;
+  function updProgress() {
+    const pct = Math.round((done / total) * 100);
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = done + ' / ' + total + ' görsel yüklendi';
+  }
+
+  function loadBatch(i) {
+    if (i >= queue.length) { finishLoad(loader); return; }
+    const batch = queue.slice(i, i + BATCH);
+    let pending = batch.length;
+    function onDone() {
+      done++; updProgress();
+      if (--pending === 0) setTimeout(() => loadBatch(i + BATCH), PAUSE);
+    }
+    batch.forEach(img => {
+      const src = img.dataset.src;
+      if (!src) { onDone(); return; }
+      delete img.dataset.src;
+      img.addEventListener('load',  onDone, {once:true});
+      img.addEventListener('error', onDone, {once:true});
+      img.src = src;
+    });
+  }
+
+  if (bar) bar.style.width = '0%';
+  loadBatch(0);
+}
+
+function finishLoad(loader) {
+  _mapImagesReady = true;
+  const bar = document.getElementById('loader-bar');
+  if (bar) bar.style.width = '100%';
+  const txt = document.getElementById('loaderText');
+  if (txt) txt.textContent = 'Hazır';
+  setTimeout(() => {
+    if (!loader) return;
+    loader.classList.add('fade-out');
+    setTimeout(() => { loader.style.display='none'; loader.classList.remove('fade-out'); }, 520);
+  }, 300);
+}
+
 // ── VIEWPORT LAZY LOADING ─────────────────────────────────────
 function updateMapVisibility() {
   if (!mapBuilt) return;
@@ -646,14 +709,13 @@ async function init() {
     }
 
     visibleIdx = rows.map((_,i)=>i);
-    if (loaderBar)  loaderBar.style.width = '50%';
-    if (loaderText) loaderText.textContent = `${rows.length} görsel yükleniyor...`;
+    if (loaderText) loaderText.textContent = rows.length + ' görsel bulundu, harita kuruluyor...';
+    if (loaderBar)  loaderBar.style.width = '10%';
     renderFilters();
     renderMasonry();
     document.body.classList.add('has-data');
     setStatus('ready', `${rows.length} images`);
-    if (loaderBar)  loaderBar.style.width = '80%';
-    buildMap();
+    buildMap(); // startBatchLoad() is called inside buildMap, handles 0→100%
   } catch(e) {
     setStatus('error','Failed to load');
     document.getElementById('mapLoader').innerHTML =
@@ -939,11 +1001,8 @@ function buildMap() {
 
   mapBuilt=true;
   applyStarFilterToMap();
-  updateMapVisibility();
-  // Fade-out loader
-  const loader=document.getElementById('mapLoader');
-  loader.classList.add('fade-out');
-  setTimeout(()=>{ loader.style.display='none'; loader.classList.remove('fade-out'); },520);
+  // Batch-load all images, keep loader visible until 100% done
+  startBatchLoad();
 
   const view=document.getElementById('mapView');
 
@@ -1035,7 +1094,10 @@ function openMap() {
   if (!mapBuilt && rows.length) {
     const loader=document.getElementById('mapLoader');
     loader.style.display='flex'; loader.style.opacity='1'; loader.classList.remove('fade-out');
+    _mapImagesReady=false;
     buildMap();
+  } else if (mapBuilt && !_mapImagesReady) {
+    // still loading — loader already visible, nothing to do
   }
   if (firstBuild && window.innerWidth < 768) requestAnimationFrame(fitMap);
   const tb = document.getElementById('modeToggleBtn');
