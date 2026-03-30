@@ -594,7 +594,7 @@ async function saveNote(idx, note) {
     await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: {'Content-Type': 'text/plain;charset=utf-8'},
-      body: JSON.stringify({row: rows[idx].excelRow, note})
+      body: JSON.stringify({row: rows[idx].excelRow, type: rows[idx].type, description: rows[idx].description, note})
     });
   } catch(e) { console.error('Note save failed:', e); }
 }
@@ -750,6 +750,7 @@ function runMemoryCuller() {
       // Evict: store src back in data-src, clear src to free decoded bitmap
       img.dataset.src = img.src;
       img.src = '';
+      delete img.dataset.triedOrig; // allow retry on reload
     } else if (dist < LOAD_DIST && !img.src && img.dataset.src) {
       // Reload on approach
       const s = img.dataset.src; delete img.dataset.src; img.src = s;
@@ -1011,10 +1012,15 @@ function buildMap() {
 
       const inner=document.createElement('div'); inner.className='map-island-inner';
       const img=document.createElement('img');
-      img.dataset.src=thumbUrl(row.imgUrl); img.referrerPolicy='no-referrer'; img.alt=''; img.draggable=false; img.decoding='async';
+      img.dataset.src=thumbUrl(row.imgUrl); img.dataset.origSrc=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.draggable=false; img.decoding='async';
       // placeholder colour while loading
       inner.style.background=row.color||'var(--dim)';
-      img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.style.display='none'; };
+      img.onerror=()=>{
+        // thumb failed → try original URL once; if that also fails, hide
+        if (!img.dataset.triedOrig && img.dataset.origSrc && img.src !== img.dataset.origSrc) {
+          img.dataset.triedOrig='1'; img.src=img.dataset.origSrc;
+        } else { inner.style.background=row.color||'var(--dim)'; img.style.display='none'; }
+      };
       inner.appendChild(img);
       const bottomBar=document.createElement('div'); bottomBar.className='map-island-bottom';
       const starsWrap=document.createElement('div'); starsWrap.className='map-stars';
