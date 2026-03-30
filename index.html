@@ -873,8 +873,8 @@ function buildMap() {
 
   const types=[...new Set(rows.map(r=>r.type).filter(Boolean))];
   const ungrouped=rows.filter(r=>!r.type);
-  const WORLD_W = isMobile ? 1600 : 3400;
-  const WORLD_H = isMobile ? Math.max(Math.ceil((types.length||1)/2) * 420, 1600) : 2600;
+  const WORLD_W = isMobile ? 1800 : 4200;
+  const WORLD_H = isMobile ? Math.max(Math.ceil((types.length||1)/2) * 520, 1800) : 3200;
   const cols = isMobile ? 2 : Math.ceil(Math.sqrt(types.length||1));
   const rcount=Math.ceil((types.length||1)/cols);
   const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
@@ -887,29 +887,64 @@ function buildMap() {
   const allItems=[];
 
   function placeCluster(group, cx, cy) {
-    const n=group.length;
-    // Desktop: daire içi yerleşim — her küme kendi dairesinde, tam örtüşme yok
     const placedRects=[];
-    // Daire yarıçapı: desktopta daha geniş (0.46), mobilde hücre boyutuna göre
-    const circR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
-    // İtemler arası minimum boşluk (desktop daha büyük)
-    const GAP=isMobile?2:8;
+    const n=group.length;
+    // Dynamic radius: scale up for large clusters so items have room
+    const baseR=Math.min(cellW,cellH)*(isMobile?0.38:0.44);
+    const circR=baseR*Math.max(1,Math.sqrt(n/8));
+
+    // Label dead-zone: cluster title sits centered at (cx, cy-75)
+    // Exclude roughly the text area so no image covers the heading
+    const LW=isMobile?200:380, LH=isMobile?90:170;
+    const LX=cx-LW/2, LY=cy-LH-30;
+
+    function tooClose(tx,ty,w,h,allowPct) {
+      // allowPct = fraction of smaller dim allowed to overlap (0 = no overlap)
+      const A=Math.floor(Math.min(w,h)*allowPct);
+      // Block the label dead-zone (always)
+      if(tx<LX+LW&&tx+w>LX&&ty<LY+LH&&ty+h>LY) return true;
+      return placedRects.some(r=>
+        tx<r.x+r.w-A&&tx+w-A>r.x&&ty<r.y+r.h-A&&ty+h-A>r.y
+      );
+    }
+
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
       const sr=rng();
       const w=isMobile?(sr<.12?56:sr<.38?40:28):(sr<.12?120:sr<.38?85:58);
       const h=isMobile?(sr<.12?75:sr<.38?53:37):(sr<.12?160:sr<.38?112:77);
-      // Mobil ve desktop için aynı daire algoritması
-      let ix=cx-w/2, iy=cy-h/2;
-      for(let att=0;att<80;att++){
+
+      let ix=null, iy=null;
+
+      // Phase 1: random within circle, strict (0% overlap)
+      for(let att=0;att<160&&ix===null;att++){
         const a=rng()*Math.PI*2;
-        const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.6);
+        const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.5);
         const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
-        // Hiçbir mevcut itemle GAP'ten fazla örtüşme olmasın
-        if(!placedRects.some(r=>
-          tx<r.x+r.w+GAP&&tx+w+GAP>r.x&&ty<r.y+r.h+GAP&&ty+h+GAP>r.y
-        )){ix=tx;iy=ty;break;}
+        if(!tooClose(tx,ty,w,h,0)){ix=tx;iy=ty;}
       }
+
+      // Phase 2: spiral outward, allow up to 25% overlap
+      if(ix===null){
+        const step=Math.max(w,h)*0.8;
+        outer: for(let ring=1;ring<=40;ring++){
+          const pts=[];
+          for(let q=-ring;q<=ring;q++){
+            pts.push([ring,q],[- ring,q],[q,ring],[q,-ring]);
+          }
+          for(const [dx,dy] of pts){
+            const tx=cx+dx*step-w/2, ty=cy+dy*step-h/2;
+            if(!tooClose(tx,ty,w,h,0.25)){ix=tx;iy=ty;break outer;}
+          }
+        }
+      }
+
+      // Phase 3: last resort — place on expanding ring, no overlap check (shouldn't happen)
+      if(ix===null){
+        const a=rng()*Math.PI*2, d=circR+Math.max(w,h)*(j%8);
+        ix=cx+Math.cos(a)*d-w/2; iy=cy+Math.sin(a)*d-h/2;
+      }
+
       placedRects.push({x:ix,y:iy,w,h});
       const rot=(rng()-.5)*6;
 
