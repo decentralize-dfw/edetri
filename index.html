@@ -847,7 +847,6 @@ function buildMap() {
           if (Math.hypot(dx,dy) < 10) { e.preventDefault(); openMapImagePanel(gi); }
           _tapStart = null;
         });
-        island.addEventListener('click', e => { e.stopPropagation(); openMapImagePanel(gi); });
       }
 
       stage.appendChild(island);
