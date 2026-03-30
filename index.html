@@ -198,7 +198,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-island-hlabel{position:absolute;bottom:3px;left:0;right:0;font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;padding:0 4px}
 
 /* HOVER TOOLTIP */
-#mapTooltip{position:fixed;bottom:40px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
+#mapTooltip{position:fixed;bottom:120px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
 #mapTooltip.visible{opacity:1}
 .tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2}
 .tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5}
@@ -847,6 +847,7 @@ function buildMap() {
           if (Math.hypot(dx,dy) < 10) { e.preventDefault(); openMapImagePanel(gi); }
           _tapStart = null;
         });
+        island.addEventListener('click', e => { e.stopPropagation(); openMapImagePanel(gi); });
       }
 
       stage.appendChild(island);
@@ -1477,7 +1478,7 @@ function setupPanelResize(panel) {
   });
 }
 
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeRapor();closeYaklasim();} });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeRapor();closeYaklasim();} });
 
 // ── STAR FILTER ────────────────────────────────────────────────
 function applyStarFilterToMap() {
