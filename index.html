@@ -100,7 +100,7 @@ body.filters-collapsed #wall-nav{display:none}
 .card-stars{display:flex;justify-content:center}
 .map-island-bottom{position:absolute;bottom:0;left:0;right:0;height:34px;background:linear-gradient(to top,rgba(9,8,7,.92) 55%,transparent);pointer-events:none;opacity:0;transition:opacity .18s}
 .map-island:hover .map-island-bottom{opacity:1}
-.map-stars{position:absolute;bottom:16px;left:0;right:0;text-align:center;pointer-events:auto}
+.map-stars{position:absolute;bottom:16px;left:0;right:0;text-align:center;pointer-events:none}
 .map-stars .star{font-size:10px;cursor:pointer;background:linear-gradient(to right,var(--gold) var(--fill,0%),rgba(176,168,144,.6) var(--fill,0%));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 /* STAR FILTER */
@@ -337,6 +337,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #bolumAciklamaWrap{width:100%;padding-bottom:8px}
   /* GIF: scrollbar kaymasın, sabit pozisyon */
   #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
+  .map-island{transition:none!important}
 }
 
 /* DESKTOP — wall-nav her iki modda görünür, moodboard kapalı */
@@ -781,8 +782,7 @@ function buildMap() {
       inner.appendChild(img);
       const bottomBar=document.createElement('div'); bottomBar.className='map-island-bottom';
       const starsWrap=document.createElement('div'); starsWrap.className='map-stars';
-      starsWrap.innerHTML=buildInteractiveStarRating(gi, row.rating);
-      initIslandStars(starsWrap, gi);
+      starsWrap.innerHTML=buildStarRating(row.rating);
       bottomBar.appendChild(starsWrap);
       const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
       bottomBar.appendChild(hl);
@@ -1157,23 +1157,6 @@ document.addEventListener('touchmove', e => {
 init();
 window.addEventListener('resize', updateGalleryPadding);
 
-// Gallery modunda mobil: scroll aşağı → header gizle, scroll yukarı → göster
-(function(){
-  let lastY=0;
-  window.addEventListener('scroll',()=>{
-    if(window.innerWidth>=768||!document.body.classList.contains('gallery-mode')) return;
-    const y=window.scrollY;
-    const gw=document.getElementById('galleryWrap');
-    if(y>lastY&&y>70){
-      document.body.classList.add('header-hidden');
-      gw.style.paddingTop='0';
-    } else if(y<lastY-12||y<70){
-      document.body.classList.remove('header-hidden');
-      requestAnimationFrame(updateGalleryPadding);
-    }
-    lastY=y;
-  },{passive:true});
-})();
 
 
 // ── YAKLAŞIM ───────────────────────────────────────────────────
