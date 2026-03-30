@@ -98,8 +98,10 @@ body.filters-collapsed #wall-nav{display:none}
 .star-rating{display:flex;gap:1px;justify-content:center;line-height:1}
 .star{font-size:12px;background:linear-gradient(to right,var(--gold) var(--fill,0%),rgba(176,168,144,.22) var(--fill,0%));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .card-stars{display:flex;justify-content:center}
-.map-stars{position:absolute;bottom:6%;left:0;right:0;text-align:center;z-index:2;pointer-events:auto}
-.map-stars .star{font-size:10px;cursor:pointer}
+.map-island-bottom{position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;background:linear-gradient(to top,rgba(9,8,7,.92) 55%,transparent);padding:14px 4px 4px;pointer-events:none;opacity:0;transition:opacity .18s}
+.map-island:hover .map-island-bottom{opacity:1}
+.map-stars{text-align:center;pointer-events:auto;padding:1px 0 2px}
+.map-stars .star{font-size:10px;cursor:pointer;background:linear-gradient(to right,var(--gold) var(--fill,0%),rgba(176,168,144,.6) var(--fill,0%));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 /* STAR FILTER */
 #star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:350;display:none;pointer-events:all}
@@ -193,8 +195,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-island-inner{position:relative;border-radius:2px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.55);transition:box-shadow .2s,outline .2s;width:100%;height:100%}
 .map-island:hover .map-island-inner{outline:1px solid rgba(168,104,40,.55);box-shadow:0 0 28px rgba(168,104,40,.12),0 14px 44px rgba(0,0,0,.75)}
 .map-island img{display:block;width:100%;height:100%;object-fit:cover}
-.map-island-hlabel{position:absolute;bottom:0;left:0;right:0;padding:18px 6px 5px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;opacity:0;transition:opacity .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.map-island:hover .map-island-hlabel{opacity:1}
+.map-island-hlabel{font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center;padding:1px 4px 0}
 
 /* HOVER TOOLTIP */
 #mapTooltip{position:fixed;bottom:40px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
@@ -778,12 +779,14 @@ function buildMap() {
       img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy'; img.draggable=false;
       img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
       inner.appendChild(img);
-      const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
-      inner.appendChild(hl);
+      const bottomBar=document.createElement('div'); bottomBar.className='map-island-bottom';
       const starsWrap=document.createElement('div'); starsWrap.className='map-stars';
       starsWrap.innerHTML=buildInteractiveStarRating(gi, row.rating);
       initIslandStars(starsWrap, gi);
-      inner.appendChild(starsWrap);
+      bottomBar.appendChild(starsWrap);
+      const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
+      bottomBar.appendChild(hl);
+      inner.appendChild(bottomBar);
       island.appendChild(inner);
 
       if (!isMobile) {
