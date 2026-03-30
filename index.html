@@ -180,8 +180,11 @@ body.show-comments .card-desc{display:block!important}
 #corner-gif{position:fixed;bottom:18px;right:18px;width:64px;height:auto;filter:invert(1);pointer-events:none;z-index:50}
 body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
-#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
+#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:all;background:var(--black);transition:opacity .5s}
+#mapLoader.fade-out{opacity:0;pointer-events:none}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
+#loader-bar-wrap{width:140px;height:1px;background:rgba(176,168,144,.12);position:relative;overflow:hidden}
+#loader-bar{position:absolute;left:0;top:0;height:100%;background:var(--copper);width:0%;transition:width .35s}
 
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
@@ -358,7 +361,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   <button class="map-ui-btn" id="mapDuvarBtn" onclick="closeMap()">Duvar</button>
   <div id="mapStage"></div>
   <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
-  <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
+  <div id="mapLoader"><div class="spinner"></div><p id="loaderText">Arşiv yükleniyor...</p><div id="loader-bar-wrap"><div id="loader-bar"></div></div></div>
   <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
 </div>
 
@@ -582,9 +585,42 @@ let mapAllItems = [];
 let panX = 0, panY = 0, scale = 1;
 let isPanning = false, panSX, panSY, panOX, panOY;
 
+// ── VIEWPORT LAZY LOADING ─────────────────────────────────────
+function updateMapVisibility() {
+  if (!mapBuilt) return;
+  const VW = window.innerWidth, VH = window.innerHeight;
+  const isMob = VW < 768;
+  // Load images within a buffer zone around the current viewport
+  const BUFFER = isMob ? 250 : 500;
+  mapAllItems.forEach(item => {
+    const el = item.el;
+    if (el.style.display === 'none') return;
+    const img = el.querySelector('img');
+    if (!img || !img.dataset.src) return; // already loaded or no src
+    const curX = parseFloat(el.style.left);
+    const curY = parseFloat(el.style.top);
+    const iw   = parseFloat(el.style.width)  || 80;
+    const ih   = parseFloat(el.style.height) || 100;
+    // World → screen
+    const sx = curX * scale + panX;
+    const sy = curY * scale + panY;
+    const sw = iw * scale;
+    const sh = ih * scale;
+    const visible = sx + sw > -BUFFER && sx < VW + BUFFER &&
+                    sy + sh > -BUFFER && sy < VH + BUFFER;
+    if (visible) {
+      img.src = img.dataset.src;
+      delete img.dataset.src;
+    }
+  });
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
   try {
+    const loaderBar = document.getElementById('loader-bar');
+    const loaderText = document.getElementById('loaderText');
+    if (loaderBar) loaderBar.style.width = '15%';
     const res = await fetch(GVIZ);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
@@ -610,10 +646,13 @@ async function init() {
     }
 
     visibleIdx = rows.map((_,i)=>i);
+    if (loaderBar)  loaderBar.style.width = '50%';
+    if (loaderText) loaderText.textContent = `${rows.length} görsel yükleniyor...`;
     renderFilters();
     renderMasonry();
     document.body.classList.add('has-data');
     setStatus('ready', `${rows.length} images`);
+    if (loaderBar)  loaderBar.style.width = '80%';
     buildMap();
   } catch(e) {
     setStatus('error','Failed to load');
@@ -777,7 +816,7 @@ function buildMap() {
 
       const inner=document.createElement('div'); inner.className='map-island-inner';
       const img=document.createElement('img');
-      img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy'; img.draggable=false;
+      img.dataset.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.draggable=false;
       img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
       inner.appendChild(img);
       const bottomBar=document.createElement('div'); bottomBar.className='map-island-bottom';
@@ -898,9 +937,13 @@ function buildMap() {
     ? 'tap to open · drag to pan · pinch to zoom'
     : 'scroll to zoom · drag canvas to pan · drag image to move · click to open';
 
-  document.getElementById('mapLoader').style.display='none';
   mapBuilt=true;
   applyStarFilterToMap();
+  updateMapVisibility();
+  // Fade-out loader
+  const loader=document.getElementById('mapLoader');
+  loader.classList.add('fade-out');
+  setTimeout(()=>{ loader.style.display='none'; loader.classList.remove('fade-out'); },520);
 
   const view=document.getElementById('mapView');
 
@@ -926,8 +969,9 @@ function buildMap() {
         isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
       }
     }, {passive:false});
-    let _rafId=null;
-    const scheduleTransform=()=>{ if(_rafId) return; _rafId=requestAnimationFrame(()=>{ _rafId=null; applyTransform(); }); };
+    let _rafId=null, _visRafId=null;
+    const scheduleVisibility=()=>{ if(_visRafId) return; _visRafId=requestAnimationFrame(()=>{ _visRafId=null; updateMapVisibility(); }); };
+    const scheduleTransform=()=>{ if(_rafId) return; _rafId=requestAnimationFrame(()=>{ _rafId=null; applyTransform(); scheduleVisibility(); }); };
     view.addEventListener('pointermove', e=>{
       if (!activePtrs.has(e.pointerId)) return;
       e.preventDefault();
@@ -958,11 +1002,13 @@ function buildMap() {
       view.setPointerCapture(e.pointerId);
       view.style.cursor='grabbing';
     });
+    let _deskVisTimer=null;
+    const scheduleDesktopVisibility=()=>{ clearTimeout(_deskVisTimer); _deskVisTimer=setTimeout(updateMapVisibility,60); };
     view.addEventListener('pointermove', e=>{
       if (!isPanning) return;
-      panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+      panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform(); scheduleDesktopVisibility();
     });
-    view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; });
+    view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; updateMapVisibility(); });
     view.addEventListener('pointercancel', ()=>{ isPanning=false; view.style.cursor=''; });
     view.addEventListener('wheel', e=>{
       if (e.target.closest('.cluster-panel')) return;
@@ -972,7 +1018,7 @@ function buildMap() {
       const rect=view.getBoundingClientRect();
       const mx=e.clientX-rect.left, my=e.clientY-rect.top;
       panX=mx-(mx-panX)*(ns/scale); panY=my-(my-panY)*(ns/scale);
-      scale=ns; applyTransform();
+      scale=ns; applyTransform(); scheduleDesktopVisibility();
     },{passive:false});
   }
 }
@@ -986,7 +1032,11 @@ function openMap() {
   document.body.classList.remove('gallery-mode');
   document.body.style.overflow='hidden';
   const firstBuild = !mapBuilt;
-  if (!mapBuilt && rows.length) buildMap();
+  if (!mapBuilt && rows.length) {
+    const loader=document.getElementById('mapLoader');
+    loader.style.display='flex'; loader.style.opacity='1'; loader.classList.remove('fade-out');
+    buildMap();
+  }
   if (firstBuild && window.innerWidth < 768) requestAnimationFrame(fitMap);
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = 'Duvar';
@@ -1494,7 +1544,7 @@ function fitMap() {
   const stage = document.getElementById('mapStage');
   stage.style.transition = 'transform .5s cubic-bezier(.25,.46,.45,.94)';
   applyTransform();
-  setTimeout(() => { stage.style.transition = ''; }, 520);
+  setTimeout(() => { stage.style.transition = ''; updateMapVisibility(); }, 520);
 }
 
 function positionMipStars(panel) {
