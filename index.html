@@ -134,6 +134,18 @@ body.show-comments .card-desc{display:block!important}
 #commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
 #commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
 
+/* EDITABLE NOTE */
+.card-note{display:block;padding:4px 6px 5px;font-family:'Archivo',sans-serif;font-size:9px;font-weight:300;color:rgba(176,168,144,.6);line-height:1.4;cursor:text;min-height:16px;border-top:1px solid rgba(176,168,144,.07);outline:none;white-space:pre-wrap;word-break:break-word;transition:color .15s,background .15s;background:transparent;border-radius:0 0 2px 2px}
+.card-note:empty::before{content:attr(data-ph);color:rgba(176,168,144,.22);pointer-events:none;font-style:italic}
+.card-note:focus{color:var(--cream);background:rgba(176,168,144,.04)}
+.mip-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.1);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;line-height:1.45;padding:6px 0 2px;resize:none;outline:none;min-height:32px;cursor:text;transition:color .15s}
+.mip-note:focus{color:var(--cream)}
+.mip-note::placeholder{color:rgba(176,168,144,.25);font-style:italic}
+.modal-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.1);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.5;padding:6px 0 2px;resize:none;outline:none;min-height:28px;cursor:text;max-width:50vw;transition:color .15s;margin-top:4px}
+.modal-note:focus{color:var(--cream)}
+.modal-note::placeholder{color:rgba(176,168,144,.22);font-style:italic}
+@media(max-width:768px){.modal-note{max-width:85vw;font-size:11px}}
+
 /* SPINNER */
 .spinner{width:24px;height:24px;border:1px solid rgba(176,168,144,.2);border-top-color:var(--copper);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -451,6 +463,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
       <div id="mStars"></div>
       <div class="modal-title" id="mTitle"></div>
       <div class="modal-desc-text" id="mDesc"></div>
+      <div id="mNoteWrap"></div>
     </div>
     <div class="modal-info-right">
       <a class="pinterest-link" id="mLink" href="#" target="_blank" rel="noopener">↗ Pinterest</a>
@@ -470,7 +483,7 @@ function txtToHtml(txt) {
 }
 
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
-const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AH&gid=0`;
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AI&gid=0`;
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
 
 const SECTION_DOCS = [
@@ -567,6 +580,54 @@ function initStarInteraction(idx) {
     });
     star.addEventListener('click', () => saveRating(idx, val));
   });
+}
+
+async function saveNote(idx, note) {
+  rows[idx].note = note;
+  // sync all other note inputs for this idx
+  document.querySelectorAll('[data-note-idx="'+idx+'"]').forEach(el => {
+    if (document.activeElement === el) return;
+    if (el.tagName === 'TEXTAREA') { if (el.value !== note) el.value = note; }
+    else { if (el.textContent !== note) el.textContent = note; }
+  });
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({row: rows[idx].excelRow, note})
+    });
+  } catch(e) { console.error('Note save failed:', e); }
+}
+
+function makeNoteInput(idx, tagName, extraClass) {
+  const note = rows[idx] ? (rows[idx].note || '') : '';
+  let el;
+  if (tagName === 'textarea') {
+    el = document.createElement('textarea');
+    el.className = extraClass;
+    el.placeholder = 'Bir yorum yaz...';
+    el.value = note;
+    el.rows = 2;
+  } else {
+    el = document.createElement('div');
+    el.className = extraClass;
+    el.contentEditable = 'true';
+    el.dataset.ph = 'Bir yorum yaz...';
+    el.textContent = note;
+  }
+  el.dataset.noteIdx = idx;
+  const commit = () => {
+    const val = tagName === 'textarea' ? el.value.trim() : el.textContent.trim();
+    if (val !== (rows[idx].note || '')) saveNote(idx, val);
+  };
+  el.addEventListener('blur', commit);
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+    e.stopPropagation(); // don't trigger modal nav
+  });
+  el.addEventListener('click', e => e.stopPropagation());
+  el.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+  return el;
 }
 
 async function saveRating(idx, rating) {
@@ -745,6 +806,7 @@ async function init() {
         type:         (c[4]||'').trim(),
         description:  (c[5]||'').trim(),
         rating:       parseFloat((c[6]||'').replace(',','.')) || 0,
+        note:         (c[7]||'').trim(),
         excelRow:     i + 10
       });
     }
@@ -830,6 +892,7 @@ function renderMasonry() {
     ov.appendChild(metaRow);
     wrap.appendChild(img); wrap.appendChild(ov); card.appendChild(wrap);
     if (row.description) { const desc=document.createElement('div'); desc.className='card-desc'; desc.textContent=row.description; card.appendChild(desc); }
+    card.appendChild(makeNoteInput(idx, 'div', 'card-note'));
     m.appendChild(card);
   });
 }
@@ -889,22 +952,19 @@ function buildMap() {
   function placeCluster(group, cx, cy) {
     const placedRects=[];
     const n=group.length;
-    // Dynamic radius: scale up for large clusters so items have room
-    const baseR=Math.min(cellW,cellH)*(isMobile?0.38:0.44);
-    const circR=baseR*Math.max(1,Math.sqrt(n/8));
+    // Scale radius for more items, capped at 49% of cell so clusters never touch
+    const baseR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
+    const circR=Math.min(baseR*Math.sqrt(Math.max(1,n/8)), Math.min(cellW,cellH)*0.49);
 
     // Label dead-zone: cluster title sits centered at (cx, cy-75)
-    // Exclude roughly the text area so no image covers the heading
-    const LW=isMobile?200:380, LH=isMobile?90:170;
+    const LW=isMobile?200:380, LH=isMobile?90:150;
     const LX=cx-LW/2, LY=cy-LH-30;
 
-    function tooClose(tx,ty,w,h,allowPct) {
-      // allowPct = fraction of smaller dim allowed to overlap (0 = no overlap)
-      const A=Math.floor(Math.min(w,h)*allowPct);
-      // Block the label dead-zone (always)
+    // Checks if position (tx,ty,w,h) conflicts. GAP>0 = spacing, GAP<0 = allow that many px overlap
+    function tooClose(tx,ty,w,h,GAP){
       if(tx<LX+LW&&tx+w>LX&&ty<LY+LH&&ty+h>LY) return true;
       return placedRects.some(r=>
-        tx<r.x+r.w-A&&tx+w-A>r.x&&ty<r.y+r.h-A&&ty+h-A>r.y
+        tx<r.x+r.w+GAP&&tx+w+GAP>r.x&&ty<r.y+r.h+GAP&&ty+h+GAP>r.y
       );
     }
 
@@ -913,35 +973,31 @@ function buildMap() {
       const sr=rng();
       const w=isMobile?(sr<.12?56:sr<.38?40:28):(sr<.12?120:sr<.38?85:58);
       const h=isMobile?(sr<.12?75:sr<.38?53:37):(sr<.12?160:sr<.38?112:77);
+      // innerR: farthest centre point that keeps island fully inside circR
+      const innerR=Math.max(0,circR-Math.max(w,h)*0.55);
 
-      let ix=null, iy=null;
+      let ix=null,iy=null;
 
-      // Phase 1: random within circle, strict (0% overlap)
+      // Phase 1: 160 attempts — strict no-overlap, stays inside circle
       for(let att=0;att<160&&ix===null;att++){
-        const a=rng()*Math.PI*2;
-        const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.5);
+        const a=rng()*Math.PI*2, d=Math.sqrt(rng())*innerR;
         const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
-        if(!tooClose(tx,ty,w,h,0)){ix=tx;iy=ty;}
+        if(!tooClose(tx,ty,w,h,4)){ix=tx;iy=ty;}
       }
 
-      // Phase 2: spiral outward, allow up to 25% overlap
+      // Phase 2: 150 attempts — allow up to 25% overlap, stays inside circle
       if(ix===null){
-        const step=Math.max(w,h)*0.8;
-        outer: for(let ring=1;ring<=40;ring++){
-          const pts=[];
-          for(let q=-ring;q<=ring;q++){
-            pts.push([ring,q],[- ring,q],[q,ring],[q,-ring]);
-          }
-          for(const [dx,dy] of pts){
-            const tx=cx+dx*step-w/2, ty=cy+dy*step-h/2;
-            if(!tooClose(tx,ty,w,h,0.25)){ix=tx;iy=ty;break outer;}
-          }
+        const NEG=-Math.floor(Math.min(w,h)*0.25);
+        for(let att=0;att<150&&ix===null;att++){
+          const a=rng()*Math.PI*2, d=Math.sqrt(rng())*innerR;
+          const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
+          if(!tooClose(tx,ty,w,h,NEG)){ix=tx;iy=ty;}
         }
       }
 
-      // Phase 3: last resort — place on expanding ring, no overlap check (shouldn't happen)
+      // Phase 3: last resort — random inside circle, no overlap check
       if(ix===null){
-        const a=rng()*Math.PI*2, d=circR+Math.max(w,h)*(j%8);
+        const a=rng()*Math.PI*2, d=Math.sqrt(rng())*innerR;
         ix=cx+Math.cos(a)*d-w/2; iy=cy+Math.sin(a)*d-h/2;
       }
 
@@ -1294,6 +1350,10 @@ function openModal(idx) {
   initStarInteraction(idx);
   document.getElementById('mTitle').textContent=row.type||'';
   document.getElementById('mDesc').textContent=row.description||'';
+  // Editable note in modal
+  const noteWrap=document.getElementById('mNoteWrap');
+  noteWrap.innerHTML='';
+  noteWrap.appendChild(makeNoteInput(idx,'textarea','modal-note'));
   const lnk=document.getElementById('mLink');
   if (row.pinterestUrl){ lnk.href=row.pinterestUrl; lnk.style.display='flex'; }
   else lnk.style.display='none';
@@ -1515,7 +1575,7 @@ function _createMapImagePanel(gi) {
   panel.innerHTML =
     '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + '</span><button class="cp-close">✕</button></div>' +
     '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer"></div>' +
-    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div><div class="mip-stars">' + buildInteractiveStarRating(gi, row.rating||0) + '</div></div>' +
+    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div><div class="mip-stars">' + buildInteractiveStarRating(gi, row.rating||0) + '</div><div class="mip-note-slot"></div></div>' +
     '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
     '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
     '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
@@ -1525,6 +1585,8 @@ function _createMapImagePanel(gi) {
   setupPanelDrag(panel);
   setupPanelResize(panel);
   initMipPanelStars(panel, gi);
+  const noteSlot = panel.querySelector('.mip-note-slot');
+  if (noteSlot) noteSlot.appendChild(makeNoteInput(gi, 'textarea', 'mip-note'));
   return panel;
 }
 
