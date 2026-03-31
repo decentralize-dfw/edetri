@@ -121,7 +121,7 @@ body.has-data #star-filter-wrap{display:block}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
-#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px;user-select:none;-webkit-user-select:none}
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #colSlider{width:110px;height:2px;cursor:pointer;-webkit-appearance:none;appearance:none;background:rgba(176,168,144,.25);border-radius:1px;outline:none;border:none;padding:0;flex-shrink:0}
 #colSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;background:var(--copper);border-radius:0;cursor:pointer}
 #colSlider::-moz-range-thumb{width:10px;height:10px;background:var(--copper);border-radius:0;border:none;cursor:pointer}
@@ -130,7 +130,7 @@ body.show-comments .card-desc{display:block}
 #sizeDisplay{display:none;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);min-width:18px;text-align:center;letter-spacing:.05em}
 
 /* COMMENT TOGGLE */
-#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto;user-select:none;-webkit-user-select:none}
+#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 body.gallery-mode #commentToggleWrap{display:flex}
 body.gallery-mode #sizeSliderWrap{display:flex}
 body.show-comments .card-desc{display:block!important}
@@ -373,10 +373,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
-  <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
-  <button class="map-ui-btn" id="mapFitBtn" onclick="fitMap()">⊡ Sığdır</button>
-  <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
-  <button class="map-ui-btn" id="mapDuvarBtn" onclick="closeMap()">Duvar</button>
+  <button class="map-ui-btn" id="mapYaklasimBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="openYaklasimPanel(this)">Yaklaşım</button>
+  <button class="map-ui-btn" id="mapFitBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="fitMap()">⊡ Sığdır</button>
+  <button class="map-ui-btn" id="mapShuffleBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="toggleShuffle()">⇄ Shuffle</button>
+  <button class="map-ui-btn" id="mapDuvarBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="closeMap()">Duvar</button>
   <div id="mapStage"></div>
   <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
   <div id="mapLoader"><div class="spinner"></div><p id="loaderText">Arşiv yükleniyor...</p><div id="loader-bar-wrap"><div id="loader-bar"></div></div></div>
@@ -424,9 +424,9 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 <!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
   <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" oninput="applyColSlider(this.value)" onmouseup="this.blur()" onpointerup="this.blur()">
-  <button type="button" class="size-step-btn" ontouchstart="event.preventDefault();changeSizeStep(-1)" onclick="changeSizeStep(-1)">−</button>
+  <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(-1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(-1)">−</button>
   <span id="sizeDisplay">5</span>
-  <button type="button" class="size-step-btn" ontouchstart="event.preventDefault();changeSizeStep(1)" onclick="changeSizeStep(1)">+</button>
+  <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(1)">+</button>
 </div>
 
 <!-- COMMENT TOGGLE (masonry mode) -->
@@ -926,11 +926,15 @@ function changeSizeStep(dir) {
   _cols = Math.min(15, Math.max(1, _cols + dir));
   const el = document.getElementById('sizeDisplay');
   if (el) el.textContent = _cols;
-  const sl = document.getElementById('colSlider');
-  if (sl) { sl.value = _cols; sl.blur(); }
+  // Only sync slider when it's visible (desktop); touching it on mobile can steal focus
+  if (window.innerWidth >= 768) {
+    const sl = document.getElementById('colSlider');
+    if (sl) sl.value = _cols;
+  }
   applySize(_cols);
-  // clear any stray text selection left by touch/pointer interaction
   if (window.getSelection) window.getSelection().removeAllRanges();
+  const ae = document.activeElement;
+  if (ae && ae !== document.body) ae.blur();
 }
 function applyColSlider(val) {
   _cols = parseInt(val);
@@ -1265,6 +1269,10 @@ function buildMap() {
 }
 
 function openMap() {
+  // Flush any focused input/button so iOS doesn't carry keyboard into pano mode
+  const ae = document.activeElement;
+  if (ae && ae !== document.body) ae.blur();
+  if (window.getSelection) window.getSelection().removeAllRanges();
   closeMobileNav();
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
