@@ -1147,8 +1147,6 @@ function buildMap() {
     const lbl=document.createElement('div'); lbl.className='map-cluster-label';
     lbl.style.left=centers[i].x+'px'; lbl.style.top=(centers[i].y-75)+'px';
     const nm=document.createElement('div'); nm.className='map-cluster-name'; nm.textContent=t;
-    const _firstRefNo=(rows.filter(r=>r.type===t)[0]||{}).refNo;
-    if (_firstRefNo){const _rs=document.createElement('span');_rs.className='map-cluster-ref';_rs.textContent=' ('+_firstRefNo+')';nm.appendChild(_rs);}
     const cnt=document.createElement('div'); cnt.className='map-cluster-count';
     cnt.textContent=`${rows.filter(r=>r.type===t).length} items`;
     lbl.appendChild(nm); lbl.appendChild(cnt);
