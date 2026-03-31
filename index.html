@@ -415,10 +415,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <input type="range" id="colSlider" min="1" max="13" value="5" oninput="applyColSlider(this.value)">
-  <button class="size-step-btn" onclick="changeSizeStep(-1)">−</button>
+  <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" oninput="applyColSlider(this.value)">
+  <button type="button" class="size-step-btn" ontouchstart="event.preventDefault();changeSizeStep(-1)" onclick="changeSizeStep(-1)">−</button>
   <span id="sizeDisplay">5</span>
-  <button class="size-step-btn" onclick="changeSizeStep(1)">+</button>
+  <button type="button" class="size-step-btn" ontouchstart="event.preventDefault();changeSizeStep(1)" onclick="changeSizeStep(1)">+</button>
 </div>
 
 <!-- COMMENT TOGGLE (masonry mode) -->
@@ -910,7 +910,7 @@ function renderMasonry() {
 
 let _cols = 5;
 function changeSizeStep(dir) {
-  _cols = Math.min(13, Math.max(1, _cols + dir));
+  _cols = Math.min(15, Math.max(1, _cols + dir));
   const el = document.getElementById('sizeDisplay');
   if (el) el.textContent = _cols;
   const sl = document.getElementById('colSlider');
