@@ -106,7 +106,7 @@ body.filters-collapsed #wall-nav{display:none}
 /* STAR FILTER */
 #star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:350;display:none;pointer-events:all}
 body.has-data #star-filter-wrap{display:block}
-#star-filter-btn{background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 12px;cursor:pointer;border-radius:2px;line-height:1;transition:all .2s}
+#star-filter-btn{background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 12px;cursor:pointer;border-radius:2px;line-height:1;transition:all .2s;user-select:none;-webkit-user-select:none}
 #star-filter-btn:hover{border-color:rgba(176,168,144,.4);color:var(--gold)}
 #star-filter-btn.has-active{border-color:var(--gold);color:var(--gold);background:rgba(184,152,80,.08)}
 #star-filter-panel{position:absolute;bottom:calc(100% + 8px);left:0;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border:1px solid rgba(176,168,144,.15);border-radius:2px;padding:4px 0;min-width:72px;display:none}
@@ -118,7 +118,7 @@ body.has-data #star-filter-wrap{display:block}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
-#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px}
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px;user-select:none;-webkit-user-select:none}
 #colSlider{width:110px;height:2px;cursor:pointer;-webkit-appearance:none;appearance:none;background:rgba(176,168,144,.25);border-radius:1px;outline:none;border:none;padding:0;flex-shrink:0}
 #colSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;background:var(--copper);border-radius:0;cursor:pointer}
 #colSlider::-moz-range-thumb{width:10px;height:10px;background:var(--copper);border-radius:0;border:none;cursor:pointer}
@@ -127,7 +127,7 @@ body.show-comments .card-desc{display:block}
 #sizeDisplay{display:none;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);min-width:18px;text-align:center;letter-spacing:.05em}
 
 /* COMMENT TOGGLE */
-#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto}
+#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto;user-select:none;-webkit-user-select:none}
 body.gallery-mode #commentToggleWrap{display:flex}
 body.gallery-mode #sizeSliderWrap{display:flex}
 body.show-comments .card-desc{display:block!important}
@@ -420,7 +420,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" oninput="applyColSlider(this.value)">
+  <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" oninput="applyColSlider(this.value)" onmouseup="this.blur()" onpointerup="this.blur()">
   <button type="button" class="size-step-btn" ontouchstart="event.preventDefault();changeSizeStep(-1)" onclick="changeSizeStep(-1)">−</button>
   <span id="sizeDisplay">5</span>
   <button type="button" class="size-step-btn" ontouchstart="event.preventDefault();changeSizeStep(1)" onclick="changeSizeStep(1)">+</button>
@@ -920,8 +920,10 @@ function changeSizeStep(dir) {
   const el = document.getElementById('sizeDisplay');
   if (el) el.textContent = _cols;
   const sl = document.getElementById('colSlider');
-  if (sl) sl.value = _cols;
+  if (sl) { sl.value = _cols; sl.blur(); }
   applySize(_cols);
+  // clear any stray text selection left by touch/pointer interaction
+  if (window.getSelection) window.getSelection().removeAllRanges();
 }
 function applyColSlider(val) {
   _cols = parseInt(val);
