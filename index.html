@@ -1482,10 +1482,9 @@ function openYaklasim() {
   if (!yaklasimLoaded) {
     const content = document.getElementById('yaklasimContent');
     content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0">Yükleniyor...</div>';
-    fetch(RAPOR_BASE + 'ozet.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { content.innerHTML = result.value; yaklasimLoaded = true; })
+    fetch(RAPOR_BASE + 'ozet.txt')
+      .then(r => r.text())
+      .then(txt => { content.innerHTML = txtToHtml(txt); yaklasimLoaded = true; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
 }
@@ -1560,10 +1559,9 @@ function openYaklasimPanel(anchorEl) {
     clusterPanelCache[KEY] = panel;
     document.getElementById('mapView').appendChild(panel);
     const content = panel.querySelector('.cp-content');
-    fetch(RAPOR_BASE + 'ozet.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { content.innerHTML = result.value; })
+    fetch(RAPOR_BASE + 'ozet.txt')
+      .then(r => r.text())
+      .then(txt => { content.innerHTML = txtToHtml(txt); })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
   const panel = clusterPanelCache[KEY];
