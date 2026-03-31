@@ -963,20 +963,25 @@ function buildMap() {
   function placeCluster(group, cx, cy) {
     const placedRects=[];
     const n=group.length;
-    // Scale radius for more items, capped at 49% of cell so clusters never touch
     const baseR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
     const circR=Math.min(baseR*Math.sqrt(Math.max(1,n/8)), Math.min(cellW,cellH)*0.49);
 
-    // Label dead-zone: cluster title sits centered at (cx, cy-75)
+    // Label dead-zone (cluster title area)
     const LW=isMobile?200:380, LH=isMobile?90:150;
     const LX=cx-LW/2, LY=cy-LH-30;
 
-    // Checks if position (tx,ty,w,h) conflicts. GAP>0 = spacing, GAP<0 = allow that many px overlap
-    function tooClose(tx,ty,w,h,GAP){
-      if(tx<LX+LW&&tx+w>LX&&ty<LY+LH&&ty+h>LY) return true;
-      return placedRects.some(r=>
-        tx<r.x+r.w+GAP&&tx+w+GAP>r.x&&ty<r.y+r.h+GAP&&ty+h+GAP>r.y
-      );
+    // ── Sunflower / Phyllotaxis spiral slots ──────────────────
+    // sqrt(frac) gives uniform-area density → no center clustering
+    // Shuffled → random look. Jitter → organic feel.
+    const GOLDEN=Math.PI*(3-Math.sqrt(5)); // ≈ 2.3998 rad
+    const slots=[];
+    for(let i=0;i<n;i++){
+      slots.push({ r: circR*0.87*Math.sqrt((i+0.5)/n), a: i*GOLDEN });
+    }
+    // Fisher-Yates shuffle
+    for(let i=slots.length-1;i>0;i--){
+      const j=Math.floor(rng()*(i+1));
+      const tmp=slots[i]; slots[i]=slots[j]; slots[j]=tmp;
     }
 
     group.forEach((row,j)=>{
@@ -984,32 +989,41 @@ function buildMap() {
       const sr=rng();
       const w=isMobile?(sr<.12?56:sr<.38?40:28):(sr<.12?120:sr<.38?85:58);
       const h=isMobile?(sr<.12?75:sr<.38?53:37):(sr<.12?160:sr<.38?112:77);
-      // innerR: farthest centre point that keeps island fully inside circR
-      const innerR=Math.max(0,circR-Math.max(w,h)*0.55);
+      const maxR=Math.max(0,circR-Math.max(w,h)*0.55);
 
-      let ix=null,iy=null;
+      const slot=slots[j%slots.length];
+      // Small jitter — organic without losing even spread
+      const jR=(rng()-.5)*circR*0.07;
+      const jA=(rng()-.5)*0.28;
+      const r=Math.max(circR*0.08, Math.min(slot.r+jR, maxR));
+      const a=slot.a+jA;
+      let ix=cx+Math.cos(a)*r-w/2;
+      let iy=cy+Math.sin(a)*r-h/2;
 
-      // Phase 1: 160 attempts — strict no-overlap, stays inside circle
-      for(let att=0;att<160&&ix===null;att++){
-        const a=rng()*Math.PI*2, d=Math.sqrt(rng())*innerR;
-        const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
-        if(!tooClose(tx,ty,w,h,4)){ix=tx;iy=ty;}
+      // Push out of label dead-zone (deflect angle)
+      if(ix<LX+LW&&ix+w>LX&&iy<LY+LH&&iy+h>LY){
+        const pa=a+Math.PI*(0.35+rng()*0.3);
+        const pr=Math.min(Math.max(r, circR*0.35), maxR);
+        ix=cx+Math.cos(pa)*pr-w/2;
+        iy=cy+Math.sin(pa)*pr-h/2;
+        // clamp to circle
+        const d=Math.hypot(ix+w/2-cx,iy+h/2-cy);
+        if(d>maxR){const sc=maxR/d;ix=cx+(ix+w/2-cx)*sc-w/2;iy=cy+(iy+h/2-cy)*sc-h/2;}
       }
 
-      // Phase 2: 150 attempts — allow up to 25% overlap, stays inside circle
-      if(ix===null){
-        const NEG=-Math.floor(Math.min(w,h)*0.25);
-        for(let att=0;att<150&&ix===null;att++){
-          const a=rng()*Math.PI*2, d=Math.sqrt(rng())*innerR;
-          const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
-          if(!tooClose(tx,ty,w,h,NEG)){ix=tx;iy=ty;}
-        }
-      }
-
-      // Phase 3: last resort — random inside circle, no overlap check
-      if(ix===null){
-        const a=rng()*Math.PI*2, d=Math.sqrt(rng())*innerR;
-        ix=cx+Math.cos(a)*d-w/2; iy=cy+Math.sin(a)*d-h/2;
+      // Resolve >30% overlap: push away from conflicting rects
+      const MAX_OV=Math.floor(Math.min(w,h)*0.30);
+      for(let att=0;att<16;att++){
+        const conf=placedRects.find(r=>
+          ix<r.x+r.w-MAX_OV&&ix+w-MAX_OV>r.x&&iy<r.y+r.h-MAX_OV&&iy+h-MAX_OV>r.y
+        );
+        if(!conf) break;
+        const da=Math.atan2(iy+h/2-(conf.y+conf.h/2), ix+w/2-(conf.x+conf.w/2));
+        const nudge=Math.max(w,h)*0.38;
+        ix+=Math.cos(da)*nudge; iy+=Math.sin(da)*nudge;
+        // keep in circle
+        const d=Math.hypot(ix+w/2-cx,iy+h/2-cy);
+        if(d>maxR){const sc=maxR/d;ix=cx+(ix+w/2-cx)*sc-w/2;iy=cy+(iy+h/2-cy)*sc-h/2;}
       }
 
       placedRects.push({x:ix,y:iy,w,h});
