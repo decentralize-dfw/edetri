@@ -199,6 +199,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
 .map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.90);letter-spacing:.04em;white-space:nowrap;line-height:1;-webkit-text-stroke:2px rgba(0,0,0,.85);paint-order:stroke fill}
+.map-cluster-ref{font-size:0.5em;font-style:italic;letter-spacing:-0.2px;opacity:.65;-webkit-text-stroke:1px rgba(0,0,0,.7)}
 .map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.5);margin-top:8px;-webkit-text-stroke:1px rgba(0,0,0,.7);paint-order:stroke fill}
 
 /* ISLANDS */
@@ -214,6 +215,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 #mapTooltip{position:fixed;bottom:120px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
 #mapTooltip.visible{opacity:1}
 .tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2}
+.tt-ref{font-size:0.6em;font-style:italic;letter-spacing:-0.2px;opacity:.65}
+.card-ref{font-size:0.75em;font-style:italic;letter-spacing:-0.2px;opacity:.7;text-transform:none}
+#mRefNo{font-family:'IBM Plex Mono',monospace;font-style:italic;font-size:10px;color:var(--silver);letter-spacing:-0.2px;opacity:.75;margin-bottom:4px}
+.cp-ref{font-size:0.75em;font-style:italic;letter-spacing:-0.2px;opacity:.7}
 .tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5}
 
 /* RAPOR TABS */
@@ -454,12 +459,12 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   </div>
   <div class="modal-info-strip">
     <div class="modal-info-left">
+      <div id="mRefNo"></div>
       <div class="modal-color-row">
         <div class="modal-color-dot" id="mColorDot" style="display:none"></div>
         <span class="modal-color-hex" id="mColorHex"></span>
       </div>
       <div id="mStars"></div>
-      <div class="modal-title" id="mTitle"></div>
       <div class="modal-desc-text" id="mDesc"></div>
       <div id="mNoteWrap"></div>
     </div>
@@ -481,7 +486,7 @@ function txtToHtml(txt) {
 }
 
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
-const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AI&gid=0`;
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=A10%3AI&gid=0`;
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwohSaC-slC2icLYf1gHg02I0Fqgfqj0IGsJ9OAsAulIZyBoqJdkwpWu5FlcbKL_ivq/exec';
 
 const SECTION_DOCS = [
@@ -807,16 +812,17 @@ async function init() {
     for (let i = 0; i < tableRows.length; i++) {
       const row = tableRows[i];
       const c = (row.c||[]).map(x => x&&x.v!=null ? String(x.v) : '');
-      const imgUrl = (c[0]||'').trim();
+      const imgUrl = (c[1]||'').trim();
       if (!imgUrl) continue;
       rows.push({
+        refNo:        (c[0]||'').trim(),
         imgUrl,
-        color:        (c[2]||'').trim(),
-        pinterestUrl: (c[3]||'').trim(),
-        type:         (c[4]||'').trim(),
-        description:  (c[5]||'').trim(),
-        rating:       parseFloat((c[6]||'').replace(',','.')) || 0,
-        note:         (c[7]||'').trim(),
+        color:        (c[3]||'').trim(),
+        pinterestUrl: (c[4]||'').trim(),
+        type:         (c[5]||'').trim(),
+        description:  (c[6]||'').trim(),
+        rating:       parseFloat((c[7]||'').replace(',','.')) || 0,
+        note:         (c[8]||'').trim(),
         excelRow:     i + 10
       });
     }
@@ -898,7 +904,7 @@ function renderMasonry() {
     const ov = document.createElement('div'); ov.className='card-overlay';
     const metaRow = document.createElement('div'); metaRow.className='card-meta-row';
     if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; metaRow.appendChild(d); }
-    if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; metaRow.appendChild(s); }
+    if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; if(row.refNo){const r=document.createElement('span');r.className='card-ref';r.textContent=' ('+row.refNo+')';s.appendChild(r);} metaRow.appendChild(s); }
     ov.appendChild(metaRow);
     wrap.appendChild(img); wrap.appendChild(ov); card.appendChild(wrap);
     if (row.description) { const desc=document.createElement('div'); desc.className='card-desc'; desc.textContent=row.description; card.appendChild(desc); }
@@ -1090,7 +1096,9 @@ function buildMap() {
         island.addEventListener('mouseenter', ()=>{
           const r=parseFloat(island.dataset.currentRot);
           island.style.transform=`rotate(${r+10}deg)`;
-          document.getElementById('ttType').textContent=row.type||'';
+          const ttEl=document.getElementById('ttType');
+          ttEl.textContent=row.type||'';
+          if (row.refNo) { const rs=document.createElement('span'); rs.className='tt-ref'; rs.textContent=' ('+row.refNo+')'; ttEl.appendChild(rs); }
           document.getElementById('ttDesc').textContent=row.description||'';
           if (row.type||row.description) document.getElementById('mapTooltip').classList.add('visible');
         });
@@ -1130,6 +1138,8 @@ function buildMap() {
     const lbl=document.createElement('div'); lbl.className='map-cluster-label';
     lbl.style.left=centers[i].x+'px'; lbl.style.top=(centers[i].y-75)+'px';
     const nm=document.createElement('div'); nm.className='map-cluster-name'; nm.textContent=t;
+    const _firstRefNo=(rows.filter(r=>r.type===t)[0]||{}).refNo;
+    if (_firstRefNo){const _rs=document.createElement('span');_rs.className='map-cluster-ref';_rs.textContent=' ('+_firstRefNo+')';nm.appendChild(_rs);}
     const cnt=document.createElement('div'); cnt.className='map-cluster-count';
     cnt.textContent=`${rows.filter(r=>r.type===t).length} items`;
     lbl.appendChild(nm); lbl.appendChild(cnt);
@@ -1378,7 +1388,7 @@ function openModal(idx) {
   else { dot.style.display='none'; hex.textContent=''; }
   document.getElementById('mStars').innerHTML = buildInteractiveStarRating(idx, row.rating);
   initStarInteraction(idx);
-  document.getElementById('mTitle').textContent=row.type||'';
+  document.getElementById('mRefNo').textContent = row.refNo || '';
   document.getElementById('mDesc').textContent=row.description||'';
   // Editable note in modal
   const noteWrap=document.getElementById('mNoteWrap');
@@ -1602,7 +1612,7 @@ function _createMapImagePanel(gi) {
   panel.className = 'cluster-panel map-image-panel';
   panel.style.display = 'none';
   panel.innerHTML =
-    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + '</span><button class="cp-close">✕</button></div>' +
+    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + (row.refNo?' <span class="cp-ref">('+row.refNo+')</span>':'') + '</span><button class="cp-close">✕</button></div>' +
     '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer"></div>' +
     '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div><div class="mip-stars">' + buildInteractiveStarRating(gi, row.rating||0) + '</div><div class="mip-note-slot"></div></div>' +
     '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
