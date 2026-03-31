@@ -52,7 +52,9 @@ body.filters-collapsed #wall-nav{display:none}
 .doc-content h3{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:9px;color:var(--silver);text-transform:uppercase;letter-spacing:.18em;margin:1.6em 0 .4em}
 .doc-content h4{font-family:'IBM Plex Mono',monospace;font-weight:300;font-size:8px;color:rgba(176,168,144,.45);text-transform:uppercase;letter-spacing:.16em;margin:1.3em 0 .3em}
 .doc-content p{margin:0 0 .9em;text-align:justify;text-align-last:left}
-.doc-content br{display:block;margin-bottom:.5em}
+.doc-content .doc-block{margin:0 0 .9em;text-align:justify;text-align-last:left}
+.doc-content .doc-line{display:block}
+.doc-content .doc-line+.doc-line{margin-top:.5em}
 .doc-content strong{font-weight:500;color:var(--cream)}
 .doc-content em{font-style:italic;color:var(--gold);font-weight:300}
 .doc-content ul,.doc-content ol{padding-left:1.4em;margin:0 0 .9em}
@@ -481,8 +483,12 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 <script>
 function txtToHtml(txt) {
   return txt.split(/\n\n+/)
-    .map(p => '<p>' + p.trim().replace(/\n/g, '<br>') + '</p>')
-    .filter(p => p !== '<p></p>')
+    .map(p => {
+      const lines = p.trim().split('\n').filter(l => l.trim());
+      if (!lines.length) return '';
+      return '<div class="doc-block">' + lines.map(l => '<span class="doc-line">' + l + '</span>').join('') + '</div>';
+    })
+    .filter(Boolean)
     .join('');
 }
 
