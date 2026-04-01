@@ -118,7 +118,7 @@ body.has-data #star-filter-wrap{display:block}
 .sfp-row:hover{color:var(--cream);background:rgba(255,255,255,.04)}
 .sfp-row.active{color:var(--gold)}
 .card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,10px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
-body.show-comments .card-desc{display:block}
+body.show-desc .card-desc{display:block}
 
 /* SIZE SLIDER */
 #sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -131,24 +131,29 @@ body.show-comments .card-desc{display:block}
 
 /* COMMENT TOGGLE */
 #commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-body.has-data #commentToggleWrap{display:flex}
-body.has-data:not(.gallery-mode) #commentToggleWrap{bottom:115px}
+body.has-data:not(.gallery-mode) #commentToggleWrap{display:flex;bottom:115px}
 body.gallery-mode #sizeSliderWrap{display:flex}
-body.show-comments .card-desc{display:block!important}
+body.show-desc .card-desc{display:block!important}
 #commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
-#commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
+#commentToggle,#edetriToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
+.ctw-sep{color:rgba(176,168,144,.18);font-size:10px;user-select:none;padding:0 2px}
 
 /* NOTE DISPLAY (read-only on wall cards) */
 .card-note-display{display:block;padding:4px 6px 5px;font-family:'Archivo',sans-serif;font-size:9px;font-weight:300;color:rgba(176,168,144,.55);line-height:1.4;border-top:1px solid rgba(176,168,144,.07);white-space:pre-wrap;word-break:break-word;border-radius:0 0 2px 2px;pointer-events:none}
 /* MAP-ISLAND comment overlay (duvar wall UI) */
 .map-island-comments{position:absolute;bottom:34px;left:0;right:0;z-index:6;display:none}
-body.show-comments .map-island-comments{display:block}
-.map-island-comments .card-desc{display:block!important;background:rgba(0,0,0,.88);color:#fff;font-family:'Archivo',sans-serif;font-size:7px;font-weight:300;line-height:1.35;padding:3px 5px;word-break:break-word;overflow:hidden;max-height:36px}
-.map-island-comments .card-note-display{display:block;background:rgba(0,0,0,.75);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:6px;font-weight:300;line-height:1.35;padding:2px 5px;word-break:break-word;overflow:hidden;max-height:22px;border-top:1px solid rgba(176,168,144,.12);pointer-events:none}
+body.show-desc .map-island-comments,body.show-notes .map-island-comments{display:block}
+.map-island-comments .card-desc{display:none!important;background:rgba(0,0,0,.88);color:#fff;font-family:'Archivo',sans-serif;font-size:7px;font-weight:300;line-height:1.35;padding:3px 5px;word-break:break-word;overflow:hidden;max-height:36px}
+body.show-desc .map-island-comments .card-desc{display:block!important}
+.map-island-comments .card-note-display{display:none!important;background:rgba(0,0,0,.75);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:7px;font-weight:300;line-height:1.35;padding:2px 5px;word-break:break-word;overflow:hidden;max-height:22px;border-top:1px solid rgba(176,168,144,.12);pointer-events:none}
+body.show-notes .map-island-comments .card-note-display{display:block!important}
+/* Star badge: top-left of island when Edetri Yorum active */
+.island-star-badge{position:absolute;top:4px;left:4px;z-index:7;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--gold);background:rgba(0,0,0,.5);padding:1px 3px;border-radius:1px;display:none;pointer-events:none;line-height:1.2;letter-spacing:.02em}
+body.show-notes .island-star-badge{display:block}
 .mip-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.1);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;line-height:1.45;padding:6px 0 2px;resize:none;outline:none;min-height:32px;cursor:text;transition:color .15s}
 .mip-note:focus{color:var(--cream)}
 .mip-note::placeholder{color:rgba(176,168,144,.45);font-style:italic}
-.modal-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.25);color:rgba(176,168,144,.75);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.5;padding:6px 0 2px;resize:none;outline:none;min-height:28px;cursor:text;max-width:50vw;transition:color .15s;margin-top:4px}
+.modal-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.25);color:rgba(176,168,144,.75);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.5;padding:6px 0 2px;resize:none;outline:none;min-height:28px;cursor:text;max-width:50vw;transition:color .15s;margin-top:4px;overflow:hidden}
 .modal-note:focus{color:var(--cream)}
 .modal-note::placeholder{color:rgba(176,168,144,.55);font-style:italic}
 @media(max-width:768px){.modal-note{max-width:85vw;font-size:11px}}
@@ -345,7 +350,6 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #colSlider{display:none}
   .size-step-btn{display:flex;width:24px;height:24px;font-size:14px}
   #sizeDisplay{display:inline}
-  body.gallery-mode #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
   body.has-data:not(.gallery-mode) #commentToggleWrap{bottom:100px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
@@ -436,10 +440,13 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(1)">+</button>
 </div>
 
-<!-- COMMENT TOGGLE (masonry mode) -->
+<!-- COMMENT TOGGLES (duvar mode only) -->
 <div id="commentToggleWrap">
   <input type="checkbox" id="commentToggle">
   <label for="commentToggle">Yorum</label>
+  <span class="ctw-sep">|</span>
+  <input type="checkbox" id="edetriToggle">
+  <label for="edetriToggle">Edetri Yorum</label>
 </div>
 
 <!-- STAR FILTER (masonry mode) -->
@@ -661,6 +668,12 @@ function makeNoteInput(idx, tagName, extraClass) {
   });
   el.addEventListener('click', e => e.stopPropagation());
   el.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+  // Auto-resize for pano modal textarea (no scrollbar)
+  if (extraClass === 'modal-note' && tagName === 'textarea') {
+    const resize = () => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+    el.addEventListener('input', resize);
+    requestAnimationFrame(resize);
+  }
   return el;
 }
 
@@ -1086,7 +1099,9 @@ function buildMap() {
       bottomBar.appendChild(hl);
       inner.appendChild(bottomBar);
       island.appendChild(inner);
-      // Comment overlay (shown when body.show-comments)
+      // Star badge: top-left, visible when body.show-notes (Edetri Yorum)
+      if (row.rating) { const badge=document.createElement('div'); badge.className='island-star-badge'; badge.textContent=row.rating+'★'; island.appendChild(badge); }
+      // Comment overlay (shown when body.show-desc or body.show-notes)
       const cmtWrap=document.createElement('div'); cmtWrap.className='map-island-comments';
       if (row.description) { const d=document.createElement('div'); d.className='card-desc'; d.textContent=row.description; cmtWrap.appendChild(d); }
       const nd=document.createElement('div'); nd.className='card-note-display'; nd.textContent=row.note||''; if(!row.note) nd.style.display='none'; cmtWrap.appendChild(nd);
@@ -1487,7 +1502,10 @@ document.getElementById('modal').addEventListener('click', e=>{
 })();
 
 document.getElementById('commentToggle').addEventListener('change', function(){
-  document.body.classList.toggle('show-comments', this.checked);
+  document.body.classList.toggle('show-desc', this.checked);
+});
+document.getElementById('edetriToggle').addEventListener('change', function(){
+  document.body.classList.toggle('show-notes', this.checked);
 });
 
 // Browser pinch-zoom'u engelle — sadece iç canvas zoom'u kullan
