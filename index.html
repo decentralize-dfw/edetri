@@ -240,6 +240,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 .tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2;user-select:none}
 .tt-ref{font-size:0.6em;font-style:italic;letter-spacing:-0.2px;opacity:.65}
 .card-ref{font-size:0.75em;font-style:italic;letter-spacing:-0.2px;opacity:.7;text-transform:none}
+#mType{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:400;color:var(--copper);text-transform:uppercase;letter-spacing:.14em;margin-bottom:2px}
 #mRefNo{font-family:'IBM Plex Mono',monospace;font-style:italic;font-size:10px;color:var(--silver);letter-spacing:-0.2px;opacity:.75;margin-bottom:4px}
 .cp-ref{font-size:0.75em;font-style:italic;letter-spacing:-0.2px;opacity:.7}
 .tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5;user-select:none}
@@ -261,6 +262,8 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 /* CLUSTER PANEL (floating docx windows, multiple can be open) */
 .cluster-panel{position:fixed;z-index:1100;background:rgba(8,7,6,.97);backdrop-filter:blur(20px);border:1px solid rgba(176,168,144,.13);width:400px;height:480px;min-width:240px;min-height:160px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.75);overflow:visible}
 .cp-titlebar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(176,168,144,.09);cursor:grab;user-select:none;flex-shrink:0}
+.mip-title-stars{flex:1;display:flex;justify-content:center;pointer-events:all}
+.mip-title-stars .star{font-size:13px;cursor:pointer}
 .cp-titlebar:active{cursor:grabbing}
 .cp-title{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;font-weight:400;color:rgba(176,168,144,.65);letter-spacing:.06em}
 .cp-close{background:none;border:none;color:rgba(176,168,144,.3);font-size:13px;cursor:pointer;padding:0;line-height:1;transition:color .15s}
@@ -483,6 +486,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   </div>
   <div class="modal-info-strip">
     <div class="modal-info-left">
+      <div id="mType"></div>
       <div id="mRefNo"></div>
       <div class="modal-color-row">
         <div class="modal-color-dot" id="mColorDot" style="display:none"></div>
@@ -1465,6 +1469,7 @@ function openModal(idx) {
   else { dot.style.display='none'; hex.textContent=''; }
   document.getElementById('mStars').innerHTML = buildInteractiveStarRating(idx, row.rating);
   initStarInteraction(idx);
+  document.getElementById('mType').textContent = row.type || '';
   document.getElementById('mRefNo').textContent = row.refNo || '';
   document.getElementById('mDesc').textContent=row.description||'';
   // Editable note in modal
@@ -1710,9 +1715,9 @@ function _createMapImagePanel(gi) {
   panel.className = 'cluster-panel map-image-panel';
   panel.style.display = 'none';
   panel.innerHTML =
-    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + (row.refNo?' <span class="cp-ref">('+row.refNo+')</span>':'') + '</span><button class="cp-close">✕</button></div>' +
+    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + (row.refNo?' <span class="cp-ref">('+row.refNo+')</span>':'') + '</span><div class="mip-title-stars">' + buildInteractiveStarRating(gi, row.rating||0) + '</div><button class="cp-close">✕</button></div>' +
     '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer"></div>' +
-    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div><div class="mip-stars">' + buildInteractiveStarRating(gi, row.rating||0) + '</div><div class="mip-note-slot"></div></div>' +
+    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div><div class="mip-note-slot"></div></div>' +
     '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
     '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
     '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
@@ -1733,7 +1738,7 @@ function _createMapImagePanel(gi) {
 }
 
 function initMipPanelStars(panel, gi) {
-  const mipStars = panel.querySelector('.mip-stars');
+  const mipStars = panel.querySelector('.mip-title-stars');
   if (!mipStars) return;
   const container = mipStars.querySelector('.star-interactive');
   if (!container) return;
