@@ -131,7 +131,7 @@ body.show-desc .card-desc{display:block}
 
 /* COMMENT TOGGLE */
 #commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-body.has-data:not(.gallery-mode) #commentToggleWrap{display:flex;bottom:115px}
+body.has-data.gallery-mode #commentToggleWrap{display:flex;bottom:115px}
 body.gallery-mode #sizeSliderWrap{display:flex}
 body.show-desc .card-desc{display:block!important}
 #commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
@@ -140,6 +140,10 @@ body.show-desc .card-desc{display:block!important}
 
 /* NOTE DISPLAY (read-only on wall cards) */
 .card-note-display{display:none;padding:4px 6px 5px;font-family:'Archivo',sans-serif;font-size:9px;font-weight:300;font-style:italic;color:rgba(196,162,90,.82);line-height:1.4;border-top:1px solid rgba(176,168,144,.07);white-space:pre-wrap;word-break:break-word;border-radius:0 0 2px 2px;pointer-events:none}
+body.show-notes .card-note-display{display:block}
+/* Star badge on masonry cards (DUVAR mode) when Edetri Yorum active */
+.card-star-badge{position:absolute;top:4px;left:4px;z-index:7;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--gold);background:rgba(0,0,0,.5);padding:1px 3px;border-radius:1px;display:none;pointer-events:none;line-height:1.2;letter-spacing:.02em}
+body.show-notes.gallery-mode .card-star-badge{display:block}
 /* MAP-ISLAND comment overlay (duvar wall UI) */
 .map-island-comments{position:absolute;bottom:34px;left:0;right:0;z-index:6;display:none}
 body.show-desc .map-island-comments,body.show-notes .map-island-comments{display:block}
@@ -350,7 +354,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #colSlider{display:none}
   .size-step-btn{display:flex;width:24px;height:24px;font-size:14px}
   #sizeDisplay{display:inline}
-  body.has-data:not(.gallery-mode) #commentToggleWrap{bottom:100px;left:10px;padding:8px 11px}
+  body.has-data.gallery-mode #commentToggleWrap{bottom:100px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
   .map-ui-btn{font-size:9px;padding:7px 14px}
@@ -939,6 +943,7 @@ function renderMasonry() {
     if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; metaRow.appendChild(d); }
     if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; if(row.refNo){const r=document.createElement('span');r.className='card-ref';r.textContent=' ('+row.refNo+')';s.appendChild(r);} metaRow.appendChild(s); }
     ov.appendChild(metaRow);
+    if (row.rating) { const badge=document.createElement('div'); badge.className='card-star-badge'; badge.textContent=row.rating+'★'; wrap.appendChild(badge); }
     wrap.appendChild(img); wrap.appendChild(ov); card.appendChild(wrap);
     if (row.description) { const desc=document.createElement('div'); desc.className='card-desc'; desc.textContent=row.description; card.appendChild(desc); }
     // Note: read-only on wall — only show if has content, edit only from modal/panel
@@ -1311,6 +1316,10 @@ function openMap() {
   document.getElementById('mapView').style.display='block';
   document.getElementById('sizeSliderWrap').style.display='none';
   document.body.classList.remove('gallery-mode');
+  // Clear comment toggle states when entering PANO mode
+  document.body.classList.remove('show-desc','show-notes');
+  const ct=document.getElementById('commentToggle'); if(ct) ct.checked=false;
+  const et=document.getElementById('edetriToggle'); if(et) et.checked=false;
   document.body.style.overflow='hidden';
   const firstBuild = !mapBuilt;
   if (!mapBuilt && rows.length) {
