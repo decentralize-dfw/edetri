@@ -109,14 +109,10 @@ body.filters-collapsed #wall-nav{display:none}
 /* STAR FILTER */
 #star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:350;display:none;pointer-events:all}
 body.has-data #star-filter-wrap{display:block}
-body.has-data.gallery-mode #star-filter-wrap{bottom:76px}
-body.has-pin-filter #star-filter-wrap{bottom:108px}
-body.has-pin-filter.gallery-mode #star-filter-wrap{bottom:112px}
 
 /* PIN FILTER */
 #pin-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:349;display:none;pointer-events:all;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);border-radius:2px;padding:5px 6px;flex-wrap:wrap;align-items:center;gap:4px}
 body.has-pin-filter #pin-filter-wrap{display:flex}
-body.has-pin-filter.gallery-mode #pin-filter-wrap{bottom:76px}
 .pin-chip{background:none;border:1px solid rgba(176,168,144,.2);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;cursor:pointer;border-radius:1px;transition:all .2s;white-space:nowrap;user-select:none;-webkit-user-select:none}
 .pin-chip:hover{border-color:rgba(176,168,144,.5);color:var(--cream)}
 .pin-chip.active{background:var(--copper);border-color:var(--copper);color:var(--black)}
@@ -377,11 +373,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #sizeDisplay{display:inline}
   body.has-data.gallery-mode #commentToggleWrap{bottom:14px;left:10px;padding:6px 9px;flex-direction:column;align-items:flex-start}
   #star-filter-wrap{bottom:62px;left:10px}
-  body.has-data.gallery-mode #star-filter-wrap{bottom:66px;left:10px}
-  body.has-pin-filter #star-filter-wrap{bottom:98px;left:10px}
-  body.has-pin-filter.gallery-mode #star-filter-wrap{bottom:102px;left:10px}
   #pin-filter-wrap{bottom:62px;left:10px}
-  body.has-pin-filter.gallery-mode #pin-filter-wrap{bottom:66px;left:10px}
   /* Map UI buttons */
   .map-ui-btn{font-size:9px;padding:7px 14px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
@@ -973,6 +965,42 @@ function applyFilter(f) {
   }
 }
 
+// ── BOTTOM-LEFT STACK LAYOUT ──────────────────────────────────
+// Computes equal gaps between: sığdır/commentToggle → pin filter → star filter
+function layoutBottomLeft() {
+  const GAP = 8;
+  const isMob = window.innerWidth < 768;
+  const basePx = isMob ? 14 : 24;
+  const leftPx = (isMob ? 10 : 24) + 'px';
+  const isGallery = document.body.classList.contains('gallery-mode');
+  const hasData = document.body.classList.contains('has-data');
+  const hasPinFilter = document.body.classList.contains('has-pin-filter');
+  if (!hasData) return;
+
+  let nextBottom = basePx;
+
+  if (isGallery) {
+    const ct = document.getElementById('commentToggleWrap');
+    ct.style.bottom = nextBottom + 'px';
+    ct.style.left = leftPx;
+    nextBottom += (ct.offsetHeight || 0) + GAP;
+  } else {
+    const fitBtn = document.getElementById('mapFitBtn');
+    nextBottom += (fitBtn ? fitBtn.offsetHeight : 32) + GAP;
+  }
+
+  if (hasPinFilter) {
+    const pf = document.getElementById('pin-filter-wrap');
+    pf.style.bottom = nextBottom + 'px';
+    pf.style.left = leftPx;
+    nextBottom += (pf.offsetHeight || 0) + GAP;
+  }
+
+  const sf = document.getElementById('star-filter-wrap');
+  sf.style.bottom = nextBottom + 'px';
+  sf.style.left = leftPx;
+}
+
 // ── PIN AUTHOR FILTER ─────────────────────────────────────────
 function renderPinFilter() {
   const wrap = document.getElementById('pin-filter-wrap');
@@ -991,6 +1019,7 @@ function renderPinFilter() {
     btn.addEventListener('click', e => { e.stopPropagation(); applyPinFilter(name); });
     wrap.appendChild(btn);
   });
+  requestAnimationFrame(layoutBottomLeft);
 }
 
 function applyPinFilter(name) {
@@ -1419,6 +1448,7 @@ function openMap() {
   if (window.innerWidth < 768 && _mapImagesReady && !_cullerTimer) startMemoryCuller();
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = 'Duvar';
+  requestAnimationFrame(layoutBottomLeft);
 }
 
 function closeMap() {
@@ -1440,6 +1470,7 @@ function closeMap() {
     applySize(2);
   }
   requestAnimationFrame(updateGalleryPadding);
+  requestAnimationFrame(layoutBottomLeft);
 }
 
 function handleModeToggle() {
@@ -2053,6 +2084,7 @@ document.addEventListener('touchstart', e => {
 window.addEventListener('beforeunload', () => {
   if (_cullerTimer) { clearInterval(_cullerTimer); _cullerTimer = null; }
 });
+window.addEventListener('resize', layoutBottomLeft);
 </script>
 
 <!-- RAPOR OVERLAY -->
