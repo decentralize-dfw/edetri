@@ -1324,6 +1324,9 @@ function buildMap() {
 }
 
 function openMap() {
+  // Close modal if open (clears focus/selection inside it)
+  const modal = document.getElementById('modal');
+  if (modal && modal.classList.contains('open')) closeModal();
   // Flush any focused input/button so iOS doesn't carry keyboard into pano mode
   const ae = document.activeElement;
   if (ae && ae !== document.body) ae.blur();
@@ -1475,7 +1478,16 @@ function openModal(idx) {
 }
 
 function closeModal() {
-  document.getElementById('modal').classList.remove('open');
+  const modal = document.getElementById('modal');
+  // Blur any focused element inside modal before hiding
+  const focused = modal.querySelector(':focus');
+  if (focused) focused.blur();
+  // Clear text selection
+  if (window.getSelection) window.getSelection().removeAllRanges();
+  // Clear note textarea from DOM so it can't retain cursor state
+  const noteWrap = document.getElementById('mNoteWrap');
+  if (noteWrap) noteWrap.innerHTML = '';
+  modal.classList.remove('open');
 }
 
 function navModal(dir) {
@@ -1636,7 +1648,7 @@ function openYaklasimPanel(anchorEl) {
       '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
       '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
       '<div class="cp-resize cp-resize-w"></div><div class="cp-resize cp-resize-nw"></div>';
-    panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
+    panel.querySelector('.cp-close').onclick = () => { const f=panel.querySelector(':focus');if(f)f.blur();if(window.getSelection)window.getSelection().removeAllRanges();panel.style.display='none'; };
     panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
     setupPanelDrag(panel);
     setupPanelResize(panel);
@@ -1704,6 +1716,8 @@ function _createMapImagePanel(gi) {
     '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
     '<div class="cp-resize cp-resize-w"></div><div class="cp-resize cp-resize-nw"></div>';
   panel.querySelector('.cp-close').onclick = () => {
+    const f = panel.querySelector(':focus'); if (f) f.blur();
+    if (window.getSelection) window.getSelection().removeAllRanges();
     panel.style.display = 'none';
     if (panel._starsObserver) { panel._starsObserver.disconnect(); delete panel._starsObserver; }
   };
@@ -1798,7 +1812,7 @@ function createClusterPanel(key) {
     '<div class="cp-resize cp-resize-sw"></div>' +
     '<div class="cp-resize cp-resize-w"></div>' +
     '<div class="cp-resize cp-resize-nw"></div>';
-  panel.querySelector('.cp-close').onclick = () => { panel.style.display = 'none'; };
+  panel.querySelector('.cp-close').onclick = () => { const f=panel.querySelector(':focus');if(f)f.blur();if(window.getSelection)window.getSelection().removeAllRanges();panel.style.display='none'; };
   panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
   setupPanelDrag(panel);
   setupPanelResize(panel);
