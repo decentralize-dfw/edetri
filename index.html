@@ -110,6 +110,16 @@ body.filters-collapsed #wall-nav{display:none}
 #star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:350;display:none;pointer-events:all}
 body.has-data #star-filter-wrap{display:block}
 body.has-data.gallery-mode #star-filter-wrap{bottom:76px}
+body.has-pin-filter #star-filter-wrap{bottom:108px}
+body.has-pin-filter.gallery-mode #star-filter-wrap{bottom:112px}
+
+/* PIN FILTER */
+#pin-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:349;display:none;pointer-events:all;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);border-radius:2px;padding:5px 6px;flex-wrap:wrap;align-items:center;gap:4px}
+body.has-pin-filter #pin-filter-wrap{display:flex}
+body.has-pin-filter.gallery-mode #pin-filter-wrap{bottom:76px}
+.pin-chip{background:none;border:1px solid rgba(176,168,144,.2);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;cursor:pointer;border-radius:1px;transition:all .2s;white-space:nowrap;user-select:none;-webkit-user-select:none}
+.pin-chip:hover{border-color:rgba(176,168,144,.5);color:var(--cream)}
+.pin-chip.active{background:var(--copper);border-color:var(--copper);color:var(--black)}
 #star-filter-btn{background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 12px;cursor:pointer;border-radius:2px;line-height:1;transition:all .2s;user-select:none;-webkit-user-select:none}
 #star-filter-btn:hover{border-color:rgba(176,168,144,.4);color:var(--gold)}
 #star-filter-btn.has-active{border-color:var(--gold);color:var(--gold);background:rgba(184,152,80,.08)}
@@ -368,6 +378,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   body.has-data.gallery-mode #commentToggleWrap{bottom:14px;left:10px;padding:6px 9px;flex-direction:column;align-items:flex-start}
   #star-filter-wrap{bottom:62px;left:10px}
   body.has-data.gallery-mode #star-filter-wrap{bottom:66px;left:10px}
+  body.has-pin-filter #star-filter-wrap{bottom:98px;left:10px}
+  body.has-pin-filter.gallery-mode #star-filter-wrap{bottom:102px;left:10px}
+  #pin-filter-wrap{bottom:62px;left:10px}
+  body.has-pin-filter.gallery-mode #pin-filter-wrap{bottom:66px;left:10px}
   /* Map UI buttons */
   .map-ui-btn{font-size:9px;padding:7px 14px}
   .map-hint-label{font-size:7px;white-space:normal;text-align:center;width:80%;left:10%;transform:none;bottom:12px}
@@ -456,6 +470,9 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(1)">+</button>
 </div>
 
+<!-- PIN AUTHOR FILTER -->
+<div id="pin-filter-wrap"></div>
+
 <!-- COMMENT TOGGLES (duvar mode only) -->
 <div id="commentToggleWrap">
   <div class="ctw-row"><input type="checkbox" id="edetriToggle"><label for="edetriToggle">Edetri Yorum</label></div>
@@ -530,7 +547,7 @@ function txtToHtml(txt) {
 }
 
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
-const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=A10%3AI&gid=0`;
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=A10%3AJ&gid=0`;
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwohSaC-slC2icLYf1gHg02I0Fqgfqj0IGsJ9OAsAulIZyBoqJdkwpWu5FlcbKL_ivq/exec';
 
 const SECTION_DOCS = [
@@ -561,6 +578,7 @@ let rows = [], visibleIdx = [], currentIdx = -1;
 let mapBuilt = false, isShuffled = false;
 let currentFilter = 'all';
 let selectedStars = new Set();
+let selectedPinnedBy = null;
 
 function buildStarRating(rating) {
   if (!rating) return '';
@@ -884,6 +902,7 @@ async function init() {
         description:  (c[6]||'').trim(),
         rating:       parseFloat((c[7]||'').replace(',','.')) || 0,
         note:         (c[8]||'').trim(),
+        pinnedBy:     (c[9]||'').trim(),
         excelRow:     i + 10
       });
     }
@@ -892,6 +911,7 @@ async function init() {
     if (loaderText) loaderText.textContent = rows.length + ' görsel bulundu, harita kuruluyor...';
     if (loaderBar)  loaderBar.style.width = '10%';
     renderFilters();
+    renderPinFilter();
     renderMasonry();
     document.body.classList.add('has-data');
     setStatus('ready', `${rows.length} images`);
@@ -933,12 +953,14 @@ function applyFilter(f) {
     const idx = +card.dataset.idx;
     const typeOk = f==='all' || rows[idx].type===f;
     const starOk = selectedStars.size===0 || selectedStars.has(Math.round(rows[idx].rating));
-    card.classList.toggle('hidden', !typeOk || !starOk);
+    const pinOk = !selectedPinnedBy || rows[idx].pinnedBy===selectedPinnedBy;
+    card.classList.toggle('hidden', !typeOk || !starOk || !pinOk);
   });
   visibleIdx = rows.map((_,i)=>i).filter(i=>{
     const typeOk = f==='all' || rows[i].type===f;
     const starOk = selectedStars.size===0 || selectedStars.has(Math.round(rows[i].rating));
-    return typeOk && starOk;
+    const pinOk = !selectedPinnedBy || rows[i].pinnedBy===selectedPinnedBy;
+    return typeOk && starOk && pinOk;
   });
   // show/hide bölüm açıklama button
   const wrap = document.getElementById('bolumAciklamaWrap');
@@ -949,6 +971,39 @@ function applyFilter(f) {
   } else {
     wrap.style.display = 'none';
   }
+}
+
+// ── PIN AUTHOR FILTER ─────────────────────────────────────────
+function renderPinFilter() {
+  const wrap = document.getElementById('pin-filter-wrap');
+  wrap.innerHTML = '';
+  const authors = [...new Set(rows.map(r=>r.pinnedBy).filter(Boolean))].sort();
+  if (!authors.length) {
+    document.body.classList.remove('has-pin-filter');
+    return;
+  }
+  document.body.classList.add('has-pin-filter');
+  authors.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'pin-chip';
+    btn.textContent = name;
+    btn.dataset.name = name;
+    btn.addEventListener('click', e => { e.stopPropagation(); applyPinFilter(name); });
+    wrap.appendChild(btn);
+  });
+}
+
+function applyPinFilter(name) {
+  if (selectedPinnedBy === name) {
+    selectedPinnedBy = null;
+  } else {
+    selectedPinnedBy = name;
+  }
+  document.querySelectorAll('.pin-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.name === selectedPinnedBy);
+  });
+  applyFilter(currentFilter);
+  applyStarFilterToMap();
 }
 
 // ── MASONRY ───────────────────────────────────────────────────
@@ -1897,7 +1952,8 @@ function applyStarFilterToMap() {
     const gi = +island.dataset.idx;
     if (isNaN(gi)) return;
     const starOk = selectedStars.size === 0 || selectedStars.has(Math.round(rows[gi].rating));
-    island.style.display = starOk ? '' : 'none';
+    const pinOk = !selectedPinnedBy || rows[gi].pinnedBy === selectedPinnedBy;
+    island.style.display = (starOk && pinOk) ? '' : 'none';
   });
 }
 
