@@ -182,13 +182,15 @@ body.show-notes .island-star-badge{display:block}
 .modal-image-full{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .modal-image-full img{width:100%;height:100%;object-fit:contain;display:block}
 .modal-info-strip{position:absolute;bottom:0;left:0;right:0;padding:80px 28px 24px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:10;pointer-events:none}
-.modal-info-left{display:flex;flex-direction:column;gap:8px;pointer-events:all}
+.modal-info-left{display:flex;flex-direction:column;gap:8px;pointer-events:all;user-select:none}
+.modal-backdrop:not(.open) .modal-info-left{pointer-events:none}
 .modal-color-row{display:flex;align-items:center;gap:8px}
 .modal-color-dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
 .modal-color-hex{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--silver);letter-spacing:.08em;opacity:.7}
 .modal-title{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,42px);font-weight:400;font-style:italic;color:var(--cream);line-height:1.15;max-width:60vw}
 .modal-desc-text{font-family:'Archivo',sans-serif;font-size:13px;font-weight:300;color:var(--silver);opacity:.75;line-height:1.5;max-width:50vw}
 .modal-info-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:all}
+.modal-backdrop:not(.open) .modal-info-right{pointer-events:none}
 .pinterest-link{display:flex;align-items:center;gap:6px;color:var(--silver);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;opacity:.4;transition:opacity .2s}
 .pinterest-link:hover{opacity:.9;color:var(--copper)}
 .keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.45;letter-spacing:.06em}
