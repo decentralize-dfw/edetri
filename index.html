@@ -84,18 +84,18 @@ body.filters-collapsed #wall-nav{display:none}
 .filter-chip.all-chip.active{background:rgba(176,168,144,.15);border-color:var(--silver);color:var(--cream)}
 
 /* MASONRY */
-.gallery-wrap{padding:24px 8px}
+.gallery-wrap{padding:24px 8px;user-select:none;-webkit-user-select:none}
 .masonry{column-count:5;column-gap:8px}
-.card{break-inside:avoid;margin-bottom:8px;position:relative;cursor:pointer;border-radius:2px;background:var(--dim)}
+.card{break-inside:avoid;margin-bottom:8px;position:relative;cursor:pointer;border-radius:2px;background:var(--dim);user-select:none;-webkit-user-select:none}
 .card.hidden{display:none}
 .card-img-wrap{overflow:hidden;border-radius:2px 2px 0 0;position:relative}
-.card-img-wrap img{display:block;width:100%;height:auto;transition:transform .4s ease}
+.card-img-wrap img{display:block;width:100%;height:auto;transition:transform .4s ease;user-select:none;-webkit-user-select:none;pointer-events:none}
 .card:hover .card-img-wrap img{transform:scale(1.03)}
-.card-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 8px 8px;background:linear-gradient(to top,rgba(9,8,7,.85),transparent);opacity:0;transition:opacity .3s;display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.card-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 8px 8px;background:linear-gradient(to top,rgba(9,8,7,.85),transparent);opacity:0;transition:opacity .3s;display:flex;flex-direction:column;align-items:stretch;gap:4px;user-select:none;-webkit-user-select:none}
 .card:hover .card-overlay{opacity:1}
 .card-meta-row{display:flex;align-items:center;gap:5px}
 .card-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.2)}
-.card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-type{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.08em;color:var(--cream);text-transform:uppercase;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none;-webkit-user-select:none}
 
 /* STAR RATING */
 .star-rating{display:flex;gap:1px;justify-content:center;line-height:1}
@@ -118,7 +118,7 @@ body.has-data.gallery-mode #star-filter-wrap{bottom:76px}
 .sfp-row{padding:7px 14px;cursor:pointer;color:rgba(176,168,144,.55);font-family:'IBM Plex Mono',monospace;font-size:11px;user-select:none;transition:color .15s,background .15s;white-space:nowrap}
 .sfp-row:hover{color:var(--cream);background:rgba(255,255,255,.04)}
 .sfp-row.active{color:var(--gold)}
-.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,10px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px}
+.card-desc{display:none;background:#000;color:#fff;font-family:'Archivo',sans-serif;font-size:var(--desc-font-size,10px);font-weight:300;line-height:1.4;padding:4px 6px;word-break:break-word;overflow-wrap:break-word;border-radius:0 0 2px 2px;user-select:none;-webkit-user-select:none}
 body.show-desc .card-desc{display:block}
 
 /* SIZE SLIDER */
@@ -442,7 +442,7 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" oninput="applyColSlider(this.value)" onmouseup="this.blur()" onpointerup="this.blur()">
+  <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" onselectstart="return false" oninput="applyColSlider(this.value)" onmouseup="this.blur()" onpointerup="this.blur()">
   <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(-1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(-1)">−</button>
   <span id="sizeDisplay">5</span>
   <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(1)">+</button>
@@ -986,6 +986,7 @@ function applyColSlider(val) {
   _cols = parseInt(val);
   const el = document.getElementById('sizeDisplay');
   if (el) el.textContent = _cols;
+  if (window.getSelection) window.getSelection().removeAllRanges();
   applySize(_cols);
 }
 function applySize(cols) {
@@ -1541,6 +1542,16 @@ document.addEventListener('gestureend', e => e.preventDefault(), {passive:false}
 document.addEventListener('touchmove', e => {
   if (e.touches.length > 1) e.preventDefault();
 }, {passive:false});
+
+// Prevent accidental text selection in gallery (masonry) mode — e.g. after slider drag
+document.addEventListener('selectstart', e => {
+  if (document.body.classList.contains('gallery-mode')) {
+    const tag = e.target.tagName;
+    if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !e.target.isContentEditable) {
+      e.preventDefault();
+    }
+  }
+});
 
 init();
 window.addEventListener('resize', updateGalleryPadding);
