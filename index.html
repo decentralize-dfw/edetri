@@ -14,9 +14,11 @@ body{background:var(--black);color:var(--cream);font-family:'Archivo',sans-serif
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:9999}
 
 /* HEADER */
-#siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12)}
+#siteHeader{position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(176,168,144,.12);transition:transform .22s ease}
+body.header-hidden #siteHeader{transform:translateY(-100%)}
 body:not(.gallery-mode) #siteHeader{background:none;backdrop-filter:none;border-bottom:none;pointer-events:none}
-body:not(.gallery-mode) #siteHeader>*{pointer-events:all}
+body:not(.gallery-mode) #siteHeader>*{pointer-events:none}
+body:not(.gallery-mode) #siteHeader button:not(#filterCollapseBtn),body:not(.gallery-mode) #siteHeader a{pointer-events:all}
 #top-bar-row{display:flex;align-items:center;gap:12px;padding:10px 24px 10px 14px;flex-wrap:nowrap}
 .header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;letter-spacing:.12em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
 .header-title span{color:var(--copper);font-style:italic}
@@ -50,6 +52,9 @@ body.filters-collapsed #wall-nav{display:none}
 .doc-content h3{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:9px;color:var(--silver);text-transform:uppercase;letter-spacing:.18em;margin:1.6em 0 .4em}
 .doc-content h4{font-family:'IBM Plex Mono',monospace;font-weight:300;font-size:8px;color:rgba(176,168,144,.45);text-transform:uppercase;letter-spacing:.16em;margin:1.3em 0 .3em}
 .doc-content p{margin:0 0 .9em;text-align:justify;text-align-last:left}
+.doc-content .doc-block{margin:0 0 .9em;text-align:justify;text-align-last:left}
+.doc-content .doc-line{display:block}
+.doc-content .doc-line+.doc-line{margin-top:.5em}
 .doc-content strong{font-weight:500;color:var(--cream)}
 .doc-content em{font-style:italic;color:var(--gold);font-weight:300}
 .doc-content ul,.doc-content ol{padding-left:1.4em;margin:0 0 .9em}
@@ -60,22 +65,13 @@ body.filters-collapsed #wall-nav{display:none}
 .doc-content a{color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,104,40,.3)}
 .doc-content a:hover{border-bottom-color:var(--copper)}
 
-/* ÖZET OVERLAY */
-#ozetOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
-#ozetOverlay.open{display:block}
-#ozetOverlay::-webkit-scrollbar{width:4px}
-#ozetOverlay::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
-#ozetInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
-#ozetClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
-#ozetClose:hover{color:var(--copper)}
-
 /* RAPOR OVERLAY */
-#raporOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
-#raporOverlay.open{display:block}
-#raporOverlay::-webkit-scrollbar{width:4px}
-#raporOverlay::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
-#raporInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
-#raporClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#raporOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px}
+#raporOverlay.open{display:flex}
+#raporInner{position:relative;background:var(--black);border:1px solid rgba(176,168,144,.12);width:44%;max-width:680px;max-height:85vh;overflow-y:auto;overflow-x:hidden;padding:32px 36px 44px;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
+#raporInner::-webkit-scrollbar{width:4px}
+#raporInner::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
+#raporClose{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--silver);font-size:18px;cursor:pointer;line-height:1;z-index:1}
 #raporClose:hover{color:var(--copper)}
 #raporLoading{color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0}
 
@@ -105,13 +101,15 @@ body.filters-collapsed #wall-nav{display:none}
 .star-rating{display:flex;gap:1px;justify-content:center;line-height:1}
 .star{font-size:12px;background:linear-gradient(to right,var(--gold) var(--fill,0%),rgba(176,168,144,.22) var(--fill,0%));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .card-stars{display:flex;justify-content:center}
-.map-stars{position:absolute;bottom:6%;left:0;right:0;text-align:center;z-index:2;pointer-events:none}
-.map-stars .star{font-size:10px}
+.map-island-bottom{position:absolute;bottom:0;left:0;right:0;height:34px;background:linear-gradient(to top,rgba(9,8,7,.92) 55%,transparent);pointer-events:none;opacity:0;transition:opacity .18s}
+.map-island:hover .map-island-bottom{opacity:1}
+.map-stars{position:absolute;bottom:16px;left:0;right:0;text-align:center;pointer-events:none}
+.map-stars .star{font-size:10px;cursor:pointer;background:linear-gradient(to right,var(--gold) var(--fill,0%),rgba(176,168,144,.6) var(--fill,0%));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 /* STAR FILTER */
 #star-filter-wrap{position:fixed;bottom:72px;left:24px;z-index:350;display:none;pointer-events:all}
 body.has-data #star-filter-wrap{display:block}
-#star-filter-btn{background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 12px;cursor:pointer;border-radius:2px;line-height:1;transition:all .2s}
+#star-filter-btn{background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);color:rgba(176,168,144,.5);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 12px;cursor:pointer;border-radius:2px;line-height:1;transition:all .2s;user-select:none;-webkit-user-select:none}
 #star-filter-btn:hover{border-color:rgba(176,168,144,.4);color:var(--gold)}
 #star-filter-btn.has-active{border-color:var(--gold);color:var(--gold);background:rgba(184,152,80,.08)}
 #star-filter-panel{position:absolute;bottom:calc(100% + 8px);left:0;background:rgba(9,8,7,.95);backdrop-filter:blur(12px);border:1px solid rgba(176,168,144,.15);border-radius:2px;padding:4px 0;min-width:72px;display:none}
@@ -123,18 +121,31 @@ body.has-data #star-filter-wrap{display:block}
 body.show-comments .card-desc{display:block}
 
 /* SIZE SLIDER */
-#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px}
-.size-step-btn{background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:15px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;flex-shrink:0;padding:0}
+#sizeSliderWrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:150;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:8px 14px;border-radius:2px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#colSlider{width:110px;height:2px;cursor:pointer;-webkit-appearance:none;appearance:none;background:rgba(176,168,144,.25);border-radius:1px;outline:none;border:none;padding:0;flex-shrink:0}
+#colSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;background:var(--copper);border-radius:0;cursor:pointer}
+#colSlider::-moz-range-thumb{width:10px;height:10px;background:var(--copper);border-radius:0;border:none;cursor:pointer}
+.size-step-btn{display:none;background:none;border:1px solid rgba(176,168,144,.25);color:var(--silver);font-family:'IBM Plex Mono',monospace;font-size:15px;width:28px;height:28px;cursor:pointer;align-items:center;justify-content:center;transition:all .2s;line-height:1;flex-shrink:0;padding:0}
 .size-step-btn:hover{border-color:var(--copper);color:var(--copper)}
-#sizeDisplay{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);min-width:18px;text-align:center;letter-spacing:.05em}
+#sizeDisplay{display:none;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cream);min-width:18px;text-align:center;letter-spacing:.05em}
 
 /* COMMENT TOGGLE */
-#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto}
+#commentToggleWrap{position:fixed;bottom:24px;left:24px;z-index:200;display:none;align-items:center;gap:8px;background:rgba(9,8,7,.8);backdrop-filter:blur(10px);border:1px solid rgba(176,168,144,.15);padding:10px 14px;border-radius:2px;pointer-events:auto;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 body.gallery-mode #commentToggleWrap{display:flex}
 body.gallery-mode #sizeSliderWrap{display:flex}
 body.show-comments .card-desc{display:block!important}
 #commentToggleWrap label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(176,168,144,.4);text-transform:uppercase;cursor:pointer;user-select:none}
 #commentToggle{accent-color:var(--copper);cursor:pointer;width:12px;height:12px}
+
+/* NOTE DISPLAY (read-only on wall cards) */
+.card-note-display{display:block;padding:4px 6px 5px;font-family:'Archivo',sans-serif;font-size:9px;font-weight:300;color:rgba(176,168,144,.55);line-height:1.4;border-top:1px solid rgba(176,168,144,.07);white-space:pre-wrap;word-break:break-word;border-radius:0 0 2px 2px;pointer-events:none}
+.mip-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.1);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;line-height:1.45;padding:6px 0 2px;resize:none;outline:none;min-height:32px;cursor:text;transition:color .15s}
+.mip-note:focus{color:var(--cream)}
+.mip-note::placeholder{color:rgba(176,168,144,.45);font-style:italic}
+.modal-note{width:100%;background:transparent;border:none;border-top:1px solid rgba(176,168,144,.1);color:rgba(176,168,144,.65);font-family:'Archivo',sans-serif;font-size:12px;font-weight:300;line-height:1.5;padding:6px 0 2px;resize:none;outline:none;min-height:28px;cursor:text;max-width:50vw;transition:color .15s;margin-top:4px}
+.modal-note:focus{color:var(--cream)}
+.modal-note::placeholder{color:rgba(176,168,144,.45);font-style:italic}
+@media(max-width:768px){.modal-note{max-width:85vw;font-size:11px}}
 
 /* SPINNER */
 .spinner{width:24px;height:24px;border:1px solid rgba(176,168,144,.2);border-top-color:var(--copper);border-radius:50%;animation:spin .8s linear infinite}
@@ -162,7 +173,7 @@ body.show-comments .card-desc{display:block!important}
 .modal-info-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:all}
 .pinterest-link{display:flex;align-items:center;gap:6px;color:var(--silver);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;opacity:.4;transition:opacity .2s}
 .pinterest-link:hover{opacity:.9;color:var(--copper)}
-.keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.25;letter-spacing:.06em}
+.keyboard-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--silver);opacity:.45;letter-spacing:.06em}
 
 /* MAP VIEW */
 #mapView{position:fixed;inset:0;background:#060504;z-index:200;overflow:hidden;cursor:grab;user-select:none;touch-action:none}
@@ -182,27 +193,35 @@ body.show-comments .card-desc{display:block!important}
 #corner-gif{position:fixed;bottom:18px;right:18px;width:64px;height:auto;filter:invert(1);pointer-events:none;z-index:50}
 body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-hint-label{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(176,168,144,.18);letter-spacing:.08em;z-index:300;pointer-events:none;white-space:nowrap}
-#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:290;pointer-events:none}
+#mapLoader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:500;pointer-events:all;background:var(--black);transition:opacity .5s}
+#mapLoader.fade-out{opacity:0;pointer-events:none}
 #mapLoader p{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(176,168,144,.4)}
+#loader-bar-wrap{width:180px;height:2px;background:rgba(176,168,144,.15);position:relative;overflow:hidden;border-radius:1px}
+#loader-bar{position:absolute;left:0;top:0;height:100%;background:var(--copper);width:0%;transition:width .3s ease}
 
 /* CLUSTER LABELS — always on top */
 .map-cluster-label{position:absolute;pointer-events:none;text-align:center;transform:translateX(-50%);z-index:1001}
 .map-cluster-name{font-family:'Playfair Display',serif;font-style:italic;font-size:60px;font-weight:400;color:rgba(255,250,240,.90);letter-spacing:.04em;white-space:nowrap;line-height:1;-webkit-text-stroke:2px rgba(0,0,0,.85);paint-order:stroke fill}
+.map-cluster-ref{font-size:0.5em;font-style:italic;letter-spacing:-0.2px;opacity:.65;-webkit-text-stroke:1px rgba(0,0,0,.7)}
 .map-cluster-count{font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,250,240,.5);margin-top:8px;-webkit-text-stroke:1px rgba(0,0,0,.7);paint-order:stroke fill}
 
 /* ISLANDS */
 .map-island{position:absolute;cursor:pointer;z-index:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+#mapView.panning .map-island{transition:none!important}
 .map-island:hover{z-index:999!important}
 .map-island-inner{position:relative;border-radius:2px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.55);transition:box-shadow .2s,outline .2s;width:100%;height:100%}
 .map-island:hover .map-island-inner{outline:1px solid rgba(168,104,40,.55);box-shadow:0 0 28px rgba(168,104,40,.12),0 14px 44px rgba(0,0,0,.75)}
 .map-island img{display:block;width:100%;height:100%;object-fit:cover}
-.map-island-hlabel{position:absolute;bottom:0;left:0;right:0;padding:18px 6px 5px;background:linear-gradient(to top,rgba(9,8,7,.92),transparent);font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;opacity:0;transition:opacity .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.map-island:hover .map-island-hlabel{opacity:1}
+.map-island-hlabel{position:absolute;bottom:3px;left:0;right:0;font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:.1em;color:var(--cream);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;padding:0 4px}
 
 /* HOVER TOOLTIP */
-#mapTooltip{position:fixed;bottom:40px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
+#mapTooltip{position:fixed;bottom:120px;left:24px;z-index:300;pointer-events:none;opacity:0;transition:opacity .2s;max-width:300px}
 #mapTooltip.visible{opacity:1}
 .tt-type{font-family:'Playfair Display',serif;font-style:italic;font-size:20px;color:var(--cream);letter-spacing:.02em;line-height:1.2}
+.tt-ref{font-size:0.6em;font-style:italic;letter-spacing:-0.2px;opacity:.65}
+.card-ref{font-size:0.75em;font-style:italic;letter-spacing:-0.2px;opacity:.7;text-transform:none}
+#mRefNo{font-family:'IBM Plex Mono',monospace;font-style:italic;font-size:10px;color:var(--silver);letter-spacing:-0.2px;opacity:.75;margin-bottom:4px}
+.cp-ref{font-size:0.75em;font-style:italic;letter-spacing:-0.2px;opacity:.7}
 .tt-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);margin-top:4px;line-height:1.5}
 
 /* RAPOR TABS */
@@ -248,22 +267,31 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 .map-image-panel .mip-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
 .map-image-panel .mip-info{padding:10px 16px 14px;flex-shrink:0;border-top:1px solid rgba(176,168,144,.09)}
 .map-image-panel .mip-desc{font-family:'Archivo',sans-serif;font-size:11px;font-weight:300;color:rgba(176,168,144,.6);line-height:1.4;margin-top:4px}
-.mip-stars{position:absolute;bottom:5%;left:0;right:0;text-align:center;z-index:2;pointer-events:none}
-.mip-stars .star{font-size:20px}
+.mip-stars{text-align:center;padding:6px 0 2px;pointer-events:auto}
+.mip-stars .star{font-size:18px;cursor:pointer}
 #mStars .star-rating{justify-content:flex-start;gap:2px}
 #mStars .star{font-size:17px}
+
+/* MOBILE NAV POPUP */
+#mobileNavBtn{display:none;background:none;border:1px solid rgba(176,168,144,.2);color:rgba(176,168,144,.6);font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;transition:all .2s;flex-shrink:0;letter-spacing:.08em}
+#mobileNavBtn:hover,#mobileNavBtn.active{border-color:var(--copper);color:var(--copper)}
+#mobileNavPopup{display:none;position:fixed;z-index:390;left:0;right:0;background:rgba(9,8,7,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(176,168,144,.12);padding:10px 12px;flex-direction:column;gap:4px}
+#mobileNavPopup.open{display:flex}
+#mobileNavPopup .btn-map{text-align:left;padding:11px 14px;font-size:9px;border:1px solid rgba(176,168,144,.12)}
+
+/* GALLERY SHUFFLE */
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dim);border:1px solid rgba(176,168,144,.2);color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;padding:10px 20px;z-index:9998;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
 /* YAKLAŞIM OVERLAY */
-#yaklasimOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
-#yaklasimOverlay.open{display:block}
-#yaklasimOverlay::-webkit-scrollbar{width:4px}
-#yaklasimOverlay::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
-#yaklasimInner{margin:0 auto;padding:60px 0 80px;width:40%;box-sizing:border-box}
-#yaklasimClose{position:fixed;top:24px;right:32px;background:none;border:none;color:var(--silver);font-size:20px;cursor:pointer;line-height:1;z-index:10000}
+#yaklasimOverlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px}
+#yaklasimOverlay.open{display:flex}
+#yaklasimInner{position:relative;background:var(--black);border:1px solid rgba(176,168,144,.12);width:44%;max-width:680px;max-height:85vh;overflow-y:auto;overflow-x:hidden;padding:32px 36px 44px;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(168,104,40,.2) transparent}
+#yaklasimInner::-webkit-scrollbar{width:4px}
+#yaklasimInner::-webkit-scrollbar-thumb{background:rgba(168,104,40,.3);border-radius:2px}
+#yaklasimClose{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--silver);font-size:18px;cursor:pointer;line-height:1;z-index:1}
 #yaklasimClose:hover{color:var(--copper)}
 
 /* MOBILE */
@@ -278,9 +306,11 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   /* Filtre oku: her iki modda da alan ayır (layout kaymasın), sadece galeri modunda görünür */
   #filterCollapseBtn{display:flex!important;visibility:hidden;pointer-events:none;order:1;margin-left:auto;font-size:13px;padding:5px 10px;align-items:center;justify-content:center}
   body.gallery-mode #filterCollapseBtn{visibility:visible;pointer-events:auto}
-  /* Wall-nav: HER İKİ MODDA DA görünsün, toggle'ın hemen altında */
+  /* Wall-nav: her iki modda görünsün */
   #wall-nav{display:flex!important;order:2;flex-basis:100%;gap:5px}
   body.filters-collapsed #wall-nav{display:flex!important}
+  /* Popup menü butonunu gizle */
+  #mobileNavBtn{display:none!important}
   .btn-map{font-size:8px;padding:5px 9px;letter-spacing:.06em}
   #header-status{display:none}
   /* Filter row */
@@ -289,11 +319,14 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   #mapYaklasimBtn{display:none!important}
   /* Filtre kapalıyken filter-row tamamen gizle → içerik üç tuşun hemen altından başlar */
   body.filters-collapsed #filter-row{display:none!important}
-  /* Shuffle: modeToggleBtn ile aynı boyut/yükseklik */
+  /* Map shuffle: küçük dokunmatik boyut */
   #mapShuffleBtn{right:12px;top:8px;font-size:9px;padding:7px 14px}
+  /* mapFitBtn: yorum tuşuyla aynı konum ve boyut */
+  #mapFitBtn{bottom:14px;left:10px;top:auto;right:auto;font-size:9px;padding:8px 11px}
+  /* Overlay popup: mobilde tam genişlik */
+  #raporInner,#yaklasimInner{width:92%;padding:28px 18px 36px}
+  #raporClose,#yaklasimClose{top:10px;right:12px;font-size:16px}
   /* Overlay inner */
-  #ozetInner,#raporInner,#yaklasimInner{width:90%;padding:50px 0 60px}
-  #ozetClose,#raporClose,#yaklasimClose{top:14px;right:14px;font-size:17px}
   /* Rapor tabs */
   #raporTabs{gap:2px;margin-bottom:20px}
   .rapor-tab{font-size:8px;padding:5px 7px;letter-spacing:.07em}
@@ -301,8 +334,11 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .masonry{column-count:2;column-gap:5px}
   .gallery-wrap{padding:0 5px 12px}
   /* Bottom controls */
-  #sizeSliderWrap{bottom:14px;padding:6px 10px}
-  .size-step-btn{width:32px;height:32px;font-size:18px}
+  /* Size control: yorum tuşuyla aynı boyut/konum */
+  #sizeSliderWrap{bottom:14px;padding:8px 11px;gap:6px}
+  #colSlider{display:none}
+  .size-step-btn{display:flex;width:24px;height:24px;font-size:14px}
+  #sizeDisplay{display:inline}
   #commentToggleWrap{bottom:14px;left:10px;padding:8px 11px}
   #star-filter-wrap{bottom:62px;left:10px}
   /* Map UI buttons */
@@ -319,9 +355,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   .modal-title{font-size:clamp(16px,5vw,26px);max-width:85vw}
   .modal-desc-text{max-width:85vw;font-size:11px}
   .modal-info-strip{padding:60px 16px 18px}
-  #bolumAciklamaWrap{width:100%;padding-bottom:8px}
+  #bolumAciklamaWrap{padding-bottom:0}
   /* GIF: scrollbar kaymasın, sabit pozisyon */
   #corner-gif{width:44px;bottom:12px;right:12px;z-index:300}
+  .map-island{transition:none!important}
 }
 
 /* DESKTOP — wall-nav her iki modda görünür, moodboard kapalı */
@@ -336,13 +373,13 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- MAP — shown immediately, full screen loader -->
 <div id="mapView">
-  <button class="map-ui-btn" id="mapYaklasimBtn" onclick="openYaklasimPanel(this)">Yaklaşım</button>
-  <button class="map-ui-btn" id="mapFitBtn" onclick="fitMap()">⊡ Sığdır</button>
-  <button class="map-ui-btn" id="mapShuffleBtn" onclick="toggleShuffle()">⇄ Shuffle</button>
-  <button class="map-ui-btn" id="mapDuvarBtn" onclick="closeMap()">Duvar</button>
+  <button class="map-ui-btn" id="mapYaklasimBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="openYaklasimPanel(this)">Yaklaşım</button>
+  <button class="map-ui-btn" id="mapFitBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="fitMap()">⊡ Sığdır</button>
+  <button class="map-ui-btn" id="mapShuffleBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="toggleShuffle()">⇄ Shuffle</button>
+  <button class="map-ui-btn" id="mapDuvarBtn" tabindex="-1" onmousedown="event.preventDefault()" onclick="closeMap()">Duvar</button>
   <div id="mapStage"></div>
   <div id="mapTooltip"><div class="tt-type" id="ttType"></div><div class="tt-desc" id="ttDesc"></div></div>
-  <div id="mapLoader"><div class="spinner"></div><p>Loading archive...</p></div>
+  <div id="mapLoader"><div class="spinner"></div><p id="loaderText">Arşiv yükleniyor...</p><div id="loader-bar-wrap"><div id="loader-bar"></div></div></div>
   <div class="map-hint-label">scroll to zoom · drag canvas to pan · drag image to move · click to open</div>
 </div>
 
@@ -351,10 +388,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   <div id="top-bar-row">
     <img id="site-logo" src="https://edetri.com/cdn/shop/files/EDETRI.png?v=1721483775&width=400" alt="EDETRI" referrerpolicy="no-referrer">
     <button id="modeToggleBtn" onclick="handleModeToggle()">Duvar</button>
+    <button id="mobileNavBtn" onclick="toggleMobileNav()">···</button>
     <span id="header-moodboard" class="header-title"><span>Moodboard</span></span>
     <div id="wall-nav">
       <button class="btn-map" onclick="openYaklasim()">Yaklaşım</button>
-      <button class="btn-map" onclick="openOzet()">Özet</button>
       <button class="btn-map" onclick="openRapor()">Ful Rapor</button>
       <div id="bolumAciklamaWrap" style="display:none">
         <button id="bolumAciklamaBtn" class="btn-map" onclick="openBolumAciklama()">+ Bölüm Açıklama</button>
@@ -371,6 +408,12 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   </div>
 </header>
 
+<!-- MOBILE NAV POPUP -->
+<div id="mobileNavPopup">
+  <button class="btn-map" onclick="closeMobileNav();openYaklasim()">Yaklaşım</button>
+  <button class="btn-map" onclick="closeMobileNav();openRapor()">Ful Rapor</button>
+</div>
+
 <!-- GALLERY — hidden until map closed -->
 <main id="galleryWrap" style="display:none">
   <div class="gallery-wrap">
@@ -380,9 +423,10 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 
 <!-- SIZE CONTROL (masonry mode) -->
 <div id="sizeSliderWrap">
-  <button class="size-step-btn" onclick="changeSizeStep(-1)">−</button>
+  <input type="range" id="colSlider" min="1" max="15" value="5" tabindex="-1" aria-hidden="true" oninput="applyColSlider(this.value)" onmouseup="this.blur()" onpointerup="this.blur()">
+  <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(-1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(-1)">−</button>
   <span id="sizeDisplay">5</span>
-  <button class="size-step-btn" onclick="changeSizeStep(1)">+</button>
+  <button type="button" class="size-step-btn" tabindex="-1" ontouchend="event.preventDefault();changeSizeStep(1);this.blur()" onmousedown="event.preventDefault();changeSizeStep(1)">+</button>
 </div>
 
 <!-- COMMENT TOGGLE (masonry mode) -->
@@ -418,13 +462,14 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
   </div>
   <div class="modal-info-strip">
     <div class="modal-info-left">
+      <div id="mRefNo"></div>
       <div class="modal-color-row">
         <div class="modal-color-dot" id="mColorDot" style="display:none"></div>
         <span class="modal-color-hex" id="mColorHex"></span>
       </div>
       <div id="mStars"></div>
-      <div class="modal-title" id="mTitle"></div>
       <div class="modal-desc-text" id="mDesc"></div>
+      <div id="mNoteWrap"></div>
     </div>
     <div class="modal-info-right">
       <a class="pinterest-link" id="mLink" href="#" target="_blank" rel="noopener">↗ Pinterest</a>
@@ -438,14 +483,18 @@ body:not(.gallery-mode) #corner-gif{z-index:250}
 <script>
 function txtToHtml(txt) {
   return txt.split(/\n\n+/)
-    .map(p => '<p>' + p.trim().replace(/\n/g, '<br>') + '</p>')
-    .filter(p => p !== '<p></p>')
+    .map(p => {
+      const lines = p.trim().split('\n').filter(l => l.trim());
+      if (!lines.length) return '';
+      return '<div class="doc-block">' + lines.map(l => '<span class="doc-line">' + l + '</span>').join('') + '</div>';
+    })
+    .filter(Boolean)
     .join('');
 }
 
 const SHEET_ID = '1o3kX-cYFY8RjPWfQN5kzzGQf_2g-ZxJvan9Mu7Jf7pQ';
-const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=B10%3AH&gid=0`;
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGWSvisF5zoQFY2mdYlhcHAHqhr6Qd7uA5f3RRjR1c6pctWt9u7T7SWFNG9DGDNM7/exec';
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=0&range=A10%3AI&gid=0`;
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwohSaC-slC2icLYf1gHg02I0Fqgfqj0IGsJ9OAsAulIZyBoqJdkwpWu5FlcbKL_ivq/exec';
 
 const SECTION_DOCS = [
   { key: 'EDETRI_Bolum2_AnaCerceve', label: 'Ana Çerçeve' },
@@ -456,7 +505,7 @@ const SECTION_DOCS = [
   { key: 'drape-ip-kaplama', label: 'Drape / İp Kaplama' },
   { key: 'metal-kumas',      label: 'Metal Kumaş' }
 ];
-const RAPOR_BASE = 'https://xrweb.studio/edetri/rapor/';
+const RAPOR_BASE = 'https://virtuallyeverafter.xyz/edetri/rapor/';
 
 function toSlug(s) {
   return s.toLowerCase()
@@ -497,6 +546,33 @@ function buildInteractiveStarRating(idx, rating) {
   return html;
 }
 
+function initIslandStars(starsWrap, idx) {
+  const stars = [...starsWrap.querySelectorAll('.star')];
+  stars.forEach(star => {
+    const val = parseInt(star.dataset.val);
+    star.addEventListener('pointerdown', e => e.stopPropagation());
+    star.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+    star.addEventListener('mouseenter', () => {
+      stars.forEach(s => s.style.setProperty('--fill', parseInt(s.dataset.val) <= val ? '100%' : '0%'));
+    });
+    star.addEventListener('mouseleave', () => {
+      stars.forEach(s => {
+        const f = Math.min(100, Math.max(0, (rows[idx].rating - (parseInt(s.dataset.val)-1)) * 100));
+        s.style.setProperty('--fill', f + '%');
+      });
+    });
+    star.addEventListener('click', e => {
+      e.stopPropagation();
+      rows[idx].rating = val;
+      starsWrap.innerHTML = buildInteractiveStarRating(idx, val);
+      initIslandStars(starsWrap, idx);
+      fetch(APPS_SCRIPT_URL, {method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({row:rows[idx].excelRow,type:rows[idx].type,description:rows[idx].description,rating:val})
+      }).catch(()=>{});
+    });
+  });
+}
+
 function initStarInteraction(idx) {
   const container = document.querySelector('#mStars .star-interactive');
   if (!container) return;
@@ -516,6 +592,65 @@ function initStarInteraction(idx) {
   });
 }
 
+async function saveNote(idx, note) {
+  rows[idx].note = note;
+  // sync editable inputs (modal / panel)
+  document.querySelectorAll('[data-note-idx="'+idx+'"]').forEach(el => {
+    if (document.activeElement === el) return;
+    if (el.tagName === 'TEXTAREA') { if (el.value !== note) el.value = note; }
+    else { if (el.textContent !== note) el.textContent = note; }
+  });
+  // sync read-only display on wall card
+  const card = document.querySelector('.card[data-idx="'+idx+'"]');
+  if (card) {
+    let disp = card.querySelector('.card-note-display');
+    if (note) {
+      if (!disp) { disp=document.createElement('div'); disp.className='card-note-display'; card.appendChild(disp); }
+      disp.textContent = note;
+    } else if (disp) {
+      disp.remove();
+    }
+  }
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({row: rows[idx].excelRow, type: rows[idx].type, description: rows[idx].description, note})
+    });
+  } catch(e) { console.error('Note save failed:', e); }
+}
+
+function makeNoteInput(idx, tagName, extraClass) {
+  const note = rows[idx] ? (rows[idx].note || '') : '';
+  let el;
+  if (tagName === 'textarea') {
+    el = document.createElement('textarea');
+    el.className = extraClass;
+    el.placeholder = 'Bir yorum yaz...';
+    el.value = note;
+    el.rows = 2;
+  } else {
+    el = document.createElement('div');
+    el.className = extraClass;
+    el.contentEditable = 'true';
+    el.dataset.ph = 'Bir yorum yaz...';
+    el.textContent = note;
+  }
+  el.dataset.noteIdx = idx;
+  const commit = () => {
+    const val = tagName === 'textarea' ? el.value.trim() : el.textContent.trim();
+    if (val !== (rows[idx].note || '')) saveNote(idx, val);
+  };
+  el.addEventListener('blur', commit);
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+    e.stopPropagation(); // don't trigger modal nav
+  });
+  el.addEventListener('click', e => e.stopPropagation());
+  el.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+  return el;
+}
+
 async function saveRating(idx, rating) {
   rows[idx].rating = rating;
   document.getElementById('mStars').innerHTML = buildInteractiveStarRating(idx, rating);
@@ -532,9 +667,147 @@ let mapAllItems = [];
 let panX = 0, panY = 0, scale = 1;
 let isPanning = false, panSX, panSY, panOX, panOY;
 
+// ── THUMBNAIL URL TRANSFORM ───────────────────────────────────
+// Pinterest CDN: get 236x thumbnail instead of originals/736x (10-50x smaller file & decoded bitmap)
+function thumbUrl(url) {
+  if (!url) return url;
+  if (url.includes('pinimg.com')) {
+    return url.replace(/\/(originals|736x|564x|474x|600x|1200x|750x)\//g, '/236x/');
+  }
+  return url;
+}
+
+// ── BATCH IMAGE LOADER + MEMORY MANAGER ──────────────────────
+let _mapImagesReady = false;
+let _cullerTimer    = null;
+
+function startBatchLoad() {
+  const loader = document.getElementById('mapLoader');
+  const bar    = document.getElementById('loader-bar');
+  const txt    = document.getElementById('loaderText');
+  const isMob  = window.innerWidth < 768;
+  // Mobile: 2 parallel, 120ms pause — keeps decoded bitmap count low per tick
+  // Desktop: 8 parallel, 20ms pause
+  const BATCH  = isMob ? 2 : 8;
+  const PAUSE  = isMob ? 120 : 20;
+
+  const queue = [];
+  mapAllItems.forEach(item => {
+    const img = item.el.querySelector('img');
+    if (img && img.dataset.src) queue.push(img);
+  });
+
+  const total = queue.length;
+  if (!total) { finishLoad(loader); return; }
+
+  if (bar) bar.style.width = '0%';
+  let done = 0;
+
+  function updProg() {
+    const pct = Math.round((done / total) * 100);
+    if (bar)  bar.style.width = pct + '%';
+    if (txt)  txt.textContent = pct + '%  (' + done + ' / ' + total + ')';
+  }
+
+  function loadBatch(i) {
+    if (i >= total) { finishLoad(loader); return; }
+    const slice = queue.slice(i, i + BATCH);
+    let pending = slice.length;
+    const next = () => { if (--pending === 0) setTimeout(() => loadBatch(i + BATCH), PAUSE); };
+    slice.forEach(img => {
+      const src = img.dataset.src;
+      if (!src) { done++; updProg(); next(); return; }
+      delete img.dataset.src;               // mark as "loading/loaded"
+      img.addEventListener('load',  () => { done++; updProg(); next(); }, {once:true});
+      img.addEventListener('error', () => { done++; updProg(); next(); }, {once:true});
+      img.src = src;
+    });
+  }
+  loadBatch(0);
+}
+
+function finishLoad(loader) {
+  _mapImagesReady = true;
+  const bar = document.getElementById('loader-bar');
+  const txt = document.getElementById('loaderText');
+  if (bar) bar.style.width = '100%';
+  if (txt) txt.textContent = 'Hazır!';
+  // Start memory culler on mobile after a short delay
+  if (window.innerWidth < 768) {
+    setTimeout(startMemoryCuller, 3000);
+  }
+  setTimeout(() => {
+    if (!loader) return;
+    loader.classList.add('fade-out');
+    setTimeout(() => { loader.style.display = 'none'; loader.classList.remove('fade-out'); }, 520);
+  }, 400);
+}
+
+// ── MEMORY CULLER (mobile only) ───────────────────────────────
+// After loading, periodically evict decoded bitmaps that are far from viewport.
+// Brings them back when user pans near them.
+function startMemoryCuller() {
+  if (_cullerTimer) return;
+  _cullerTimer = setInterval(runMemoryCuller, 5000);
+}
+
+function runMemoryCuller() {
+  if (!mapBuilt) return;
+  const VW = window.innerWidth, VH = window.innerHeight;
+  const EVICT_DIST = Math.max(VW, VH) * 3;   // world-space px
+  const LOAD_DIST  = Math.max(VW, VH) * 1.8;
+  mapAllItems.forEach(item => {
+    const el = item.el;
+    if (el.style.display === 'none') return;
+    const img = el.querySelector('img');
+    if (!img) return;
+    const cx = parseFloat(el.style.left) + (parseFloat(el.style.width)  || 80) / 2;
+    const cy = parseFloat(el.style.top)  + (parseFloat(el.style.height) || 100) / 2;
+    // screen distance from viewport centre
+    const sx = cx * scale + panX - VW / 2;
+    const sy = cy * scale + panY - VH / 2;
+    const dist = Math.hypot(sx, sy);
+    if (dist > EVICT_DIST && img.src && !img.dataset.src) {
+      // Evict: store src back in data-src, clear src to free decoded bitmap
+      img.dataset.src = img.src;
+      img.src = '';
+      delete img.dataset.triedOrig; // allow retry on reload
+    } else if (dist < LOAD_DIST && !img.src && img.dataset.src) {
+      // Reload on approach
+      const s = img.dataset.src; delete img.dataset.src; img.src = s;
+    }
+  });
+}
+
+// ── VIEWPORT RELOAD (after pan/zoom — reloads evicted images) ─
+function updateMapVisibility() {
+  if (!mapBuilt) return;
+  const VW = window.innerWidth, VH = window.innerHeight;
+  const BUFFER = window.innerWidth < 768 ? 300 : 600;
+  mapAllItems.forEach(item => {
+    const el = item.el;
+    if (el.style.display === 'none') return;
+    const img = el.querySelector('img');
+    if (!img || !img.dataset.src) return;   // nothing pending
+    const curX = parseFloat(el.style.left);
+    const curY = parseFloat(el.style.top);
+    const iw   = parseFloat(el.style.width)  || 80;
+    const ih   = parseFloat(el.style.height) || 100;
+    const sx = curX * scale + panX;
+    const sy = curY * scale + panY;
+    if (sx + iw * scale > -BUFFER && sx < VW + BUFFER &&
+        sy + ih * scale > -BUFFER && sy < VH + BUFFER) {
+      const s = img.dataset.src; delete img.dataset.src; img.src = s;
+    }
+  });
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
   try {
+    const loaderBar = document.getElementById('loader-bar');
+    const loaderText = document.getElementById('loaderText');
+    if (loaderBar) loaderBar.style.width = '15%';
     const res = await fetch(GVIZ);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
@@ -546,31 +819,36 @@ async function init() {
     for (let i = 0; i < tableRows.length; i++) {
       const row = tableRows[i];
       const c = (row.c||[]).map(x => x&&x.v!=null ? String(x.v) : '');
-      const imgUrl = (c[0]||'').trim();
+      const imgUrl = (c[1]||'').trim();
       if (!imgUrl) continue;
       rows.push({
+        refNo:        (c[0]||'').trim(),
         imgUrl,
-        color:        (c[2]||'').trim(),
-        pinterestUrl: (c[3]||'').trim(),
-        type:         (c[4]||'').trim(),
-        description:  (c[5]||'').trim(),
-        rating:       parseFloat((c[6]||'').replace(',','.')) || 0,
+        color:        (c[3]||'').trim(),
+        pinterestUrl: (c[4]||'').trim(),
+        type:         (c[5]||'').trim(),
+        description:  (c[6]||'').trim(),
+        rating:       parseFloat((c[7]||'').replace(',','.')) || 0,
+        note:         (c[8]||'').trim(),
         excelRow:     i + 10
       });
     }
 
     visibleIdx = rows.map((_,i)=>i);
+    if (loaderText) loaderText.textContent = rows.length + ' görsel bulundu, harita kuruluyor...';
+    if (loaderBar)  loaderBar.style.width = '10%';
     renderFilters();
     renderMasonry();
     document.body.classList.add('has-data');
     setStatus('ready', `${rows.length} images`);
-    buildMap();
+    buildMap(); // startBatchLoad() is called inside buildMap, handles 0→100%
   } catch(e) {
     setStatus('error','Failed to load');
-    document.getElementById('mapLoader').innerHTML =
+    const ml = document.getElementById('mapLoader');
+    ml.innerHTML =
       `<div style="text-align:center;padding:40px 20px">
-        <p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;margin-bottom:12px">Error: ${e.message}</p>
-        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(176,168,144,.4);letter-spacing:.06em">Make sure the Google Sheet is set to<br>"Anyone with the link can view"</p>
+        <p style="color:var(--burgundy);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;margin-bottom:12px">Hata: ${e.message}</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(176,168,144,.4);letter-spacing:.06em">Google Sheet "Herkese açık" ayarında olmalı.<br><br><button onclick="location.reload()" style="background:var(--copper);border:none;color:var(--black);font-family:'IBM Plex Mono',monospace;font-size:10px;padding:8px 18px;cursor:pointer;letter-spacing:.1em">Yeniden Dene</button></p>
       </div>`;
   }
 }
@@ -633,23 +911,38 @@ function renderMasonry() {
     const ov = document.createElement('div'); ov.className='card-overlay';
     const metaRow = document.createElement('div'); metaRow.className='card-meta-row';
     if (row.color) { const d=document.createElement('div'); d.className='card-color'; d.style.background=row.color; metaRow.appendChild(d); }
-    if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; metaRow.appendChild(s); }
+    if (row.type)  { const s=document.createElement('span'); s.className='card-type'; s.textContent=row.type; if(row.refNo){const r=document.createElement('span');r.className='card-ref';r.textContent=' ('+row.refNo+')';s.appendChild(r);} metaRow.appendChild(s); }
     ov.appendChild(metaRow);
     wrap.appendChild(img); wrap.appendChild(ov); card.appendChild(wrap);
     if (row.description) { const desc=document.createElement('div'); desc.className='card-desc'; desc.textContent=row.description; card.appendChild(desc); }
+    // Note: read-only on wall — only show if has content, edit only from modal/panel
+    if (row.note) { const n=document.createElement('div'); n.className='card-note-display'; n.textContent=row.note; card.appendChild(n); }
     m.appendChild(card);
   });
 }
 
-let _sizeVal = 5;
+let _cols = 5;
 function changeSizeStep(dir) {
-  _sizeVal = Math.min(9, Math.max(1, _sizeVal + dir));
+  _cols = Math.min(15, Math.max(1, _cols + dir));
   const el = document.getElementById('sizeDisplay');
-  if (el) el.textContent = _sizeVal;
-  applySize(_sizeVal);
+  if (el) el.textContent = _cols;
+  // Only sync slider when it's visible (desktop); touching it on mobile can steal focus
+  if (window.innerWidth >= 768) {
+    const sl = document.getElementById('colSlider');
+    if (sl) sl.value = _cols;
+  }
+  applySize(_cols);
+  if (window.getSelection) window.getSelection().removeAllRanges();
+  const ae = document.activeElement;
+  if (ae && ae !== document.body) ae.blur();
 }
-function applySize(v) {
-  const cols = 10 - parseInt(v);
+function applyColSlider(val) {
+  _cols = parseInt(val);
+  const el = document.getElementById('sizeDisplay');
+  if (el) el.textContent = _cols;
+  applySize(_cols);
+}
+function applySize(cols) {
   document.getElementById('masonry').style.columnCount = cols;
   document.documentElement.style.setProperty('--desc-font-size', Math.max(10, Math.round(80/cols)) + 'px');
 }
@@ -673,9 +966,9 @@ function buildMap() {
 
   const types=[...new Set(rows.map(r=>r.type).filter(Boolean))];
   const ungrouped=rows.filter(r=>!r.type);
-  const WORLD_W = isMobile ? 800 : 3400;
-  const WORLD_H = isMobile ? Math.max(types.length * 420, 1800) : 2600;
-  const cols = isMobile ? 1 : Math.ceil(Math.sqrt(types.length||1));
+  const WORLD_W = isMobile ? 1800 : 4200;
+  const WORLD_H = isMobile ? Math.max(Math.ceil((types.length||1)/2) * 520, 1800) : 3200;
+  const cols = isMobile ? 2 : Math.ceil(Math.sqrt(types.length||1));
   const rcount=Math.ceil((types.length||1)/cols);
   const cellW=WORLD_W/cols, cellH=WORLD_H/rcount;
 
@@ -687,29 +980,71 @@ function buildMap() {
   const allItems=[];
 
   function placeCluster(group, cx, cy) {
-    const n=group.length;
-    // Desktop: daire içi yerleşim — her küme kendi dairesinde, tam örtüşme yok
     const placedRects=[];
-    // Daire yarıçapı: desktopta daha geniş (0.46), mobilde hücre boyutuna göre
-    const circR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
-    // İtemler arası minimum boşluk (desktop daha büyük)
-    const GAP=isMobile?2:8;
+    const n=group.length;
+    const baseR=Math.min(cellW,cellH)*(isMobile?0.40:0.46);
+    const circR=Math.min(baseR*Math.sqrt(Math.max(1,n/8)), Math.min(cellW,cellH)*0.49);
+
+    // Label dead-zone (cluster title area)
+    const LW=isMobile?200:380, LH=isMobile?90:150;
+    const LX=cx-LW/2, LY=cy-LH-30;
+
+    // ── Sunflower / Phyllotaxis spiral slots ──────────────────
+    // sqrt(frac) gives uniform-area density → no center clustering
+    // Shuffled → random look. Jitter → organic feel.
+    const GOLDEN=Math.PI*(3-Math.sqrt(5)); // ≈ 2.3998 rad
+    const slots=[];
+    for(let i=0;i<n;i++){
+      slots.push({ r: circR*0.87*Math.sqrt((i+0.5)/n), a: i*GOLDEN });
+    }
+    // Fisher-Yates shuffle
+    for(let i=slots.length-1;i>0;i--){
+      const j=Math.floor(rng()*(i+1));
+      const tmp=slots[i]; slots[i]=slots[j]; slots[j]=tmp;
+    }
+
     group.forEach((row,j)=>{
       const gi=rows.indexOf(row);
       const sr=rng();
-      const w=isMobile?(sr<.12?70:sr<.38?50:36):(sr<.12?120:sr<.38?85:58);
-      const h=isMobile?(sr<.12?93:sr<.38?67:48):(sr<.12?160:sr<.38?112:77);
-      // Mobil ve desktop için aynı daire algoritması
-      let ix=cx-w/2, iy=cy-h/2;
-      for(let att=0;att<80;att++){
-        const a=rng()*Math.PI*2;
-        const d=Math.sqrt(rng())*Math.max(0,circR-Math.max(w,h)*0.6);
-        const tx=cx+Math.cos(a)*d-w/2, ty=cy+Math.sin(a)*d-h/2;
-        // Hiçbir mevcut itemle GAP'ten fazla örtüşme olmasın
-        if(!placedRects.some(r=>
-          tx<r.x+r.w+GAP&&tx+w+GAP>r.x&&ty<r.y+r.h+GAP&&ty+h+GAP>r.y
-        )){ix=tx;iy=ty;break;}
+      const w=isMobile?(sr<.12?56:sr<.38?40:28):(sr<.12?120:sr<.38?85:58);
+      const h=isMobile?(sr<.12?75:sr<.38?53:37):(sr<.12?160:sr<.38?112:77);
+      const maxR=Math.max(0,circR-Math.max(w,h)*0.55);
+
+      const slot=slots[j%slots.length];
+      // Small jitter — organic without losing even spread
+      const jR=(rng()-.5)*circR*0.07;
+      const jA=(rng()-.5)*0.28;
+      const r=Math.max(circR*0.08, Math.min(slot.r+jR, maxR));
+      const a=slot.a+jA;
+      let ix=cx+Math.cos(a)*r-w/2;
+      let iy=cy+Math.sin(a)*r-h/2;
+
+      // Push out of label dead-zone (deflect angle)
+      if(ix<LX+LW&&ix+w>LX&&iy<LY+LH&&iy+h>LY){
+        const pa=a+Math.PI*(0.35+rng()*0.3);
+        const pr=Math.min(Math.max(r, circR*0.35), maxR);
+        ix=cx+Math.cos(pa)*pr-w/2;
+        iy=cy+Math.sin(pa)*pr-h/2;
+        // clamp to circle
+        const d=Math.hypot(ix+w/2-cx,iy+h/2-cy);
+        if(d>maxR){const sc=maxR/d;ix=cx+(ix+w/2-cx)*sc-w/2;iy=cy+(iy+h/2-cy)*sc-h/2;}
       }
+
+      // Resolve >30% overlap: push away from conflicting rects
+      const MAX_OV=Math.floor(Math.min(w,h)*0.30);
+      for(let att=0;att<16;att++){
+        const conf=placedRects.find(r=>
+          ix<r.x+r.w-MAX_OV&&ix+w-MAX_OV>r.x&&iy<r.y+r.h-MAX_OV&&iy+h-MAX_OV>r.y
+        );
+        if(!conf) break;
+        const da=Math.atan2(iy+h/2-(conf.y+conf.h/2), ix+w/2-(conf.x+conf.w/2));
+        const nudge=Math.max(w,h)*0.38;
+        ix+=Math.cos(da)*nudge; iy+=Math.sin(da)*nudge;
+        // keep in circle
+        const d=Math.hypot(ix+w/2-cx,iy+h/2-cy);
+        if(d>maxR){const sc=maxR/d;ix=cx+(ix+w/2-cx)*sc-w/2;iy=cy+(iy+h/2-cy)*sc-h/2;}
+      }
+
       placedRects.push({x:ix,y:iy,w,h});
       const rot=(rng()-.5)*6;
 
@@ -720,11 +1055,24 @@ function buildMap() {
 
       const inner=document.createElement('div'); inner.className='map-island-inner';
       const img=document.createElement('img');
-      img.src=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.loading='lazy'; img.draggable=false;
-      img.onerror=()=>{ inner.style.background=row.color||'var(--dim)'; img.remove(); };
+      img.dataset.src=thumbUrl(row.imgUrl); img.dataset.origSrc=row.imgUrl; img.referrerPolicy='no-referrer'; img.alt=''; img.draggable=false; img.decoding='async';
+      // placeholder colour while loading
+      inner.style.background=row.color||'var(--dim)';
+      img.onerror=()=>{
+        // thumb failed → try original URL once; if that also fails, hide
+        if (!img.dataset.triedOrig && img.dataset.origSrc && img.src !== img.dataset.origSrc) {
+          img.dataset.triedOrig='1'; img.src=img.dataset.origSrc;
+        } else { inner.style.background=row.color||'var(--dim)'; img.style.display='none'; }
+      };
       inner.appendChild(img);
+      const bottomBar=document.createElement('div'); bottomBar.className='map-island-bottom';
+      const starsWrap=document.createElement('div'); starsWrap.className='map-stars';
+      starsWrap.innerHTML=buildStarRating(row.rating);
+      bottomBar.appendChild(starsWrap);
       const hl=document.createElement('div'); hl.className='map-island-hlabel'; hl.textContent=row.type||'';
-      inner.appendChild(hl); island.appendChild(inner);
+      bottomBar.appendChild(hl);
+      inner.appendChild(bottomBar);
+      island.appendChild(inner);
 
       if (!isMobile) {
         // Desktop: drag to reposition, click (no move) to open modal
@@ -761,7 +1109,9 @@ function buildMap() {
         island.addEventListener('mouseenter', ()=>{
           const r=parseFloat(island.dataset.currentRot);
           island.style.transform=`rotate(${r+10}deg)`;
-          document.getElementById('ttType').textContent=row.type||'';
+          const ttEl=document.getElementById('ttType');
+          ttEl.textContent=row.type||'';
+          if (row.refNo) { const rs=document.createElement('span'); rs.className='tt-ref'; rs.textContent=' ('+row.refNo+')'; ttEl.appendChild(rs); }
           document.getElementById('ttDesc').textContent=row.description||'';
           if (row.type||row.description) document.getElementById('mapTooltip').classList.add('visible');
         });
@@ -835,9 +1185,10 @@ function buildMap() {
     ? 'tap to open · drag to pan · pinch to zoom'
     : 'scroll to zoom · drag canvas to pan · drag image to move · click to open';
 
-  document.getElementById('mapLoader').style.display='none';
   mapBuilt=true;
   applyStarFilterToMap();
+  // Batch-load all images, keep loader visible until 100% done
+  startBatchLoad();
 
   const view=document.getElementById('mapView');
 
@@ -849,6 +1200,7 @@ function buildMap() {
       if (e.target.closest('.map-ui-btn')||e.target.closest('.cluster-panel')||e.target.closest('.map-cluster-aciklama-btn')) return;
       e.preventDefault();
       view.setPointerCapture(e.pointerId);
+      view.classList.add('panning');
       activePtrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (activePtrs.size === 2) {
         isPanning = false;
@@ -862,6 +1214,9 @@ function buildMap() {
         isPanning=true; panSX=e.clientX; panSY=e.clientY; panOX=panX; panOY=panY;
       }
     }, {passive:false});
+    let _rafId=null, _visRafId=null;
+    const scheduleVisibility=()=>{ if(_visRafId) return; _visRafId=requestAnimationFrame(()=>{ _visRafId=null; updateMapVisibility(); }); };
+    const scheduleTransform=()=>{ if(_rafId) return; _rafId=requestAnimationFrame(()=>{ _rafId=null; applyTransform(); scheduleVisibility(); }); };
     view.addEventListener('pointermove', e=>{
       if (!activePtrs.has(e.pointerId)) return;
       e.preventDefault();
@@ -872,15 +1227,15 @@ function buildMap() {
         const ns=Math.min(Math.max(pinchState.scale*(curDist/pinchState.dist), 0.05), 5);
         panX=pinchState.midX-(pinchState.midX-pinchState.panX)*(ns/pinchState.scale);
         panY=pinchState.midY-(pinchState.midY-pinchState.panY)*(ns/pinchState.scale);
-        scale=ns; applyTransform();
+        scale=ns; scheduleTransform();
       } else if (isPanning) {
-        panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+        panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); scheduleTransform();
       }
     }, {passive:false});
     const releaseMobile=e=>{
       activePtrs.delete(e.pointerId);
       if (activePtrs.size < 2) pinchState=null;
-      if (activePtrs.size === 0) { isPanning=false; }
+      if (activePtrs.size === 0) { isPanning=false; view.classList.remove('panning'); }
     };
     view.addEventListener('pointerup', releaseMobile);
     view.addEventListener('pointercancel', releaseMobile);
@@ -892,11 +1247,13 @@ function buildMap() {
       view.setPointerCapture(e.pointerId);
       view.style.cursor='grabbing';
     });
+    let _deskVisTimer=null;
+    const scheduleDesktopVisibility=()=>{ clearTimeout(_deskVisTimer); _deskVisTimer=setTimeout(updateMapVisibility,60); };
     view.addEventListener('pointermove', e=>{
       if (!isPanning) return;
-      panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform();
+      panX=panOX+(e.clientX-panSX); panY=panOY+(e.clientY-panSY); applyTransform(); scheduleDesktopVisibility();
     });
-    view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; });
+    view.addEventListener('pointerup', ()=>{ isPanning=false; view.style.cursor=''; updateMapVisibility(); });
     view.addEventListener('pointercancel', ()=>{ isPanning=false; view.style.cursor=''; });
     view.addEventListener('wheel', e=>{
       if (e.target.closest('.cluster-panel')) return;
@@ -906,32 +1263,58 @@ function buildMap() {
       const rect=view.getBoundingClientRect();
       const mx=e.clientX-rect.left, my=e.clientY-rect.top;
       panX=mx-(mx-panX)*(ns/scale); panY=my-(my-panY)*(ns/scale);
-      scale=ns; applyTransform();
+      scale=ns; applyTransform(); scheduleDesktopVisibility();
     },{passive:false});
   }
 }
 
 function openMap() {
+  // Flush any focused input/button so iOS doesn't carry keyboard into pano mode
+  const ae = document.activeElement;
+  if (ae && ae !== document.body) ae.blur();
+  if (window.getSelection) window.getSelection().removeAllRanges();
+  closeMobileNav();
   document.getElementById('galleryWrap').style.display='none';
   document.getElementById('mapView').style.display='block';
   document.getElementById('commentToggleWrap').style.display='none';
   document.getElementById('sizeSliderWrap').style.display='none';
   document.body.classList.remove('gallery-mode');
   document.body.style.overflow='hidden';
-  if (!mapBuilt && rows.length) buildMap();
+  const firstBuild = !mapBuilt;
+  if (!mapBuilt && rows.length) {
+    const loader=document.getElementById('mapLoader');
+    loader.style.display='flex'; loader.style.opacity='1'; loader.classList.remove('fade-out');
+    _mapImagesReady=false;
+    buildMap();
+  } else if (mapBuilt && !_mapImagesReady) {
+    // still loading — loader already visible, nothing to do
+  }
+  if (firstBuild && window.innerWidth < 768) requestAnimationFrame(fitMap);
+  // Resume memory culler on mobile if images are already loaded
+  if (window.innerWidth < 768 && _mapImagesReady && !_cullerTimer) startMemoryCuller();
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = 'Duvar';
 }
 
 function closeMap() {
+  // Pause memory culler while in gallery mode
+  if (_cullerTimer) { clearInterval(_cullerTimer); _cullerTimer = null; }
   document.getElementById('mapView').style.display='none';
   document.getElementById('galleryWrap').style.display='';
   document.getElementById('commentToggleWrap').style.display='flex';
   document.getElementById('sizeSliderWrap').style.display='flex';
   document.body.classList.add('gallery-mode');
+  document.body.classList.remove('header-hidden');
   document.body.style.overflow='';
   const tb = document.getElementById('modeToggleBtn');
   if (tb) tb.textContent = '⊕ Pano';
+  // Mobilde masonry 2 sütun default
+  if (window.innerWidth < 768) {
+    _cols = 2;
+    const sd = document.getElementById('sizeDisplay');
+    if (sd) sd.textContent = 2;
+    applySize(2);
+  }
   requestAnimationFrame(updateGalleryPadding);
 }
 
@@ -953,6 +1336,25 @@ function updateGalleryPadding() {
   if (!header || !gallery) return;
   gallery.style.paddingTop = header.offsetHeight + 'px';
 }
+
+// ── MOBILE NAV POPUP ──────────────────────────────────────────
+function toggleMobileNav() {
+  const popup = document.getElementById('mobileNavPopup');
+  const btn   = document.getElementById('mobileNavBtn');
+  const open  = popup.classList.toggle('open');
+  btn.classList.toggle('active', open);
+  if (open) popup.style.top = document.getElementById('siteHeader').offsetHeight + 'px';
+}
+function closeMobileNav() {
+  document.getElementById('mobileNavPopup').classList.remove('open');
+  document.getElementById('mobileNavBtn').classList.remove('active');
+}
+document.addEventListener('click', e => {
+  const popup = document.getElementById('mobileNavPopup');
+  if (!popup.classList.contains('open')) return;
+  const btn = document.getElementById('mobileNavBtn');
+  if (!popup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) closeMobileNav();
+}, {passive:true});
 
 // ── SHUFFLE ───────────────────────────────────────────────────
 function toggleShuffle() {
@@ -1001,8 +1403,12 @@ function openModal(idx) {
   else { dot.style.display='none'; hex.textContent=''; }
   document.getElementById('mStars').innerHTML = buildInteractiveStarRating(idx, row.rating);
   initStarInteraction(idx);
-  document.getElementById('mTitle').textContent=row.type||'';
+  document.getElementById('mRefNo').textContent = row.refNo || '';
   document.getElementById('mDesc').textContent=row.description||'';
+  // Editable note in modal
+  const noteWrap=document.getElementById('mNoteWrap');
+  noteWrap.innerHTML='';
+  noteWrap.appendChild(makeNoteInput(idx,'textarea','modal-note'));
   const lnk=document.getElementById('mLink');
   if (row.pinterestUrl){ lnk.href=row.pinterestUrl; lnk.style.display='flex'; }
   else lnk.style.display='none';
@@ -1037,13 +1443,32 @@ document.addEventListener('keydown', e=>{
     if (e.key==='ArrowLeft') navModal(-1);
     if (e.key==='ArrowRight') navModal(1);
   } else {
-    if (e.key==='Escape') { closeOzet(); closeRapor(); closeYaklasim(); }
+    if (e.key==='Escape') { closeRapor(); closeYaklasim(); }
   }
 });
 
 document.getElementById('modal').addEventListener('click', e=>{
   if (e.target===document.getElementById('modal')) closeModal();
 });
+
+// Modal swipe navigation (mobile)
+(function(){
+  const m = document.getElementById('modal');
+  let sx = 0, sy = 0;
+  m.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, {passive:true});
+  m.addEventListener('touchend', e => {
+    if (!m.classList.contains('open')) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      navModal(dx < 0 ? 1 : -1);
+    }
+  }, {passive:true});
+})();
 
 document.getElementById('commentToggle').addEventListener('change', function(){
   document.body.classList.toggle('show-comments', this.checked);
@@ -1060,8 +1485,7 @@ document.addEventListener('touchmove', e => {
 init();
 window.addEventListener('resize', updateGalleryPadding);
 
-function openOzet(){document.getElementById('ozetOverlay').classList.add('open');document.body.style.overflow='hidden'}
-function closeOzet(){document.getElementById('ozetOverlay').classList.remove('open');document.body.style.overflow=''}
+
 
 // ── YAKLAŞIM ───────────────────────────────────────────────────
 let yaklasimLoaded = false;
@@ -1071,10 +1495,9 @@ function openYaklasim() {
   if (!yaklasimLoaded) {
     const content = document.getElementById('yaklasimContent');
     content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:40px 0">Yükleniyor...</div>';
-    fetch(RAPOR_BASE + 'ozet.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { content.innerHTML = result.value; yaklasimLoaded = true; })
+    fetch(RAPOR_BASE + 'ozet.txt')
+      .then(r => r.text())
+      .then(txt => { content.innerHTML = txtToHtml(txt); yaklasimLoaded = true; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
 }
@@ -1109,10 +1532,9 @@ function switchRaporTab(key) {
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; return; }
   content.innerHTML = '<div id="raporLoading">Yükleniyor...</div>';
   if (key === 'EDETRI_Bolum2_AnaCerceve') {
-    fetch(RAPOR_BASE + key + '.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; })
+    fetch(RAPOR_BASE + 'rapor_anacerceve.txt')
+      .then(r => r.text())
+      .then(txt => { const html=txtToHtml(txt); raporLoadedTabs[key]=html; content.innerHTML=html; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   } else {
     fetch(RAPOR_BASE + key + '.txt')
@@ -1150,10 +1572,9 @@ function openYaklasimPanel(anchorEl) {
     clusterPanelCache[KEY] = panel;
     document.getElementById('mapView').appendChild(panel);
     const content = panel.querySelector('.cp-content');
-    fetch(RAPOR_BASE + 'ozet.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { content.innerHTML = result.value; })
+    fetch(RAPOR_BASE + 'ozet.txt')
+      .then(r => r.text())
+      .then(txt => { content.innerHTML = txtToHtml(txt); })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper)">Dosya yüklenemedi.</p>'; });
   }
   const panel = clusterPanelCache[KEY];
@@ -1197,7 +1618,6 @@ function openMapImagePanel(gi) {
   panel.style.top    = Math.max(10, (window.innerHeight - h) / 2 + oy) + 'px';
   panel.style.display = 'flex';
   panel.style.zIndex = nextPanelZ();
-  positionMipStars(panel);
 }
 function _createMapImagePanel(gi) {
   const row = rows[gi];
@@ -1205,9 +1625,9 @@ function _createMapImagePanel(gi) {
   panel.className = 'cluster-panel map-image-panel';
   panel.style.display = 'none';
   panel.innerHTML =
-    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + '</span><button class="cp-close">✕</button></div>' +
-    '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer">' + (row.rating ? '<div class="mip-stars">' + buildStarRating(row.rating) + '</div>' : '') + '</div>' +
-    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div></div>' +
+    '<div class="cp-titlebar"><span class="cp-title">' + (row.type||'') + (row.refNo?' <span class="cp-ref">('+row.refNo+')</span>':'') + '</span><button class="cp-close">✕</button></div>' +
+    '<div class="mip-img-wrap"><img class="mip-img" src="' + (row.imgUrl||'') + '" alt="" referrerpolicy="no-referrer"></div>' +
+    '<div class="mip-info"><div class="mip-desc">' + (row.description||'') + '</div><div class="mip-stars">' + buildInteractiveStarRating(gi, row.rating||0) + '</div><div class="mip-note-slot"></div></div>' +
     '<div class="cp-resize cp-resize-n"></div><div class="cp-resize cp-resize-ne"></div>' +
     '<div class="cp-resize cp-resize-e"></div><div class="cp-resize cp-resize-se"></div>' +
     '<div class="cp-resize cp-resize-s"></div><div class="cp-resize cp-resize-sw"></div>' +
@@ -1216,7 +1636,42 @@ function _createMapImagePanel(gi) {
   panel.addEventListener('pointerdown', e => { e.stopPropagation(); panel.style.zIndex = nextPanelZ(); });
   setupPanelDrag(panel);
   setupPanelResize(panel);
+  initMipPanelStars(panel, gi);
+  const noteSlot = panel.querySelector('.mip-note-slot');
+  if (noteSlot) noteSlot.appendChild(makeNoteInput(gi, 'textarea', 'mip-note'));
   return panel;
+}
+
+function initMipPanelStars(panel, gi) {
+  const mipStars = panel.querySelector('.mip-stars');
+  if (!mipStars) return;
+  const container = mipStars.querySelector('.star-interactive');
+  if (!container) return;
+  const stars = [...container.querySelectorAll('.star')];
+  stars.forEach(star => {
+    const val = parseInt(star.dataset.val);
+    star.addEventListener('mouseenter', () => {
+      stars.forEach(s => s.style.setProperty('--fill', parseInt(s.dataset.val) <= val ? '100%' : '0%'));
+    });
+    star.addEventListener('mouseleave', () => {
+      stars.forEach(s => {
+        const f = Math.min(100, Math.max(0, (rows[gi].rating - (parseInt(s.dataset.val) - 1)) * 100));
+        s.style.setProperty('--fill', f + '%');
+      });
+    });
+    star.addEventListener('click', async () => {
+      rows[gi].rating = val;
+      mipStars.innerHTML = buildInteractiveStarRating(gi, val);
+      initMipPanelStars(panel, gi);
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'text/plain;charset=utf-8'},
+          body: JSON.stringify({row: rows[gi].excelRow, type: rows[gi].type, description: rows[gi].description, rating: val})
+        });
+      } catch(e) {}
+    });
+  });
 }
 
 // ── CLUSTER PANELS (per-cluster floating docx windows) ─────────
@@ -1282,10 +1737,9 @@ function loadClusterPanel(key, panel) {
   if (raporLoadedTabs[key]) { content.innerHTML = raporLoadedTabs[key]; content.dataset.loaded = '1'; return; }
   content.innerHTML = '<div style="color:var(--silver);font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.1em;padding:20px 0">Yükleniyor...</div>';
   if (key === 'EDETRI_Bolum2_AnaCerceve') {
-    fetch(RAPOR_BASE + key + '.docx')
-      .then(r => r.arrayBuffer())
-      .then(buf => mammoth.convertToHtml({arrayBuffer: buf}))
-      .then(result => { raporLoadedTabs[key] = result.value; content.innerHTML = result.value; content.dataset.loaded = '1'; })
+    fetch(RAPOR_BASE + 'rapor_anacerceve.txt')
+      .then(r => r.text())
+      .then(txt => { const html=txtToHtml(txt); raporLoadedTabs[key]=html; content.innerHTML=html; content.dataset.loaded='1'; })
       .catch(() => { content.innerHTML = '<p style="color:var(--copper);padding:20px 0">Dosya yüklenemedi.</p>'; });
   } else {
     fetch(RAPOR_BASE + key + '.txt')
@@ -1333,7 +1787,7 @@ function setupPanelResize(panel) {
   });
 }
 
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeOzet();closeRapor();closeYaklasim();} });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeRapor();closeYaklasim();} });
 
 // ── STAR FILTER ────────────────────────────────────────────────
 function applyStarFilterToMap() {
@@ -1367,7 +1821,7 @@ function fitMap() {
   const stage = document.getElementById('mapStage');
   stage.style.transition = 'transform .5s cubic-bezier(.25,.46,.45,.94)';
   applyTransform();
-  setTimeout(() => { stage.style.transition = ''; }, 520);
+  setTimeout(() => { stage.style.transition = ''; updateMapVisibility(); }, 520);
 }
 
 function positionMipStars(panel) {
@@ -1436,41 +1890,10 @@ document.addEventListener('mousedown', e => {
 });
 </script>
 
-<!-- ÖZET OVERLAY -->
-<div id="ozetOverlay" onclick="if(event.target===this)closeOzet()">
-  <button id="ozetClose" onclick="closeOzet()">✕</button>
-  <div id="ozetInner">
-    <div id="ozetContent" class="doc-content">
-      <h2>Kürasyon Bilançosu</h2>
-      <h3>Genel Tanım</h3>
-      <p>Bu kürasyon bir estetik manifesto değil, bir malzeme düşüncesi. Her kategori aslında aynı soruyu farklı ölçeklerde soruyor: bir şey kendi doğasından koptuğunda ne olur? Kumaş taşıdığında, metal aktığında, masa giyindiğinde, bardak kirlendiğinde — o kopuş anı nedir?</p>
-      <h3>İskelet</h3>
-      <h3>Birinci eksen: Dönüşüm</h3>
-      <p>Kürasyon boyunca en çok tekrarlayan hareket şu — bir malzeme başka bir malzemenin dilini konuşuyor. Kumaş metal gibi duruyor, metal kumaş gibi akıyor, taş cam gibi davranıyor. Bu sadece estetik bir gözlem değil, bir üretim mantığı. "Bakteri × endüstri", "zanaat ve arsızlık" gibi notlar bu eksenin en net ifadesi. Dönüşüm burada bir süsleme değil, varoluş biçimi.</p>
-      <h3>İkinci eksen: Kontrol ve bırakma arasındaki gerilim</h3>
-      <p>Kürasyon iki uç arasında sürekli gidip geliyor. Bir yanda "kontrollü kaos", "ana referans" denen görseller — düzenli ama asla tam düzenli değil. Öte yanda "çok layerlı, o kadar layerlı ki kendinden çıkmış" diye reddedilen görseller. İstenen şey bu ikisi arasındaki eşik — ne tam kontrol ne tam bırakış. "Kontrollü bir dünyada kumaşların flörtözlük ve yaşanmışlık eklemesi" notu bu eksenin tam ortasını tarif ediyor.</p>
-      <h3>Üçüncü eksen: Ölçek kayması</h3>
-      <p>Kürasyon büyük mimari jestlerden (tepeden sarkıtılan kumaşlar, koolhaas bölünmeleri) çok küçük anlamlara (tabi arasındaki bardak, bulaşıktaki kirli kadeh) gidiyor. Ve en güçlü notlar çoğunlukla küçük ölçekte. "Küçük ölçekte de çalışabilecek bir fikir", "tek noktadan vurulmalı ve o nokta her şeyi tanımlıyor" — bu kürasyon büyük jesti reddederken küçük jesti yüceltiyor.</p>
-      <h3>Kategorilerin Birbiriyle İlişkisi</h3>
-      <p>Drape sahneyi kuruyor — dış kabuk, mekânın dili.<br>Metal kumaş ilişkisi malzemenin kendisini kuruyor — iç dönüşüm, maddenin dili.<br>Sergi platform bu ikisinin taşıyıcısını kuruyor — strüktür, iskelet.<br>Yaşanmışlık hepsinin sonrasına bakıyor — kullanım izi, zamanın dili.<br>Mekan bunların hepsinin içinde yaşadığı atmosferi kuruyor.<br>Editöryel bu sistemi nasıl göstereceğini soruyor — temsil, görsel dil.<br>Booklet ise bu sistemi nasıl taşıyacağını soruyor — kalıcılık, nesne olarak belge.</p>
-      <p>Bu yedi kategori aslında tek bir sorunun yedi farklı katmanı: EDETRI bir sahne kurarken neye bakıyor, neyle bakıyor, ne bırakıyor?</p>
-      <h3>Reddiyeler Sistemi</h3>
-      <p>Kürasyon neyi istediği kadar neyi istemediği konusunda da çok net. "Hayır", "bizlik değil", "fazla vintage", "fazla flörtöz", "alakasız", "fazla hightech" — bu reddiyeler rastgele değil, bir sınır çiziyor.</p>
-      <p>Red edilen şeyler üç grupta toplanıyor:</p>
-      <ul>
-        <li>Çok temiz olanlar — steril, simetrik, tam düzenli. Yaşanmamış.</li>
-        <li>Çok kaotik olanlar — "kendinden çıkmış", efekt objeyi yutmuş, mesaj kaybolmuş.</li>
-        <li>Yanlış referans taşıyanlar — fazla vintage, fazla hightech, fazla moda, yanlış çağrışım alanı.</li>
-      </ul>
-      
-    </div>
-  </div>
-</div>
-
 <!-- RAPOR OVERLAY -->
 <div id="raporOverlay" onclick="if(event.target===this)closeRapor()">
-  <button id="raporClose" onclick="closeRapor()">✕</button>
   <div id="raporInner">
+  <button id="raporClose" onclick="closeRapor()">✕</button>
     <div id="raporTabs"></div>
     <div id="raporContent" class="doc-content"></div>
   </div>
@@ -1478,8 +1901,8 @@ document.addEventListener('mousedown', e => {
 
 <!-- YAKLAŞIM OVERLAY -->
 <div id="yaklasimOverlay" onclick="if(event.target===this)closeYaklasim()">
-  <button id="yaklasimClose" onclick="closeYaklasim()">✕</button>
   <div id="yaklasimInner">
+  <button id="yaklasimClose" onclick="closeYaklasim()">✕</button>
     <div id="yaklasimContent" class="doc-content"></div>
   </div>
 </div>
